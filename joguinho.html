@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title> Teste </title>
+  <link rel="stylesheet" href="joguinho.css">
+</head>
+
+<body>
+  <b style="font-size: 30px" title="Só um joguinho mesmo"> Joguinhu :) </b>
+  <div id="dialogo"></div>
+  <div id="continuar" title="">__Continuar</div>
+  <div class="resposta">
+    <input id="inputResposta" autocomplete="off" type="text" placeholder="Enter para continuar...">
+    <button class="botoes" id="btnNorte">Norte</button>
+    <button class="botoes" id="btnOeste">Oeste</button>
+    <button class="botoes" id="btnLeste">Leste</button>
+    <button class="botoes" id="btnSul">Sul</button>
+  </div>
+  <div class="resposta">
+    <button class="botoesSN" id="btnSim">Sim</button>
+    <button class="botoesSN" id="btnNao">Não</button>
+  </div>
+  <div class="resposta">
+    <button id="btnNenhuma">Cancelar</button>
+  </div>
+  <div class="resposta">
+    <button class="botoesAcao" id="btnAtacar">Atacar</button>
+    <button class="botoesAcao" id="btnDefender">Defender</button>
+    <button class="botoesAcao" id="btnPoderoso">Atq. poderoso</button>
+    <button class="botoesAcao" id="btnItens">Itens/magia</button>
+  </div>
+  <div class="resposta">
+    <button class="botoesAtq" id="btnSoquinho" title="[1d3 de dano]">Soquinho
+    </button>
+    <button class="botoesAtq" id="btnArma">[Sem arma]</button>
+    <button class="botoesAtq" id="btnArmaMag">Atq. mágico</button>
+  </div>
+  <div class="resposta" id="respAtqPoderoso"></div>
+  <div id="turnoBicho">
+    <span>Turno da criatura 
+      <div class="pontinho">.</div>
+      <div class="pontinho">.</div>
+      <div class="pontinho">.</div>
+    </span>
+  </div>
+  <div class="infos">
+    <div id="contexto">
+      <div class="inputInfos" id="iContexto"></div>
+      <div id="turno"></div>
+      <span id="ultimaEscolha"></span>
+      <span id="ultimaAndada"></span>
+      <span id="ultimoEvento"></span>
+      <span id="ultimoEventoVida"></span>
+    </div>
+    <div id="ficha">
+      <div class="inputInfos" id="iFicha">
+        <div class="flexRow">
+          <div class="atributos" title="A prerícia de força serve para ataques corpo-a-corpo">Força: 0</div>
+          <div class="flexRow">
+            <div class="btnMais">+</div>
+            <div class="btnMenos">-</div>
+          </div>
+        </div>
+        <div class="flexRow">
+          <div class="atributos" title="A defesa passiva se incia em 5 e aumenta 5 a cada ponto">Defesa: 0</div>
+          <div class="flexRow">
+            <div class="btnMais">+</div>
+            <div class="btnMenos">-</div>
+          </div>
+        </div>
+        <div class="flexRow">
+          <div class="atributos" title="A perícia de mágica serve para lhe dar proficiência em ataques mágicos">Inteligência: 0</div>
+          <div class="flexRow">
+            <div class="btnMais">+</div>
+            <div class="btnMenos">-</div>
+          </div>
+        </div>
+        <div class="flexRow">
+          <div class="atributos" title="Pontos de vigor servem para resistir a ataques mágicos e condições">Vigor: 0</div>
+          <div class="flexRow">
+            <div class="btnMais">+</div>
+            <div class="btnMenos">-</div>
+          </div>
+        </div>
+        <div class="flexRow">
+          <div class="atributos" title="Pontos de agilidade servem para iniciativas e recuo">Agilidade: 0</div>
+          <div class="flexRow">
+            <div class="btnMais">+</div>
+            <div class="btnMenos">-</div>
+          </div>
+        </div>
+        <div class="flexRow">
+          <div class="atributos" title="Quanto mais sorte, melhores itens apareceram">Sorte: 0</div>
+          <div class="flexRow">
+            <div class="btnMais">+</div>
+            <div class="btnMenos">-</div>
+          </div>
+        </div>
+      </div>
+      <div class="fichaNivel">
+        <div id="nivel">Nível: 0</div>
+        <div title="Sabia que os golfinhos desligam metade do cérebro para não precisar dormir?">
+          |
+        </div>
+        <div id="pontos" title="Suba de nível e ganhará pontinhos para destribuir entre suas pericias :)">
+          Pontos: 0
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hud">
+    <div class="barras">
+      <div class="progress-bar" id="barraVida" title="Aqui está sua barra de vida, vai dar um problemão se ela zarar em..."></div>
+      <div class="progress-bar" id="barraMana" title="Aqui está sua barra de mana, use mana para fazer brigadeiro, brincadeira, se contente só em praticar magias."></div>
+    </div>
+    <div id="textoCondicao">
+      <div>Condição:</div>
+      <div id="condicao">NORMAL</div>
+    </div>
+    <div class="inventario">
+      <div class="inv" id="inv1">[vazio]
+        <div class="hover">
+          <div class="img-hover-border">
+            <img class="hover-img" id="img-content1"/>
+          </div>
+          <div id="div-content1">content</div>
+        </div>
+      </div>
+      <div class="inv" id="inv2">[vazio]
+        <div class="hover">
+          <div class="img-hover-border">
+            <img class="hover-img" id="img-content2"/>
+          </div>
+          <div id="div-content2">content</div>
+        </div>
+      </div>
+      <div class="inv" id="inv3">[vazio]
+        <div class="hover">
+          <div class="img-hover-border">
+            <img class="hover-img" id="img-content3"/>
+          </div>
+          <div id="div-content3">content</div>
+        </div>
+      </div>
+      <div class="inv" id="inv4">[vazio]
+        <div class="hover">
+          <div class="img-hover-border">
+            <img class="hover-img" id="img-content4"/>
+          </div>
+          <div id="div-content4">content</div>
+        </div>
+      </div>
+      <div class="inv" id="inv5">[vazio]
+        <div class="hover">
+          <div class="img-hover-border">
+            <img class="hover-img" id="img-content5"/>
+          </div>
+          <div id="div-content5">content</div>
+        </div>
+      </div>
+    </div>
+    <div class="magias">
+      <div class="mag mag-atq" id="mag1">[vazio]</div>
+      <div class="mag mag-atq" id="mag2">[vazio]</div>
+      <div class="mag mag-sup" id="mag3">[vazio]</div>
+      <div class="mag mag-sup" id="mag4">[vazio]</div>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="joguinho.js"></script>
+
+</html>
