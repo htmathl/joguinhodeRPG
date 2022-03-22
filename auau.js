@@ -1,4 +1,4 @@
-var url = "https://docs.python-requests.org/pt_BR/latest/user/quickstart.html";//Sua URL
+var url = "https://docs.python-requests.org/pt_BR/latest/user/quickstart.html";
 
 var xhttp = new XMLHttpRequest();
 xhttp.open("GET", url, false);
