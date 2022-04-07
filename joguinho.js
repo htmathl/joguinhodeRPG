@@ -1283,10 +1283,8 @@ function iniciarTurnoOp() {
 
 function escolherMapa() {
 
-    //aleatorizar();
+    aleatorizar();
     console.log(mapaEscolhido);
-
-    mapaEscolhido = 1;
 
     recuperarAtributosViajante();
 
