@@ -123,31 +123,48 @@ function definirCondicao() {
             break;
         case 'CONGELAMENTO':
             condicao.style.setProperty('color', '#78B6E6');
+            condicao.removeAttribute('title');
             condicao.setAttribute('title', '1.A cada rodada, você rolará um teste de vigor, se falhar, perderá seu turno. \n2.Você terá -10 em qualquer teste com agilidade.');
             break;
         case 'EM CHAMAS':
             condicao.style.setProperty('color', '#C71639');
-            condicao.setAttribute('title', '1.A cada rodada, você rolará um teste de vigor, se falhar, perderá 1d8 de vida. \n2.A cada rodada, você terá -2 em quaisquer teste de força.');
+            condicao.removeAttribute('title');
+            condicao.setAttribute('title', '1.A cada rodada, você rolará um teste de vigor, se falhar, perderá 1d8 de vida. \n2.A cada rodada, você terá -1 a cada rodada em quaisquer teste de força, sendo o máximo de -10 pontos.');
             break;
         case 'ENVENENAMENTO':
             condicao.style.setProperty('color', '#8CF201');
-            condicao.setAttribute('title', 'A cada rodada, você rolará um teste de vigor, se falhar, você perderá entre 1d3 e 1d6+3 de vida.');
+            condicao.removeAttribute('title');
+            condicao.setAttribute('title', 'A cada rodada, você rolará um teste de vigor, inversamente proporcional ao valor você perderá entre 1d3 e 1d6+3 de vida.');
             break;
         case 'EM MALDIÇÃO':
             condicao.style.setProperty('color', '#5A1846');
+            condicao.removeAttribute('title');
             condicao.setAttribute('title', 'A cada rodada, você rolará um teste de vigor, se falhar, você perderá entre 1d3 e 1d6+3% de mana.');
             break;
         case 'FRAQUEZA':
             condicao.style.setProperty('color', '#FF5733');
+            condicao.removeAttribute('title');
             condicao.setAttribute('title', 'A cada rodada, você rolará um teste de vigor, se falhar, você perderá 1 dado de força.');
             break;
-        case 'EM PARALIZIA':
+        case 'EM PARALISIA':
             condicao.style.setProperty('color', '#FFC300');
-            condicao.setAttribute('title', 'A cada rodada, você terá 50% de chance de perder seu turno.');
+            condicao.removeAttribute('title');
+            condicao.setAttribute('title', '1.A cada rodada, você rolará um teste de vigor, se falhar, você perderá seu turno. \n2.Você não pode fazer ataques furtivos. \n3.Sua ação sempre será a última.');
             break;
         case 'VULNERÁVEL':
             condicao.style.setProperty('color', '#000');
-            condicao.setAttribute('title', 'A cada rodada, você rolará um teste de vigor, se falhar, você tomará o dobro de dano fisíco e ganhará 1 dado de defesa, fica a dica ;)');
+            condicao.removeAttribute('title');
+            condicao.setAttribute('title', '1.A cada rodada, você rolará um teste de vigor, se falhar, você tomará o dobro de dano fisíco e ganhará 1 dado de defesa, fica a dica ;)');
+            break;
+        case 'CONFUSÃO':
+            condicao.style.setProperty('color', '' ); //a decidir
+            condicao.removeAttribute('title');
+            condicao.setAttribute('title', 'A cada rodada você terá 50% de chance de errar ataques mágicos');
+            break;
+        case 'CANSAÇO':
+            condicao.style.setProperty('color', '');
+            condicao.removeAttribute('title');
+            condicao.setAttribute('title', '1.Você não pode fazer testes de vigor e terá -5 em testes de agilidade. \n2.Esta condição tem prioridade e se encerrará quando você tentar se defender.');
             break;
         default:
             break;
@@ -464,7 +481,7 @@ let m22 = {
     descricao: 'descrição de uma magia 2',
 };
 
-// ---------------- bichos ----------------
+// ---------------- bichos ---------------- 
 
 let m31 = {
     indice: '31',
@@ -1391,6 +1408,7 @@ function escolherMapa() {
             
             let testeAgi = rolarAcerto('Agilidade'), testeAgiOp = rolarAcertoOponente('agilidade');
             while(testeAgiOp == testeAgi) {
+                //ao invés de rolar de novo, colocar quem tem a agilidade maior, caso for igual rola de novo
                 testeAgi = rolarAcerto('Agilidade');
                 testeAgiOp = rolarAcertoOponente('agilidade');
             }
