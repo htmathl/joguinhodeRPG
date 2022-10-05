@@ -114,7 +114,7 @@ window.setInterval(() => {
 
 }, 500);
 
-// --------------- explicação da condição --------------
+// @follow-up --------------- explicação da condição -------------- 
 
 function definirCondicao() {
     switch(condicao.innerText) {
@@ -240,6 +240,7 @@ function definirIntro() {
         definirVida();
         definirMana();
         // limparInvGri(); <- por enquanto
+        contexto.append('A luz da lua irradia pela a fresta sobre sua cabeças, o ambiente está gelado, você consegue ver algo escrito na parede em sua frente.');
     }
 
     btnContinuar.addEventListener('click', () => {
@@ -301,7 +302,7 @@ function resposta() {
 
 resposta();
 
-// mapas
+// @follow-up mapas
 // ---------------- eventos aleatórios ----------------
 
 let m01 = {
@@ -532,6 +533,8 @@ let m41 = {
 //mapa com magias = 2
 //mapa com monstro = 3
 //mapa com boss = 4
+
+//@follow-up funcoes
 
 function aleatorizar() {
 
@@ -807,6 +810,7 @@ var _ataqueViajante = function(e) {
                     if(mana > 0)
                         progressbarMana.style.setProperty('--progress', mana);
                     else {
+                        // @todo arrumar (pra arma também)
                         contexto.append('Não tem mana \n\n');
                         contexto.scrollTop = contexto.scrollHeight;
                         
@@ -896,6 +900,7 @@ var _ataqueViajante = function(e) {
                 btnNenhum.removeEventListener('click', _nenhuma);
                 btnNenhum.addEventListener('click', _cancelar,);
             } else {
+                // @todo arrumar (bloquear botao da magia (talvez não de pra colocar nesse bloco) ) (tirar a variavel magiaSemMana, após isso)
                 contexto.append('Não tem mana fi da puta');
                 contexto.scrollTop = contexto.scrollHeight;
                 magiaSemMana = true;
@@ -1150,6 +1155,8 @@ function opcaoCaminhar(){
 
 }
 
+//@follow-up batalha
+
 function rolarAtaqueFurtivo() {
     let testeAgi = rolarAcerto('Agilidade'),
     testeIntOp = rolarAcertoOponente('inteligencia');
@@ -1297,6 +1304,8 @@ function iniciarTurnoOp() {
         ataqueOponente();
     }, 4000);
 }
+
+//@follow-up definir o que rolou
 
 function escolherMapa() {
 
