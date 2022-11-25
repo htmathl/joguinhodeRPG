@@ -77,19 +77,20 @@ window.setInterval(() => {
 }, 300);
 
 window.setInterval(() => {
-    if(pontinhos[0].style.display == 'inline') {
-        if(pontinhos[1].style.display == 'inline') {
-            if(pontinhos[2].style.display == 'inline') {
-                pontinhos[0].style.display = 'none';
-                pontinhos[1].style.display = 'none';
-                pontinhos[2].style.display = 'none';
-            } else
-                pontinhos[2].style.display = 'inline';
-        } else
-            pontinhos[1].style.display = 'inline';
-    } else
-        pontinhos[0].style.display = 'inline';
-}, 500);
+     //@todo colocar esse intervalo pra valer só quando o turno bicho tiver na tela
+     if(pontinhos[0].style.display == 'inline') {
+         if(pontinhos[1].style.display == 'inline') {
+             if(pontinhos[2].style.display == 'inline') {
+                 pontinhos[0].style.display = 'none';
+                 pontinhos[1].style.display = 'none';
+                 pontinhos[2].style.display = 'none';
+             } else
+                 pontinhos[2].style.display = 'inline';
+         } else
+             pontinhos[1].style.display = 'inline';
+     } else
+         pontinhos[0].style.display = 'inline';
+ }, 500);
 
 function recuperarBtns() {
     btnsAndar = document.querySelectorAll('.botoes');
@@ -140,7 +141,7 @@ class jogin {
     #usos = [];
     #nome;
     #atributos = { 
-        forca: 1,
+        forca: 0,
         vigor: 0,
         inteligencia: 0,
         defesa: 0,
@@ -176,6 +177,7 @@ class jogin {
         mag4: {
         },
     };
+    #numeroArmas;
     #critico = false;
     #furtivo;
     #validarEspecial;
@@ -186,10 +188,17 @@ class jogin {
     #acumuloAtqPod = 0;
     #acumuloManaPod = 0;
     #contagemTurno = 0;
-    
 
-    // @follow-up mapas
-    // ---------------- eventos  ----------------
+    //@todo rever os atributos dos bichos e tudo mias
+    //@todo rever o bonus dos negocios ( +15 para 4 dados me parece muito ) ( pode ser tipo a cada numero impar ou par aumentar o bonus )
+    //@todo se tirar 1 (mesmo que ataque magico) colocar desastre (acontece algo ruim);
+   
+    // @follow-up -------------- eventos ---------------
+    //mapa com evento aleatório = 0
+    //mapa com item = 1
+    //mapa com magias = 2
+    //mapa com monstro = 3
+    //mapa com boss = 4
     #eventos = [
         // ---------------- eventos aleatórios ----------------
         {
@@ -421,8 +430,8 @@ class jogin {
             tipo: 'atq',
             descricao: 'descrição de uma magia 1',
             efeito: () => {
-                ultimoEvento.condicao = 'AMALDICOADO';
-                return rolarDados('d10', 1);
+                this.#ultimoEvento.condicao = 'AMALDICOADO';
+                return this.#rolarDados('d10', 1);
             },
             gastoMana: 5,
             bonusCrt: 1,
@@ -485,19 +494,13 @@ class jogin {
         },
     ];
     
-    //mapa com evento aleatório = 0
-    //mapa com item = 1
-    //mapa com magias = 2
-    //mapa com monstro = 3
-    //mapa com boss = 4
-
     constructor() {
         this.#definirIntro();
         this.#definirCondicao();
     }
 
     //@follow-up --------------------- estilos -------------------------
-    #changeButtonAppear(ctx) {
+    #mudarVisibilidadeBotoes(ctx) {
         recuperarBtns();
         let botoes = [ btnsAndar, btnsAcao, btnsSN, btnsAtq ];
         botoes.forEach(e => {
@@ -624,6 +627,19 @@ class jogin {
         });
     }
 
+    escreverContexto(texto) {
+        contexto.append(texto);
+        contexto.scrollTop = contexto.scrollHeight;
+    }
+
+    inserirHtmlContexto(elemento, texto) {
+        const elementoCriado = document.createElement(elemento);
+        elementoCriado.innerText = `${texto} \n\n`;
+        elementoCriado.style.setProperty('text-decoration', 'underline');
+        contexto.appendChild(elementoCriado);
+        contexto.scrollTop = contexto.scrollHeight;
+    }
+
     // @follow-up --------------- explicação da condição -------------- 
     #definirCondicao() {
         switch(condicao.innerText) {
@@ -684,7 +700,7 @@ class jogin {
         return this.#atributos[atributo];
     }
 
-    //@follow-up ---------------- calcular dados ------------------
+    //@follow-up ---------------- calcular dados e funções  ------------------
     #aleatorizar() {
         const chance = Math.floor(Math.random() * 500);
         if(chance <= 180)
@@ -697,70 +713,6 @@ class jogin {
             this.#mapaEscolhido = 3;
         if(chance > 450)
             this.#mapaEscolhido = 4;
-    }
-
-    #danoSofrido(dano) {
-        return Math.floor((dano * 100) / this.#pontosVida);
-    }
-
-    #dano() {
-        this.#vida -= this.#danoSofrido(this.#ultimoEvento.dano());
-        progressbarVida.style.setProperty('--progress', this.#vida);
-        contexto.append(this.#ultimoEvento.nome + ', ' + this.#ultimoEvento.textoAtaques[Math.floor(Math.random() * (this.#ultimoEvento.textoAtaques.length))] + '\n\n');
-        contexto.scrollTop = contexto.scrollHeight;
-    }
-    
-    #manaGasta(mana) {
-        return Math.floor((mana * 100) / this.#pontosMana);
-    }
-
-    escreverContexto(texto) {
-        contexto.append(texto);
-        contexto.scrollTop = contexto.scrollHeight;
-    }
-
-    inserirHtmlContexto(elemento, texto) {
-        const elementoCriado = document.createElement(elemento);
-        elementoCriado.innerText = `${texto} \n\n`;
-        elementoCriado.style.setProperty('text-decoration', 'underline');
-        contexto.appendChild(elementoCriado);
-        contexto.scrollTop = contexto.scrollHeight;
-    }
-
-    #magicasAtq = (e) => {
-        e.currentTarget.innerText = this.#ultimoEvento.nome;
-        e.currentTarget.setAttribute('title', this.#ultimoEvento.descricao);
-        for( let i = 0; i < 2; i++ )
-            if( magAtq[i].innerText == this.#ultimoEvento.nome )
-                this.#magiasAtuais['mag' + (i+1)] = this.#ultimoEvento;
-        mag.forEach((mag) => {
-            mag.removeEventListener('click', this.#magicasAtq);
-        });
-        dialogo.innerText = 'Pra onde você quer ir?';
-        this.#opcaoCaminhar();
-    }
-    
-    #magicasSup = (e) => {
-        e.currentTarget.innerText = this.#ultimoEvento.nome;
-        e.currentTarget.setAttribute('title', this.#ultimoEvento.descricao);
-        for( let i = 0; i < 2; i++ )
-            if( magSup[i].innerText == this.#ultimoEvento.nome )
-                this.#magiasAtuais['mag' + (i+3)] = this.#ultimoEvento;
-        mag.forEach((mag) => {
-            mag.removeEventListener('click', this.#magicasSup);
-        });
-        dialogo.innerText = 'Pra onde você quer ir?';
-        this.#opcaoCaminhar();
-    }
-
-    #nenhuma = () => {
-        dialogo.innerText = `Pra onde você quer ir?`;
-        mag.forEach((mag) => {
-            mag.removeEventListener('click', this.#magicasAtq);
-            mag.removeEventListener('click', this.#magicasSup);
-        });
-        btnNenhum.removeEventListener('click', this.#nenhuma);
-        this.#opcaoCaminhar();
     }
 
     #rolarDados(tipoDados, qntDados) {
@@ -842,15 +794,67 @@ class jogin {
         return this.#rolarDados('d20', (this.#recuperarAtributos(atributo) + 1));
     }
 
+    #danoSofrido(dano) {
+        return Math.floor((dano * 100) / this.#pontosVida);
+    }
+
+    #dano() {
+        this.#vida -= this.#danoSofrido(this.#ultimoEvento.dano());
+        progressbarVida.style.setProperty('--progress', this.#vida);
+        contexto.append(this.#ultimoEvento.nome + ', ' + this.#ultimoEvento.textoAtaques[Math.floor(Math.random() * (this.#ultimoEvento.textoAtaques.length))] + '\n\n');
+        contexto.scrollTop = contexto.scrollHeight;
+    }
+    
+    #manaGasta(mana) {
+        return Math.floor((mana * 100) / this.#pontosMana);
+    }
+
     #eventoUpar() {
         //@todo balancear
         if(this.#experiencia >= (100*this.#nivel))
             lvl.innerText = 'Nível: ' + (parseInt(lvl.innerText.split(':')[1].trim()) + 1);
     }
 
-    //@follow-up batalha
-    #iniciarBatalha() {
+    //@follow-up ----------------- adicionar magias ao inv --------------
 
+    #magicasAtq = (e) => {
+        e.currentTarget.innerText = this.#ultimoEvento.nome;
+        e.currentTarget.setAttribute('title', this.#ultimoEvento.descricao);
+        for( let i = 0; i < 2; i++ )
+            if( magAtq[i].innerText == this.#ultimoEvento.nome )
+                this.#magiasAtuais['mag' + (i+1)] = this.#ultimoEvento;
+        mag.forEach((mag) => {
+            mag.removeEventListener('click', this.#magicasAtq);
+        });
+        dialogo.innerText = 'Pra onde você quer ir?';
+        this.#opcaoCaminhar();
+    }
+    
+    #magicasSup = (e) => {
+        e.currentTarget.innerText = this.#ultimoEvento.nome;
+        e.currentTarget.setAttribute('title', this.#ultimoEvento.descricao);
+        for( let i = 0; i < 2; i++ )
+            if( magSup[i].innerText == this.#ultimoEvento.nome )
+                this.#magiasAtuais['mag' + (i+3)] = this.#ultimoEvento;
+        mag.forEach((mag) => {
+            mag.removeEventListener('click', this.#magicasSup);
+        });
+        dialogo.innerText = 'Pra onde você quer ir?';
+        this.#opcaoCaminhar();
+    }
+
+    #nenhuma = () => {
+        dialogo.innerText = `Pra onde você quer ir?`;
+        mag.forEach((mag) => {
+            mag.removeEventListener('click', this.#magicasAtq);
+            mag.removeEventListener('click', this.#magicasSup);
+        });
+        btnNenhum.removeEventListener('click', this.#nenhuma);
+        this.#opcaoCaminhar();
+    }
+
+    //@follow-up ------------------ batalha -------------------------
+    #iniciarBatalha() {
         if(!this.magiaSemMana) {
             this.#contagemTurno ++;
             turno.innerText = `Turno: ${this.#contagemTurno}`;
@@ -858,8 +862,8 @@ class jogin {
     
         console.log('somadano: ' + this.#somaDano);
         this.#validarEspecial = false;
-        if(this.#recuperarAtributos('nivel') > 0) {
-            this.#contadorDano = 50 * (this.#recuperarAtributos('nivel'));
+        if(this.#nivel > 0) {
+            this.#contadorDano = 50 * (this.#nivel);
             console.log('contador dano: ' + this.#contadorDano);
             if(this.#vida <= 45 && this.#somaDano >= this.#contadorDano)
                 this.#validarEspecial = true;
@@ -876,7 +880,7 @@ class jogin {
         
         this.#magiaSemMana = false;
     
-        this.#changeButtonAppear(1);
+        this.#mudarVisibilidadeBotoes(1);
 
         btnsAcao.forEach((btnsAcao) => {
             btnsAcao.removeEventListener('click', this.#acoes);
@@ -893,10 +897,10 @@ class jogin {
     #iniciarTurnoOp() {
         this.#contagemTurno = -1;
         this.#contagemTurno ++;
-        this.#changeButtonAppear(5);
+        this.#mudarVisibilidadeBotoes(5);
         setTimeout(() => {
             this.#ataqueOponente();
-        }, 2500);
+        }, 3000);
     }
 
     #acoes = (e) => {
@@ -909,18 +913,30 @@ class jogin {
     
         switch(e.currentTarget.innerText) {
             case 'Atacar':
-                if(inv[0].innerText == '[vazio]') {
+                if( Object.keys( this.#inventario['slot1'] ) != 0 || Object.keys( this.#inventario['slot2'] ) != 0 ) {
+                    btnsAtq[1].disabled = false;
+                    btnsAtq[1].innerText = 'Atq. Armado';
+                    this.#numeroArmas = 0;
+                    //arma corpo-a-corpo
+                    if(  Object.keys( this.#inventario['slot2'] ) == 0 ) {
+                        btnsAtq[1].innerText = inv[0].innerText;
+                        btnsAtq[1].setAttribute('title', this.#inventario['slot1'].descricao);
+                        this.#numeroArmas = 1;
+                    }
+                    //arma a distancia
+                    if( Object.keys( this.#inventario['slot1'] ) == 0 ) {
+                        btnsAtq[1].innerText = inv[1].innerText;
+                        btnsAtq[1].setAttribute('title', this.#inventario['slot2'].descricao); 
+                        this.#numeroArmas = 2
+                    }
+                } else {
                     btnsAtq[1].disabled = true;
                     btnsAtq[1].setAttribute('title', 'Você não possui uma arma, tente dar um soquinho :)');
-                } else {
-                    btnsAtq[1].disabled = false;
-                    btnsAtq[1].innerText = inv[0].innerText;
-                    //@todo colocar depois pra arma a distancia tbm
-                    btnsAtq[1].setAttribute('title', this.#inventario['slot1'].descricao);
                 }
     
                 btnsAtq[2].disabled = true;
                 btnsAtq[2].setAttribute('title', 'Você não possui magias, tente dar um soquinho :)');
+
                 if(this.#acumuloAtqPod != 0)
                     btnsAtq[2].setAttribute('title', 'Não da pra usar o ataque poderoso com ataques mágicos :(');
                 else {
@@ -1104,7 +1120,7 @@ class jogin {
                             this.#acumuloAtqPod = 0;
                             this.#acumuloManaPod = 0;
     
-                            this.#changeButtonAppear(5);
+                            this.#mudarVisibilidadeBotoes(5);
                             
                             this.#somaDano += vidaTirada;
                             setTimeout(() => {
@@ -1135,6 +1151,7 @@ class jogin {
                 if(ultimoEvento.vida <= 0) {
                     contexto.append('Com um golpe fatal, você arranca a cabeça desta criatura. \n\n');
                     //@todo colocar cada vez menos chance de encontrar o bicho que ja matou
+                    //@todo verficar o que esta repitindo nos switch para otimizar (morte) (tirar furtivo) ...
                     ultimoEvento.vida = this.#ultimoEventoVida;
                     this.#usos = [];
                     turno.innerText = '';
@@ -1146,7 +1163,7 @@ class jogin {
                     this.#eventoUpar();
                     this.#opcaoCaminhar();
                 } else {
-                    this.#changeButtonAppear(5);
+                    this.#mudarVisibilidadeBotoes(5);
                     this.#somaDano += vidaTirada;
                     setTimeout(() =>{
                         this.#ataqueOponente();
@@ -1154,21 +1171,36 @@ class jogin {
                 }
                 break;
             case 'Atq. mágico':
-                if(mana > 0) {
+                if(this.#mana > 0) {
                     //tirar modo furtivo
                     this.#furtivo = false;
                     btnsAcao.forEach((btnAcao) => {
                         if(btnAcao.innerText == 'Atacar') {
-                            btnAcao.style.setProperty('color', '#767676');
+                            btnAcao.style.setProperty('color', 'white');
                         }
                     });
     
-                    this.#changeButtonAppear(4);
+                    this.#mudarVisibilidadeBotoes(4);
 
                     magAtq.forEach(magAtq => {
                         if(magAtq.innerText != '[vazio]')
                             magAtq.addEventListener('click', this.#atacarMagia);
                     });
+
+                     //@todo tirar do front isso (ctr +f em [vazio]) pra mudar todos
+                    let i = 0; 
+                    for( let key in this.#magiasAtuais ) {
+                        var magia = this.#magiasAtuais[key];
+                        if( Object.keys( magia ) != 0 && i < 2 )
+                            magAtq[i].addEventListener('click', this.#atacarMagia);
+                        i++;
+                    }
+
+                    for (let i = 0; i < magAtq.length; i++) {
+                        const magia = this.#magiasAtuais[ 'mag' + (i+1) ];
+                        if( Object.keys( magia ) != 0 )
+                            magAtq[i].addEventListener('click', this.#atacarMagia);
+                    }
 
                     btnNenhum.removeEventListener('click', this.#nenhuma);
                     btnNenhum.addEventListener('click', this._cancelar);
@@ -1181,8 +1213,9 @@ class jogin {
                     this.#iniciarBatalha();
                 }
                 break;
-            case armaAtual.nome:
-    
+            case 'Atq. armado':
+
+                //esse codigo n serve pra essa opção
                 if(ultimoEvento.defesa != 0)
                     defesaPassiva = ((ultimoEvento.defesa + 1) * defesaPassiva) + 5;
     
@@ -1243,31 +1276,26 @@ class jogin {
         let vidaTirada = 0,
         testeInt = this._rolarAcerto('inteligencia');
         let ultimoEvento = this.#ultimoEvento;
-        console.log(this.#magiasAtuais);
         for( var key in this.#magiasAtuais ) {
             if (!this.#magiasAtuais.hasOwnProperty(key)) continue;
 
-            let obj = this.#magiasAtuais[key];
-            for( var prop in obj) {
-                if (!obj.hasOwnProperty(prop)) continue;
-
-                if(e.currentTarget.innerText == prop.nome ) {
-                    if (this.#critico)
-                        vidaTirada += this.#rolarDados('d6', (sorte + prop.bonusCrt));
-                    //bonus inteligência
-                    vidaTirada += this.#rolarDados('d3', (this.#atributos['inteligencia']+1));
-                    if(this._rolarAcertoOponente('vigor') <= testeInt) {
-                        vidaTirada += prop.efeito();
-                        ultimoEvento.vida -= vidaTirada;
-                    } else {
-                        vidaTirada += prop.efeito();
-                        vidaTirada = Math.floor(vidaTirada / 2);
-                        ultimoEvento.vida -= vidaTirada;
-                    }
-                    this.#mana -= this.#manaGasta(prop.gastoMana);
-                    progressbarMana.style.setProperty('--progress', this.#mana);
+            let magia = this.#magiasAtuais[key];
+            if( magia.nome == e.currentTarget.innerText ) {
+                if (this.#critico)
+                vidaTirada += this.#rolarDados('d6', (sorte + magia.bonusCrt));
+                //bonus inteligência
+                vidaTirada += this.#rolarDados('d3', (this.#atributos['inteligencia']+1));
+                if(this._rolarAcertoOponente('vigor') <= testeInt) {
+                    vidaTirada += magia.efeito();
+                    ultimoEvento.vida -= vidaTirada;
+                } else {
+                    vidaTirada += magia.efeito();
+                    vidaTirada = Math.floor(vidaTirada / 2);
+                    ultimoEvento.vida -= vidaTirada;
                 }
-            }
+                this.#mana -= this.#manaGasta(magia.gastoMana);
+                progressbarMana.style.setProperty('--progress', this.#mana);
+             }
         }
 
         contexto.append(`Você acerta sua magia com ${testeInt}, tirando ${vidaTirada} de vida. \n\n`);
@@ -1279,7 +1307,7 @@ class jogin {
         });
 
         if(ultimoEvento.vida <= 0) {
-            //@todo colocar esse trecho em uma função ja se repete muitas vezes (menos o contexto)
+            //@todo colocar esse trecho em uma função ja se repete muitas vezes (menos o contexto) // tem outro todo falando isso tbm
             contexto.append('Em uma explosão de mana, você oblitera esta criatura. \n\n');
             ultimoEvento.vida = this.#ultimoEventoVida;
             this.#usos = [];
@@ -1288,7 +1316,7 @@ class jogin {
             this.#somaDano = 0;
             this.#opcaoCaminhar();
         } else {
-            this.#changeButtonAppear(5);
+            this.#mudarVisibilidadeBotoes(5);
             this.#somaDano += vidaTirada;
             setTimeout(() => {
                 this.#ataqueOponente();
@@ -1300,20 +1328,19 @@ class jogin {
         mag.forEach(mag => {
             mag.removeEventListener('click', this.#atacarMagia);
         });
-        this.#changeButtonAppear(3);
+        this.#mudarVisibilidadeBotoes(3);
         btnNenhum.removeEventListener('click', this._cancelar);
     }
 
+    //@follow-up -------------- definir o que rolou ------------------
     #eventoAndar = (e) => {
         this.#ultimoLugar = e.currentTarget.innerText.toLowerCase();
         this.#escolherMapa();
         contexto.scrollTop = contexto.scrollHeight;
     }
 
-    //@follow-up definir o que rolou
     #opcaoCaminhar(){
-
-        this.#changeButtonAppear(0);
+        this.#mudarVisibilidadeBotoes(0);
 
         contexto.scrollTop = contexto.scrollHeight;
 
@@ -1328,18 +1355,17 @@ class jogin {
     }
 
     #escolherMapa() {
-
-        //this.#aleatorizar();
+        this.#aleatorizar();
         let ultimaAndada = this.#ultimoLugar;
         let eventos =  [];
 
-        this.#mapaEscolhido = 3;
+        //this.#mapaEscolhido = 3;
 
         if(this.#ultimoMapa == this.#mapaEscolhido && this.#ultimoMapa != 0) {
             this.#escolherMapa();
         } else {
 
-            if(this.#recuperarAtributos('nivel') < 5 && this.#mapaEscolhido == 4)
+            if(this.#nivel < 5 && this.#mapaEscolhido == 4)
                 this.#mapaEscolhido = 0;
 
             this.#eventos.forEach(e => {
@@ -1359,13 +1385,14 @@ class jogin {
                 contexto.append(eventos[escolha].descricao + "\n\n");
                 this.#ultimoEvento = eventos[escolha];
 
-                this.#changeButtonAppear(2);
+                this.#mudarVisibilidadeBotoes(2);
 
                 const cntSN= document.getElementById('cntSN');
                 document.querySelectorAll('.botoesSN').forEach(e => {
                     cntSN.replaceChild(e.cloneNode(1), e);
                 });
 
+                //@todo mudar o bagulho de substituir o botao pra tirar o eventlisstener
                 recuperarBtns();
                 btnsSN.forEach(e => {
                     e.addEventListener("click", (e) => {
@@ -1419,7 +1446,7 @@ class jogin {
                 contexto.append(eventos[escolha].descricao + "\n\n");
                 this.#ultimoEvento = eventos[escolha];
 
-                this.#changeButtonAppear(4);
+                this.#mudarVisibilidadeBotoes(4);
 
                 btnNenhum.removeEventListener('click', this._cancelar);
                 btnNenhum.addEventListener('click', this.#nenhuma);
@@ -1462,8 +1489,8 @@ class jogin {
                 iniciarBatalha();
             }
 
-            ultimaEscolha.value = this.#mapaEscolhido;
-            console.log('ultima escolha ' + ultimaEscolha.value);
+            this.#ultimoMapa = this.#mapaEscolhido;
+            console.log('ultima escolha ' + this.#ultimoMapa);
 
         }
 
