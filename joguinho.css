@@ -92,7 +92,7 @@ input, div.inputInfos {
 
 button {
   background-color: rgba(0, 0, 0, 0);
-  color: rgba(255, 255, 255, 0.637);
+  color: white;
   margin: 12px 12px;
   padding: 5px 0;
   border: none;
