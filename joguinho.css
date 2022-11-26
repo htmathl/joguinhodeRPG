@@ -127,6 +127,10 @@ button:hover::after {
     background-color: #fff;
 }
 
+button:disabled::after {
+  width: 0 !important;
+}
+
 /* testes testes e muitos testes
 button::before {
     content: '';
@@ -149,8 +153,11 @@ button:hover::before {
 }*/
 
 button:disabled {
-  color: rgba(255, 255, 255, 0.637);
   text-decoration: line-through;
+}
+
+button:disabled > span {
+  color: rgba(255, 255, 255, 0.499) !important;
 }
 
 .inputInfos {
@@ -266,6 +273,7 @@ button:disabled {
   border-radius: 5px;
   border-color: #fff;
   margin: 12px;
+  transition: all 0.5s linear;
 }
 
 .progress-bar {
@@ -286,6 +294,7 @@ button:disabled {
 #barraMana {
   --progress: 100;
   border-color: #04245b;
+  transition: all 0.3s ease-in-out;
 }
 
 #barraVida::before {
@@ -293,6 +302,7 @@ button:disabled {
   background-color: #8a0707;
   width: calc(var(--progress) * 1%);
   transition: all 0.2s ease;
+  border-radius: 2px;
 }
 
 #barraMana::before {
@@ -300,6 +310,7 @@ button:disabled {
   width: calc(var(--progress) * 1%);
   background-color: #04245b;
   transition: all 0.2s ease;
+  border-radius: 2px;
 }
 
 @media (min-width: 1000px) {
