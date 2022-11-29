@@ -262,6 +262,7 @@ button:disabled > span {
   border-radius: 5px;
   border-color: rgb(18, 1, 105);
   margin: 12px;
+  /* color: rgba(255, 255, 255, 0.499); */
   transition: all 0.5s linear;
 }
 
@@ -273,6 +274,7 @@ button:disabled > span {
   border-radius: 5px;
   border-color: #fff;
   margin: 12px;
+  /* color: rgba(255, 255, 255, 0.499); */
   transition: all 0.5s linear;
 }
 

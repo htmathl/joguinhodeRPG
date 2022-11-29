@@ -57,6 +57,11 @@ mag.forEach(mag => {
     mag.setAttribute('title', 'Aqui é onde você escreve ou guarda suas magias, eu chamo de Alfredo, mas você pode escolher algo como grimório, não sei.');
 });
 
+//@todo fazer sistemas de escapar dos bichos tbm (tem alguns que nao vai funcionar)
+//sistema só funciona quando há uma certeza que terá atq furtivo
+//mudar o botao de defesa para fugir
+//colocar algumas recompensas alem de xp por derrotar certas criaturas
+
 //   @todo     !!!!!!!!!  refatorar fors !!!!!!!!!
 
 //defesa = 0 -> 5 de dt
@@ -79,7 +84,6 @@ window.setInterval(() => {
 }, 300);
 
 window.setInterval(() => {
-     //@todo colocar esse intervalo pra valer só quando o turno bicho tiver na tela
      if(pontinhos[0].style.display == 'inline') {
          if(pontinhos[1].style.display == 'inline') {
              if(pontinhos[2].style.display == 'inline') {
@@ -140,19 +144,19 @@ class jogin {
     #usos = [];
     #nome;
     #atributos = { 
-        forca: 0,
+        forca: 5,
         vigor: 0,
         inteligencia: 0,
         defesa: 0,
-        agilidade: 0,
+        agilidade: 6,
         sorte: 0,
     };
     #pontosVida = 20; 
-    #pontosMana = 20;
+    #pontosMana = 90;
     #vida = 100;
     #mana = 100;
     #experiencia = 0;
-    #nivel = 0;
+    #nivel = 1;
     #pontos = 0;
     #inventario = {
         slot1: {
@@ -176,15 +180,14 @@ class jogin {
         mag4: {
         },
     };
-    #numeroArmas;
     #critico = false;
     #furtivo;
-    #validarEspecial;
+    #validarPoderoso;
+    #dadosAtqPod = [];
     #testeDefesa = 0;
     #contadorDano = 0;
     #somaDano = 0;
     #acumuloAtqPod = 0;
-    #acumuloManaPod = 0;
     #contagemTurno = 0;
     #intervaloProMana;
     #intervaloValMag0;
@@ -194,7 +197,8 @@ class jogin {
     //@todo rever os atributos dos bichos e tudo mias
     //@todo rever o bonus dos negocios ( +15 para 4 dados me parece muito ) ( pode ser tipo a cada numero impar ou par aumentar o bonus )
     //@todo se tirar 1 (mesmo que ataque magico) colocar desastre (acontece algo ruim);
-   
+    //@todo se matar com magia a cor do botao nao fica branca (arrumar)
+
     // @follow-up -------------- eventos ---------------
     //mapa com evento aleatório = 0
     //mapa com item = 1
@@ -314,9 +318,9 @@ class jogin {
             tipo: 'armaCaC',
             imgArma: './img/testinho.png',
             descricao: '[Espada enferrujada, 1d6 + 4 de dano]',
-            bonusCrt: 1,
+            msgMorte: 'Um corte rápido que arranca o braço da criatura faz com que ela morra de hemorragia',
             efeito: () => {
-                return rolarDados('d6', 1) + 4;
+                return this.#rolarDados('d6', 1) + 4;
             },
         },
         
@@ -821,6 +825,7 @@ class jogin {
                 }
     
                 result = Math.max.apply(null, dados);
+                result = 20;
                 if(result == 20)
                     this.#critico = true;
                 else
@@ -921,28 +926,36 @@ class jogin {
         turno.innerText = `Turno: ${this.#contagemTurno}`;
     
         console.log('somadano: ' + this.#somaDano);
-        this.#validarEspecial = false;
+        btnPoderoso.setAttribute('title', 'Atq.Poderoso precisa ser carregado');
+        this.#validarPoderoso = false;
+        this.#dadosAtqPod = [];
+
+        //validar poderoso
         if(this.#nivel > 0) {
             this.#contadorDano = 50 * (this.#nivel);
             console.log('contador dano: ' + this.#contadorDano);
-            if(this.#vida <= 45 && this.#somaDano >= this.#contadorDano)
-                this.#validarEspecial = true;
+            if(this.#vida <= 45 && this.#somaDano >= this.#contadorDano) {
+                for (let i = 0; i < 3; i++)
+                    this.#dadosAtqPod.push(parseInt(this.#nivel)+(i+3));
+                let contar = 0;
+                this.#dadosAtqPod.forEach(dado => {
+                    if(this.#manaGasta(dado*2+5) > this.#mana)
+                        contar++;
+                });
+                if(contar < 3) {
+                    btnPoderoso.removeAttribute('title');
+                    btnPoderoso.addEventListener('click', this.#ataquePoderoso);
+                    this.#validarPoderoso = true;
+                }
+            }
         }
-            
-        if(!this.#validarEspecial)
-            btnPoderoso.setAttribute('title', 'Especial precisa ser carregado');
-        else
-            btnPoderoso.removeAttribute('title');
-        
-        btnPoderoso.disabled = !this.#validarEspecial;
-        btnPoderoso.removeEventListener('click', this.#ataquePoderoso);
-        btnPoderoso.addEventListener('click', this.#ataquePoderoso);
+
+        btnPoderoso.disabled = !this.#validarPoderoso;
     
         this.#mudarVisibilidadeBotoes(1);
-
         btnsAcao.forEach((btnsAcao) => {
             btnsAcao.removeEventListener('click', this.#acoes);
-            if(btnsAcao.innerText == 'Atacar' && !this.#furtivo);
+            if(btnsAcao.innerText == 'Atacar' && !this.#furtivo)
             //@todo ver os tirar furtivo (nem todos colocam o botao branco e sim cinza)
                 btnsAcao.style.setProperty('color', 'white');
         });
@@ -961,6 +974,38 @@ class jogin {
         }, 3000);
     }
 
+    #rolarAtaqueFurtivo() {
+        let testeAgi = this._rolarAcerto('agilidade'),
+        testeIntOp = this._rolarAcertoOponente('inteligencia');
+    
+        testeAgi > testeIntOp ? this.#furtivo = true :
+                                this.#furtivo = false;
+    
+        console.log(this.#furtivo);
+        btnsAcao.forEach((btnAcao) => {
+            if(btnAcao.innerText == 'Atacar')
+                btnAcao.style.setProperty('color', '#575CFA');
+        });
+        let textoAtqFurt = 'Possibilidade de ataque furtivo! \n\n';
+        let span = document.createElement('span');
+        span.innerText = textoAtqFurt;
+        span.style.color = '#575CFA';
+        contexto.appendChild(span);
+        this.#iniciarBatalha();
+    }
+
+    #definirDefesaPassiva(ctx) {
+        let defesaPassiva = 5;
+        if( ctx == 'vig' ) {
+            if(this.#recAtr('defesa') != 0)
+                defesaPassiva = ((this.#atributos.defesa + 1) * defesaPassiva) + 5;  
+        } else {
+            if( this.#ultimoEvento.defesa != 0)
+                defesaPassiva = ((this.#ultimoEvento.defesa + 1) * defesaPassiva) + 5;
+        }
+        return defesaPassiva;
+    }
+
     #acoes = (e) => {
         btnsAcao.forEach((btnsAcao) => {
             btnsAcao.style.display = 'none';
@@ -972,26 +1017,13 @@ class jogin {
                 //armas
                 if( Object.keys( this.#inventario['slot1'] ) != 0 || Object.keys( this.#inventario['slot2'] ) != 0 ) {
                     btnsAtq[1].disabled = false;
-                    btnsAtq[1].innerText = 'Atq. Armado';
-                    this.#numeroArmas = 0;
-                    //arma corpo-a-corpo
-                    if( Object.keys( this.#inventario['slot2'] ) == 0 ) {
-                        btnsAtq[1].innerText = inv[0].innerText;
-                        btnsAtq[1].setAttribute('title', this.#inventario['slot1'].descricao);
-                        this.#numeroArmas = 1;
-                    }
-                    //arma a distancia
-                    if( Object.keys( this.#inventario['slot1'] ) == 0 ) {
-                        btnsAtq[1].innerText = inv[1].innerText;
-                        btnsAtq[1].setAttribute('title', this.#inventario['slot2'].descricao); 
-                        this.#numeroArmas = 2
-                    }
+                    btnsAtq[1].innerText = 'Atq. armado';
                 } else {
                     btnsAtq[1].disabled = true;
                     btnsAtq[1].setAttribute('title', 'Você não possui uma arma, tente dar um soquinho :)');
-                }             
+                }
 
-                //se não tiver magia ou mana
+                //se não tiver magia ou mana ou for atq.furtivo
                 function toggleMag(toggle) {
                     btnsAtq[2].disabled = !toggle;
                     !toggle ?
@@ -999,21 +1031,20 @@ class jogin {
                     btnsAtq[2].removeAttribute('title');
                 }
                 toggleMag(false);
-
                 if(this.#acumuloAtqPod != 0)
                     btnsAtq[2].setAttribute('title', 'Não da pra usar o ataque poderoso com ataques mágicos :(');
                 else {
-                    let i = 0, listaMagia = [];
+                    let i = 0, magiasSemMana = [];
                     for( let key in this.#magiasAtuais ) {
                         var magia = this.#magiasAtuais[key];
                         if( Object.keys(magia) != 0 && i < 2 )
                             if( this.#mana < this.#manaGasta(magia.gastoMana) )
-                                listaMagia.push(magia);
+                                magiasSemMana.push(magia);
                             else
                                 toggleMag(true);
                         i++;
                     }
-                    if(listaMagia.length >= 2)
+                    if(magiasSemMana.length >= 2 || this.#furtivo )
                         toggleMag(false);
                 }
 
@@ -1051,21 +1082,46 @@ class jogin {
     }
 
     #ataquePoderoso = () => {
-        somaDano = 0;
+        btnPoderoso.removeEventListener('click', this.#ataquePoderoso);
+        this.#somaDano = 0;
         const respAtqPoderoso = document.getElementById('respAtqPoderoso');
-        nivel = lvl.innerText.split(':')[1].trim();
         for (let i = 0; i < 3; i++) {
             buttonsAtqPod[i] = document.createElement('button');
             respAtqPoderoso.appendChild(buttonsAtqPod[i]);
         }
-        buttonsAtqPod[0].innerText = '+' + (parseInt(nivel)+3) + 'd12';
-        buttonsAtqPod[1].innerText = '+' + (parseInt(nivel)+4) + 'd12';
-        buttonsAtqPod[2].innerText = '+' + (parseInt(nivel)+5) + 'd12';
+        buttonsAtqPod[0].innerHTML = `<span>+${(parseInt(this.#nivel)+3)}d12</span>`;
+        buttonsAtqPod[1].innerHTML = `<span>+${(parseInt(this.#nivel)+4)}d12</span>`;
+        buttonsAtqPod[2].innerHTML = `<span>+${(parseInt(this.#nivel)+5)}d12</span>`;
         buttonsAtqPod.forEach(button => {
-            button.removeEventListener('click', _AddDadosAtqP);
+            button.removeEventListener('click', this.#AddDadosAtqP);
+            button.disabled = true;
         });
-        buttonsAtqPod.forEach(button => {
-            button.addEventListener('click', _AddDadosAtqP);
+        for( let m = 0; m < this.#dadosAtqPod.length; m++ ) {
+            if( this.#manaGasta((this.#dadosAtqPod[m]*2+5)) <= this.#mana ) {
+                buttonsAtqPod[m].disabled = false;
+                buttonsAtqPod[m].addEventListener('click', this.#AddDadosAtqP);
+            }
+        }
+    }
+
+    #AddDadosAtqP = (e) => {
+        this.#dadosAtqPod.forEach(dado => {
+            if( e.currentTarget.innerText == ('+' + dado + 'd12') ) {
+                this.#acumuloAtqPod = this.#rolarDados('d12', dado);
+                this.#mana -= this.#manaGasta((dado*2+5));
+                progressbarMana.style.setProperty('--progress', this.#mana);
+                buttonsAtqPod.forEach(btn => {
+                    btn.style.display = 'none';
+                });
+                btnsAtq.forEach(btn => {
+                    if(btn.innerText == 'Atq. mágico')
+                        btn.disabled = true;
+                });
+                btnsAcao.forEach(btn => {
+                    if(btn.innerText == 'Atacar')
+                        btn.click();
+                });
+            }
         });
     }
 
@@ -1073,6 +1129,7 @@ class jogin {
         let usarMagias = false;
         let ultimoEvento = this.#ultimoEvento; 
     
+        //@todo arrumar esse troço ( nem fazer a chance se o uso de magia tiver acabado )
         Object.keys(ultimoEvento).forEach(key => {
             if(key == 'magias')
                 usarMagias = (Math.floor(Math.random() * 100) < 50) ? true : false;
@@ -1123,11 +1180,7 @@ class jogin {
                         if(rolarAcertoOponente('forca') >= this.#testeDefesa)
                             this.#dano();
                     } else {
-                        let defesaPassiva = 5;
-                        if(this.#atributos.defesa != 0)
-                            defesaPassiva = ((this.#atributos.defesa + 1) * defesaPassiva) + 5;
-    
-                        if(defesaPassiva <= this._rolarAcertoOponente('forca'))
+                        if(this.#definirDefesaPassiva('vig') <= this._rolarAcertoOponente('forca'))
                             this.#dano();
                     }
                     break;
@@ -1145,53 +1198,44 @@ class jogin {
     }
     
     #ataqueViajante = (e) => {
-        let vidaTirada = 0, defesaPassiva = 5, testeForca = this._rolarAcerto('forca');
+        let vidaTirada = 0, testeForca = this._rolarAcerto('forca');
         let ultimoEvento = this.#ultimoEvento;
-        
-        if(ultimoEvento.defesa != 0)
-            defesaPassiva = ((ultimoEvento.defesa + 1) * defesaPassiva) + 5;
 
         switch (e.currentTarget.innerText) {
             case 'Soquinho':
                 dialogo.innerText = 'Você deu um soquinho';
     
-                if(defesaPassiva <= testeForca) {
+                if(this.#definirDefesaPassiva(null) <= testeForca) {
                     //dano soquinho
                     vidaTirada = this.#rolarDados('d3', 1);
                     //adicionais
-                    vidaTirada += this.#adicionaisAtq(vidaTirada);
-                    
-                    //@todo tirar esse trecho e bloquear botao do atq poderoso quando nao tiver mana
-                    if(this.#acumuloAtqPod != 0) {
-                        this.#mana -= this.#acumuloAtqPod;
-                        if(this.#mana > 0)
-                            progressbarMana.style.setProperty('--progress', this.#mana);
-                        else {
-                            // @todo arrumar (pra arma também)
-                            contexto.append('Não tem mana \n\n');
-                            contexto.scrollTop = contexto.scrollHeight;
-                            
-                            this.#furtivo = false;
-                            btnsAcao.forEach((btnAcao) => {
-                                if(btnAcao.innerText == 'Atacar') {
-                                    btnAcao.style.setProperty('color', '#767676');
-                                }
-                            });
-    
-                            this.#acumuloAtqPod = 0;
-                            this.#acumuloManaPod = 0;
-    
-                            this.#mudarVisibilidadeBotoes(5);
-                            
-                            this.#somaDano += vidaTirada;
-                            setTimeout(() => {
-                                this.#ataqueOponente();
-                            }, 2000);
-    
-                            break;
-                        }
+                    vidaTirada += this.#adicionaisAtq();
+                    //critico
+                    if(this.#critico) {
+                        let resto = this.#recAtr('sorte') % 5;
+                        if( this.#recAtr('sorte') <= 0 )
+                            vidaTirada *= 2;
+                        else
+                            if(resto == 0) {
+                                let i = this.#recAtr('sorte') / 5;
+                                vidaTirada *= (i+2);
+                            }
                     }
-                    //-----------------------------------------------------------------
+
+                    ultimoEvento.vida -= vidaTirada;
+                    contexto.scrollTop = contexto.scrollHeight;
+                    console.log('vida tirada: ' + ultimoEvento.vida);
+                    console.log('defesa bicho: ' + this.#definirDefesaPassiva(null));
+                    this.#somaDano += vidaTirada;
+
+                    //tirar furtivo e atq poderoso
+                    this.#acumuloAtqPod = 0;
+                    this.#furtivo = false;
+                    btnsAcao.forEach((btnAcao) => {
+                        if(btnAcao.innerText == 'Atacar') {
+                            btnAcao.style.setProperty('color', 'white');
+                        }
+                    });
 
                     contexto.append(`Você da um soco, e acerta com ${testeForca}, tirando ${vidaTirada} de vida. \n\n`);   
                 } else {
@@ -1203,16 +1247,21 @@ class jogin {
                         this.#ataqueOponente();
                     }, 2500);
                 }
-    
+
                 if(ultimoEvento.vida <= 0) {
                     //@todo colocar cada vez menos chance de encontrar o bicho que ja matou
                     //@todo colocar texto dinamico pra cada arma (dentro de eventos)
-                    contexto.append('Com um golpe fatal, você arranca a cabeça desta criatura. \n\n');
-                    this.#definirMorteOp(null, ultimoEvento);   
-                }
+                    this.#morteOponente('Com um golpe fatal, você arranca a cabeça desta criatura.')
+                } else {
+                    this.#mudarVisibilidadeBotoes(5);
+                    setTimeout(() => {
+                        this.#ataqueOponente();
+                    }, 2500);
+                }          
+
                 break;
             case 'Atq. mágico':
-                //@todo bloquear botao de atq magico caso for atq furtivo (provavelmente em funcao anterior a esse botao)
+                //@todo bloquear botao de atq magico caso for atq furtivo ou poderoso (provavelmente em funcao anterior a esse botao)
                 this.#furtivo = false;
                 btnsAcao.forEach((btnAcao) => {
                     if(btnAcao.innerText == 'Atacar') {
@@ -1241,104 +1290,32 @@ class jogin {
                 btnNenhum.addEventListener('click', this._cancelar);
                 break;
             case 'Atq. armado':
-                let i = 0;
-                for( let key in this.#inventario ) {
-                    var arma = this.#inventario[key];
-                    if( Object.keys(arma) != 0 && i<2 )
+                console.log(this.#inventario);
+                for( let i = 0; i < 2; i++) {
+                    const arma = this.#inventario['slot' + (i+1)];
+                    if( Object.keys(arma) != 0 )
                         inv[i].addEventListener('click', this.#atacarArma);
-                    i++;
                 }
 
-                //esse codigo n serve pra essa opção
-                if(ultimoEvento.defesa != 0)
-                    defesaPassiva = ((ultimoEvento.defesa + 1) * defesaPassiva) + 5;
-    
-                if(defesaPassiva <= testeForca) {
-                    vidaTirada = armaAtual.efeito();
-                    if(furtivo)
-                        vidaTirada += rolarDados('d12', (agilidade+2));
-                    if (critico)
-                        vidaTirada += rolarDados('d3', sorte + armaAtual.bonusCrt);
-    
-                    vidaTirada += acumuloAtqPod;
-    
-                    //bonus da força
-                    forca > 0 ? vidaTirada += rolarDados('d3', forca) : console.log('nada por aqui');
-    
-                    ultimoEvento.vida = ultimoEvento.vida - vidaTirada;
-                    contexto.append(`Você acerta com ${testeForca} em seu teste, tirando ${vidaTirada} de vida. \n\n`);
-                    contexto.scrollTop = contexto.scrollHeight;
-                    console.log('vida tirada: ' + ultimoEvento.vida);
-                    console.log('defesa bicho: ' + defesaPassiva);
-                }
-    
-                furtivo = false;
-                btnsAcao.forEach((btnAcao) => {
-                    if(btnAcao.innerText == 'Atacar') {
-                        btnAcao.style.setProperty('border-color', '#767676');
-                    }
-                });
-    
-                acumuloAtqPod = 0;
-    
-                if(ultimoEvento.vida <= 0) {
-                    contexto.append('Com um golpe fatal, você arranca a cabeça desta criatura. \n\n');
-                    ultimoEvento.vida = ultimoEventoVida;
-                    usos = [];
-                    turno.innerText = '';
-                    //erro muito bizarro aconteceu aqui, vc lembra?
-                    this.#contagemTurno = 0;
-                    somaDano = 0;
-                    opcaoCaminhar();
-                } else {
-                    btnsAtq.forEach(btnAtq => {
-                        btnAtq.style.display = 'none';
-                    });
-                    turnoBicho.style.display = 'block';
-                    somaDano += vidaTirada;
-                    setTimeout(() =>{
-                        ataqueOponente();
-                    }, 2000);
-                }
+                this.#mudarVisibilidadeBotoes(4);
+                btnNenhum.removeEventListener('click', this.#nenhuma);
+                btnNenhum.addEventListener('click', this._cancelar);
                 break;
             default:
                 break;
         }
-
-        if (this.#critico)
-            vidaTirada *= 2;
-
-        //tirar furtivo e atq poderoso
-        this.#furtivo = false;
-        btnsAcao.forEach((btnAcao) => {
-            if(btnAcao.innerText == 'Atacar') {
-                btnAcao.style.setProperty('color', 'white');
-            }
-        });
-        this.#acumuloAtqPod = 0;
-        this.#acumuloManaPod = 0;
-
-        if( ultimoEvento.vida > 0 && vidaTirada > 0 ) {
-            ultimoEvento.vida -= vidaTirada;
-            contexto.scrollTop = contexto.scrollHeight;
-            console.log('vida tirada: ' + ultimoEvento.vida);
-            console.log('defesa bicho: ' + defesaPassiva);
-            this.#mudarVisibilidadeBotoes(5);
-            this.#somaDano += vidaTirada;
-            setTimeout(() =>{
-                this.#ataqueOponente();
-            }, 2500);
-        }
     }
     
-    #adicionaisAtq(vidaTirada) {
+    #adicionaisAtq() {
+        let vidaTirada = 0;
         let forca = this.#recAtr('forca');
         //bonus da força
         forca > 0 ? vidaTirada += this.#rolarDados('d3', forca) : '';
         //adicionais
+        console.log(this.#acumuloAtqPod);
         vidaTirada += this.#acumuloAtqPod;
-        if(this.#furtivo)
         //@todo balancear po
+        if(this.#furtivo)
             vidaTirada += this.#rolarDados('d6', (this.#recAtr('agilidade')+2));
 
         return vidaTirada;
@@ -1354,6 +1331,13 @@ class jogin {
             e.removeEventListener('mouseout', this.#semManaOut);
         });
 
+        let i = 0;
+        while(i < this.#intervaloValMags.length) {
+            clearInterval(this.#intervaloValMags[i]);
+            magAtq[i].style.color = 'white';
+            i++;
+        }
+
         let vidaTirada = 0,
         testeInt = this._rolarAcerto('inteligencia');
         let ultimoEvento = this.#ultimoEvento;
@@ -1364,10 +1348,19 @@ class jogin {
             let magia = this.#magiasAtuais[key];
             //@todo depois fazer algum sistema pra não pegar itens reptidos
             if( magia.nome == e.currentTarget.innerText ) {
-                if (this.#critico)
-                    vidaTirada += this.#rolarDados('d6', (sorte + magia.bonusCrt));
                 //bonus inteligência
-                vidaTirada += this.#rolarDados('d3', (this.#atributos['inteligencia']+1));
+                vidaTirada += this.#rolarDados('d3', (this.#recAtr('inteligencia')+1));
+                //critico
+                if(this.#critico) {
+                    let resto = this.#recAtr('sorte') % 5;
+                    if( this.#recAtr('sorte') <= 0 )
+                        vidaTirada *= 2;
+                    else
+                        if(resto == 0) {
+                            let i = this.#recAtr('sorte') / 5;
+                            vidaTirada *= (i+2);
+                        }
+                }
                 if(this._rolarAcertoOponente('vigor') <= testeInt) {
                     vidaTirada += magia.efeito();
                     ultimoEvento.vida -= vidaTirada;
@@ -1384,26 +1377,14 @@ class jogin {
                 console.log('vida tirada: ' + ultimoEvento.vida);
         
                 if(ultimoEvento.vida <= 0) {
-                    //@todo colocar esse trecho em uma função ja se repete muitas vezes (menos o contexto) // tem outro todo falando isso tbm
-                    contexto.append('Em uma explosão de mana, você oblitera esta criatura. \n\n');
-                    ultimoEvento.vida = this.#ultimoEventoVida;
-                    this.#usos = [];
-                    turno.innerText = '';
-                    this.#contagemTurno = 0;
-                    this.#somaDano = 0;
-                    this.#opcaoCaminhar();
+                    //@todo depois colocar narração legal e exclusiva par amagias tbm
+                    this.#morteOponente('Em uma explosão de mana, você oblitera esta criatura.')
                 } else {
-                    let i = 0;
-                    while(i < this.#intervaloValMags.length) {
-                        clearInterval(this.#intervaloValMags[i]);
-                        magAtq[i].style.color = 'white';
-                        i++;
-                    }
                     this.#mudarVisibilidadeBotoes(5);
                     this.#somaDano += vidaTirada;
                     setTimeout(() => {
                         this.#ataqueOponente();
-                    }, 2000);
+                    }, 2500);
                 }
                 break;
             }
@@ -1411,11 +1392,63 @@ class jogin {
     }
 
     #atacarArma = (e) => {
-
-
         inv.forEach(k => {
             k.removeEventListener('click', this.#atacarArma);
         });
+
+        let ultimoEvento = this.#ultimoEvento, vidaTirada = 0;
+        let testeForca = this._rolarAcerto('forca');
+
+        for( let key in this.#inventario ) {
+            if(!this.#inventario.hasOwnProperty(key)) continue;
+
+            let armaAtual = this.#inventario[key];
+            if( armaAtual.nome == e.currentTarget.innerHTML.split('<span>')[1].split('</span>')[0] ) {
+               
+                if(this.#definirDefesaPassiva(null) <= testeForca) {
+                    //dano arma
+                    vidaTirada = armaAtual.efeito();
+                    //adicionais
+                    vidaTirada += this.#adicionaisAtq();
+                    //critico
+                    if(this.#critico) {
+                        let resto = this.#recAtr('sorte') % 5;
+                    if( this.#recAtr('sorte') <= 0 )
+                        vidaTirada *= 2;
+                    else
+                        if(resto == 0) {
+                            let i = this.#recAtr('sorte') / 5;
+                            vidaTirada *= (i+2);
+                        }
+                    }
+
+                    ultimoEvento.vida = ultimoEvento.vida - vidaTirada;
+                    contexto.append(`Você acerta com ${testeForca} em seu teste, tirando ${vidaTirada} de vida. \n\n`);
+                    contexto.scrollTop = contexto.scrollHeight;
+                    console.log('vida tirada: ' + ultimoEvento.vida);
+                    console.log('defesa bicho: ' + this.#definirDefesaPassiva());
+
+                    //remover furtivo e atq poderoso
+                    this.#acumuloAtqPod = 0;
+                    this.#furtivo = false;
+                    btnsAcao.forEach((btnAcao) => {
+                        if(btnAcao.innerText == 'Atacar') {
+                            btnAcao.style.setProperty('color', 'white');
+                        }
+                    });
+
+                    if(ultimoEvento.vida <= 0) {
+                        this.#morteOponente(armaAtual.msgMorte);
+                    } else {
+                        this.#mudarVisibilidadeBotoes(5);
+                        this.#somaDano += vidaTirada;
+                        setTimeout(() =>{
+                            this.#ataqueOponente();
+                        }, 2500);
+                    }
+                }
+            }
+        }
     }
 
     _cancelar = () => {
@@ -1427,29 +1460,32 @@ class jogin {
         let i = 0;
         while(i < this.#intervaloValMags.length) {
             clearInterval(this.#intervaloValMags[i]);
-            magAtq[i].style.color = 'white';
+            this.#mudarVazio();
             i++;
         }
 
         mag.forEach(mag => {
             mag.removeEventListener('click', this.#atacarMagia);
         });
+
+        inv.forEach(inv => {
+            inv.removeEventListener('click', this.#atacarArma);
+        });
+
         this.#mudarVisibilidadeBotoes(3);
         btnNenhum.removeEventListener('click', this._cancelar);
     }
 
-    #definirMorteOp(metodo, ultimoEvento) {
-        ultimoEvento.vida = this.#ultimoEventoVida;
+    #morteOponente(msg) {
+        contexto.append(msg + '\n\n');
+        this.#ultimoEvento.vida = this.#ultimoEventoVida;
         this.#usos = [];
         turno.innerText = '';
         this.#contagemTurno = 0;
         this.#somaDano = 0;
-        this.#experiencia += ultimoEvento.exp;
+        this.#experiencia += this.#ultimoEvento.exp;
         this.#eventoUpar();
         this.#opcaoCaminhar();
-        if( metodo != null ) {
-            contexto.append(metodo.matar);
-        }
     }
 
     //@follow-up -------------- definir o que rolou ------------------
@@ -1600,7 +1636,7 @@ class jogin {
                     }
                 }
 
-                testeAgi > testeAgiOp ? rolarAtaqueFurtivo() : this.#iniciarTurnoOp();                 
+                testeAgi >= testeAgiOp ? this.#rolarAtaqueFurtivo() : this.#iniciarTurnoOp();                 
 
             } else if(this.#mapaEscolhido == 4) {
                 dialogo.innerText = `Você andou para ${ultimaAndada} e encontrou... Para onde você quer ir?`
@@ -1621,78 +1657,4 @@ class jogin {
 
 new jogin;
 
-function rolarAtaqueFurtivo() {
-    let testeAgi = rolarAcerto('Agilidade'),
-    testeIntOp = rolarAcertoOponente('inteligencia');
-
-    testeAgi > testeIntOp ? furtivo = true :
-                            furtivo = false;
-
-    console.log(furtivo);
-    btnsAcao.forEach((btnAcao) => {
-        if(btnAcao.innerText == 'Atacar') {
-            btnAcao.style.setProperty('color', '#575CFA');
-        }
-    });
-    let textoAtqFurt = 'Possibilidade de ataque furtivo! \n\n';
-    let span = document.createElement('span');
-    span.innerText = textoAtqFurt;
-    span.style.color = '#575CFA';
-    contexto.appendChild(span);
-    iniciarBatalha();
-
-}
-
-var _AddDadosAtqP = function(e) {
-    switch (e.currentTarget.innerText) {
-        case buttonsAtqPod[0].innerText:
-            acumuloAtqPod = rolarDados('d12', parseInt(buttonsAtqPod[0].innerHTML.split('d')[0]));
-            acumuloManaPod = 25;
-            buttonsAtqPod.forEach(btn => {
-                btn.style.display = 'none';
-            });
-            btnsAtq.forEach(btn => {
-                if(btn.innerText == 'Atq. mágico')
-                    btn.disabled = true;
-            });
-            btnsAcao.forEach(btn => {
-                if(btn.innerText == 'Atacar')
-                    btn.click();
-            });
-            break;
-        case buttonsAtqPod[1].innerText:
-            acumuloAtqPod = rolarDados('d12', parseInt(buttonsAtqPod[1].innerHTML.split('d')[0]));
-            acumuloManaPod = 30;
-            buttonsAtqPod.forEach(btn => {
-                btn.style.display = 'none';
-            });
-            btnsAtq.forEach(btn => {
-                if(btn.innerText == 'Atq. mágico')
-                    btn.disabled = true;
-            });
-            btnsAcao.forEach(btn => {
-                if(btn.innerText == 'Atacar')
-                    btn.click();
-            });
-            break;
-        case buttonsAtqPod[2].innerText:
-            acumuloAtqPod = rolarDados('d12', parseInt(buttonsAtqPod[2].innerHTML.split('d')[0]));
-            acumuloManaPod = 40;
-            buttonsAtqPod.forEach(btn => {
-                btn.style.display = 'none';
-            });
-            btnsAtq.forEach(btn => {
-                if(btn.innerText == 'Atq. mágico')
-                    btn.disabled = true;
-            });
-            btnsAcao.forEach(btn => {
-                if(btn.innerText == 'Atacar')
-                    btn.click();
-            });
-            break;
-        default:
-            break;
-    }
-}
-
-let maaaaaaaaaaaaaa = 2;
+let maaaaaaaaaaaaaa = 3;
