@@ -1073,19 +1073,13 @@ class jogin {
     
                 break;
             case 'Defender':
-                testeDefesa = rolarAcerto(defesa);
-                turnoBicho.style.display = 'block';
-                furtivo = false;
-                btnsAcao.forEach((btnAcao) => {
-                    if(btnAcao.innerText == 'Atacar') {
-                        btnAcao.style.setProperty('border-color', '#767676');
-                    }
-                });
+                this.#testeDefesa = this._rolarAcerto('defesa');
+                this.#furtivo = false;
+
+                this.#mudarVisibilidadeBotoes(5);
                 setTimeout(() => {
-                    ataqueOponente();
+                    this.#ataqueOponente();
                 }, 2000);
-                break;
-            case 'Atq. poderoso':
                 break;
             case 'Itens/magia':
                 break;
@@ -1191,7 +1185,7 @@ class jogin {
                     break;
                 case false:
                     if(this.#testeDefesa != 0) {
-                        if(rolarAcertoOponente('forca') >= this.#testeDefesa)
+                        if(this._rolarAcertoOponente('forca') >= this.#testeDefesa)
                             this.#dano();
                     } else {
                         if(this.#definirDefesaPassiva('vig') <= this._rolarAcertoOponente('forca'))
@@ -1244,11 +1238,6 @@ class jogin {
                     //tirar furtivo e atq poderoso
                     this.#acumuloAtqPod = 0;
                     this.#furtivo = false;
-                    btnsAcao.forEach((btnAcao) => {
-                        if(btnAcao.innerText == 'Atacar') {
-                            btnAcao.style.setProperty('color', 'white');
-                        }
-                    });
 
                     contexto.append(`Você da um soco, e acerta com ${testeForca}, tirando ${vidaTirada} de vida. \n\n`);
                     contexto.scrollTop = contexto.scrollHeight;
@@ -1277,14 +1266,8 @@ class jogin {
             case 'Atq. mágico':
                 //@todo bloquear botao de atq magico caso for atq furtivo ou poderoso (provavelmente em funcao anterior a esse botao)
                 this.#furtivo = false;
-                btnsAcao.forEach((btnAcao) => {
-                    if(btnAcao.innerText == 'Atacar') {
-                        btnAcao.style.setProperty('color', 'white');
-                    }
-                });     
 
                 this.#mudarVisibilidadeBotoes(4);
-
                 for (let i = 0; i < magAtq.length; i++) {
                     const magia = this.#magiasAtuais['mag' + (i+1)];
                     if( Object.keys(magia) != 0 ) {
@@ -1445,11 +1428,6 @@ class jogin {
                     //remover furtivo e atq poderoso
                     this.#acumuloAtqPod = 0;
                     this.#furtivo = false;
-                    btnsAcao.forEach((btnAcao) => {
-                        if(btnAcao.innerText == 'Atacar') {
-                            btnAcao.style.setProperty('color', 'white');
-                        }
-                    });
 
                     if(ultimoEvento.vida <= 0) {
                         this.#morteOponente(armaAtual.msgMorte);
