@@ -3,6 +3,7 @@
     --larguraBarras: 220px;
     --larguraInv: 80px;
     --paddingInv: 5px;
+    --bcBotoes: white;
 }
 
 @font-face {
@@ -90,6 +91,12 @@ input, div.inputInfos {
   padding: 5px;
 }
 
+#inputResposta {
+  border: none;
+  font-size: 20px;
+  text-align: center;
+}
+
 button {
   background-color: rgba(0, 0, 0, 0);
   color: white;
@@ -124,7 +131,7 @@ button::after {
 button:hover::after {
     content: '';
     width: 90%;
-    background-color: #fff;
+    background-color: var(--bcBotoes);
 }
 
 button:disabled::after {

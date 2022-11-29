@@ -951,13 +951,22 @@ class jogin {
         }
 
         btnPoderoso.disabled = !this.#validarPoderoso;
-    
+
+        if( !this.#furtivo ) {
+            btnsAcao.forEach(btnAcao => {
+                btnAcao.style.setProperty('color', 'white');
+                btnAcao.style.setProperty('--bcBotoes', 'white');
+            });
+            btnsAtq.forEach(btnAtq => {
+                btnAtq.style.setProperty('--bcBotoes', 'white');
+                if( !btnAtq.disabled )
+                    btnAtq.style.setProperty('color', 'white');
+            });
+        }
+            
         this.#mudarVisibilidadeBotoes(1);
         btnsAcao.forEach((btnsAcao) => {
             btnsAcao.removeEventListener('click', this.#acoes);
-            if(btnsAcao.innerText == 'Atacar' && !this.#furtivo)
-            //@todo ver os tirar furtivo (nem todos colocam o botao branco e sim cinza)
-                btnsAcao.style.setProperty('color', 'white');
         });
         btnsAcao.forEach((btnsAcao) => {
             btnsAcao.addEventListener('click', this.#acoes);
@@ -982,10 +991,11 @@ class jogin {
                                 this.#furtivo = false;
     
         console.log(this.#furtivo);
-        btnsAcao.forEach((btnAcao) => {
-            if(btnAcao.innerText == 'Atacar')
-                btnAcao.style.setProperty('color', '#575CFA');
-        });
+        //@todo trocar esse e o que muda pra branco colocar só btnsAcao[0]...
+        btnsAcao[0].style.setProperty('color', '#575CFA');
+        btnsAcao[0].style.setProperty('--bcBotoes', '#575CFA' );
+        btnsAtq[0].style.setProperty('color', '#575CFA');
+        btnsAtq[0].style.setProperty('--bcBotoes', '#575CFA' );
         let textoAtqFurt = 'Possibilidade de ataque furtivo! \n\n';
         let span = document.createElement('span');
         span.innerText = textoAtqFurt;
@@ -1018,6 +1028,10 @@ class jogin {
                 if( Object.keys( this.#inventario['slot1'] ) != 0 || Object.keys( this.#inventario['slot2'] ) != 0 ) {
                     btnsAtq[1].disabled = false;
                     btnsAtq[1].innerText = 'Atq. armado';
+                    if( this.#furtivo ) {
+                        btnsAtq[1].style.setProperty('color', '#575CFA');
+                        btnsAtq[1].style.setProperty('--bcBotoes', '#575CFA') ;
+                    }
                 } else {
                     btnsAtq[1].disabled = true;
                     btnsAtq[1].setAttribute('title', 'Você não possui uma arma, tente dar um soquinho :)');
@@ -1223,7 +1237,6 @@ class jogin {
                     }
 
                     ultimoEvento.vida -= vidaTirada;
-                    contexto.scrollTop = contexto.scrollHeight;
                     console.log('vida tirada: ' + ultimoEvento.vida);
                     console.log('defesa bicho: ' + this.#definirDefesaPassiva(null));
                     this.#somaDano += vidaTirada;
@@ -1237,7 +1250,8 @@ class jogin {
                         }
                     });
 
-                    contexto.append(`Você da um soco, e acerta com ${testeForca}, tirando ${vidaTirada} de vida. \n\n`);   
+                    contexto.append(`Você da um soco, e acerta com ${testeForca}, tirando ${vidaTirada} de vida. \n\n`);
+                    contexto.scrollTop = contexto.scrollHeight;
                 } else {
                     //@todo fazer pra outros tipos de defesa alem de esquiva (se for implementado)
                     contexto.append('Em um momento de desespero, você tenta dar um soco nesta criatura, que desvia com facilidade. \n\n');
