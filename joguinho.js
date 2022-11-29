@@ -13,28 +13,22 @@ let mag = document.querySelectorAll('.mag');
 let magAtq = document.querySelectorAll('.mag-atq');
 let magSup = document.querySelectorAll('.mag-sup');
 let inv = document.querySelectorAll('.inv');
+let inv4 = document.getElementById('inv4');
+let inv5 = document.getElementById('inv5');
+let invSup = [ inv4, inv5 ];
 let hover = document.querySelectorAll('.hover');
 let pontinhos = document.querySelectorAll('.pontinho');
 let turnoBicho = document.getElementById('turnoBicho');
-let inv1 = document.getElementById('inv1');
 let imgContent1 = document.getElementById('img-content1');
 let divContent1 = document.getElementById('div-content1');
-let inv2 = document.getElementById('inv2');
 let imgContent2 = document.getElementById('img-content2');
 let divContent2 = document.getElementById('div-content2');
-let inv3 = document.getElementById('inv3');
 let imgContent3 = document.getElementById('img-content3');
 let divContent3 = document.getElementById('div-content3');
-let inv4 = document.getElementById('inv4');
 let imgContent4 = document.getElementById('img-content4');
 let divContent4 = document.getElementById('div-content4');
-let inv5 = document.getElementById('inv5');
 let imgContent5 = document.getElementById('img-content5');
 let divContent5 = document.getElementById('div-content5');
-let mag1 = document.getElementById('mag1');
-let mag2 = document.getElementById('mag2');
-let mag3 = document.getElementById('mag3');
-let mag4 = document.getElementById('mag4');
 
 let contentSpan = document.createElement('span');
 
@@ -193,6 +187,7 @@ class jogin {
     #intervaloValMag0;
     #intervaloValMag1;
     #intervaloValMags = [this.#intervaloValMag0, this.#intervaloValMag1];
+    #cancelarToggle;
 
     //@todo rever os atributos dos bichos e tudo mias
     //@todo rever o bonus dos negocios ( +15 para 4 dados me parece muito ) ( pode ser tipo a cada numero impar ou par aumentar o bonus )
@@ -208,7 +203,7 @@ class jogin {
     #eventos = [
         // ---------------- eventos aleatórios ----------------
         {
-            indice: 0,
+            id: 0,
             classe: 0,
             descricao: ['Nada, além de um silêncio calmante...', 
             'Uma pedra? Não parece ser nada.',
@@ -218,7 +213,7 @@ class jogin {
             ],
         },
         {
-            indice: 1,
+            id: 1,
             classe: 0,
             descricao: ['Nada, além de um silêncio calmante...', 
             'Uma pedra? Não parece ser nada.',
@@ -228,7 +223,7 @@ class jogin {
             ],
         },
         {
-            indice: 2,
+            id: 2,
             classe: 0,
             descricao: ['Nada, além de um silêncio calmante...', 
             'Uma pedra? Não parece ser nada.',
@@ -238,7 +233,7 @@ class jogin {
             ],
         },
         {
-            indice: 3,
+            id: 3,
             classe: 0,
             descricao: ['Nada, além de um silêncio calmante...', 
             'Uma pedra? Não parece ser nada.',
@@ -248,7 +243,7 @@ class jogin {
             ],
         },
         {
-            indice: 4,
+            id: 4,
             classe: 0,
             descricao: ['Nada, além de um silêncio calmante...', 
             'Uma pedra? Não parece ser nada.',
@@ -258,7 +253,7 @@ class jogin {
             ],
         },
         {
-            indice: 5,
+            id: 5,
             classe: 0,
             descricao: ['Nada, além de um silêncio calmante...', 
             'Uma pedra? Não parece ser nada.',
@@ -268,7 +263,7 @@ class jogin {
             ],
         },
         {
-            indice: 6,
+            id: 6,
             classe: 0,
             descricao: ['Nada, além de um silêncio calmante...', 
             'Uma pedra? Não parece ser nada.',
@@ -278,7 +273,7 @@ class jogin {
             ],
         },
         {
-            indice: 7,
+            id: 7,
             classe: 0,
             descricao: ['Nada, além de um silêncio calmante...', 
             'Uma pedra? Não parece ser nada.',
@@ -288,7 +283,7 @@ class jogin {
             ],
         },
         {
-            indice: 8,
+            id: 8,
             classe: 0,
             descricao: ['Nada, além de um silêncio calmante...', 
             'Uma pedra? Não parece ser nada.',
@@ -298,7 +293,7 @@ class jogin {
             ],
         },
         {
-            indice: 9,
+            id: 9,
             classe: 0,
             descricao: ['Nada, além de um silêncio calmante...', 
             'Uma pedra? Não parece ser nada.',
@@ -312,7 +307,7 @@ class jogin {
         
         // ---------------- itens ----------------
         {
-            indice: 11,
+            id: 11,
             classe: 1,
             nome: 'Arma 1',
             tipo: 'armaCaC',
@@ -325,7 +320,7 @@ class jogin {
         },
         
         {
-            indice: 12,
+            id: 12,
             classe: 1,
             nome: 'Esp. 2',
             tipo: 'comida',
@@ -333,7 +328,7 @@ class jogin {
         },
         
         {
-            indice: 13,
+            id: 13,
             classe: 1,
             nome: 'Arma 2',
             tipo: 'arma',
@@ -347,7 +342,7 @@ class jogin {
         },
         
         {
-            indice: 14,
+            id: 14,
             classe: 1,
             nome: 'Esp. 4',
             tipo: 'pocao',
@@ -356,7 +351,7 @@ class jogin {
         },
         
         {
-            indice: 15,
+            id: 15,
             classe: 1,
             nome: 'Arma 3',
             tipo: 'arma',
@@ -369,7 +364,7 @@ class jogin {
         },
         
         {
-            indice: 16,
+            id: 16,
             classe: 1,
             nome: 'Esp. 6',
             tipo: true,
@@ -380,7 +375,7 @@ class jogin {
         },
         
         {
-            indice: 17,
+            id: 17,
             classe: 1,
             nome: 'Arma 4',
             imgArma: './img/miuu.png',
@@ -393,7 +388,7 @@ class jogin {
         },
         
         {
-            indice: 18,
+            id: 18,
             classe: 1,
             nome: 'Esp. 8',
             tipo: '',
@@ -403,7 +398,7 @@ class jogin {
         },
         
         {
-            indice: 19,
+            id: 19,
             classe: 1,
             nome: 'Arma 5',
             tipo: 'arma',
@@ -418,7 +413,7 @@ class jogin {
         },
         
         {
-            indice: 110,
+            id: 110,
             classe: 1,
             nome: 'Esp. 10',
             tipo: false,
@@ -430,7 +425,7 @@ class jogin {
         // ---------------- magias ----------------
         
         {
-            indice: 20,
+            id: 20,
             classe: 2,
             nome: 'magia',
             tipo: 'atq',
@@ -444,7 +439,7 @@ class jogin {
         },
 
         {
-            indice: 21,
+            id: 21,
             classe: 2,
             nome: 'magia 3',
             tipo: 'atq',
@@ -458,17 +453,26 @@ class jogin {
         },
         
         {
-            indice: 22,
+            id: 22,
             classe: 2,
             nome: 'magia 2',
             tipo: 'sup',
-            descricao: 'descrição de uma magia 2',
+            descricao: 'recupera 20 pontos de mana',
+            gastoMana: 5,
+            efeito: () => {
+                this.#eventos.forEach(evento => {
+                    if(evento.id == 22)
+                        this.#mana -= this.#manaGasta(evento.gastoMana);
+                });
+                this.#mana += this.#manaGasta(20);
+                progressbarMana.style.setProperty('--progress', this.#mana);
+            }
         },
         
         // ---------------- bichos ---------------- 
         
         {
-            indice: 31,
+            id: 31,
             classe: 3,
             nome: 'um zumbi de gelo',
             descricao: 'uma descrição de um bicho',
@@ -508,7 +512,7 @@ class jogin {
 
         // ----------------- boss -----------------
         {
-            indice: 41,
+            id: 41,
             classe: 4,
             descricao: 'um boss',
         },
@@ -761,6 +765,7 @@ class jogin {
     }
 
     //@follow-up ---------------- calcular dados e funções  ------------------
+    //@todo BEM DEPOIS... ver se o aleatorio nao vai fazer o jogo ficar meio ruim e se ficar fazer mapas predefinidos
     #aleatorizar() {
         const chance = Math.floor(Math.random() * 500);
         if(chance <= 180)
@@ -920,7 +925,7 @@ class jogin {
         this.#opcaoCaminhar();
     }
 
-    //@follow-up ------------------ batalha -------------------------
+    //@follow-up ----------------------- batalha -------------------------
     #iniciarBatalha() {
         this.#contagemTurno ++;
         turno.innerText = `Turno: ${this.#contagemTurno}`;
@@ -1082,11 +1087,61 @@ class jogin {
                 }, 2000);
                 break;
             case 'Itens/magia':
+                this.#mudarVisibilidadeBotoes(4);
+                this.#cancelarToggle = true;
+                btnNenhum.removeEventListener('click', this.#nenhuma);
+                btnNenhum.addEventListener('click', this._cancelar);   
+
+                for( let i = 0; i < 2; i++ ) {
+                    let item = this.#inventario['slot'+(i+4)];
+                    let magia = this.#magiasAtuais['mag'+(i+3)];
+                    if( Object.keys(item) != 0 && item.usavel )
+                        invSup[i].addEventListener('click', this.#itensMagia);
+                    if( Object.keys(magia) != 0 )
+                        magSup[i].addEventListener('click', this.#itensMagia);
+                }
+
                 break;
             default:
                 break;
         }
     
+    }
+
+    #itensMagia = (e) => {
+        
+        invSup.forEach(invSup => {
+            invSup.removeEventListener('click', this.#itensMagia);
+        });
+        magSup.forEach(magSup => {
+            magSup.removeEventListener('click', this.#itensMagia);
+        });
+        
+        //@todo depois fazer função para recuperar magias e inventarios pois esse cdg ta repitindo muito
+        for( let key in this.#inventario ) {
+            if(!this.#inventario.hasOwnProperty(key)) continue;
+
+            let item = this.#inventario[key];
+            if(item.usavel)
+            if(item.nome == e.currentTarget.innerHTML.split('<span>')[1].split('</span>')[0]) {
+                item.efeito();
+            }
+        }
+
+        for( let key in this.#magiasAtuais ) {
+            if(!this.#magiasAtuais.hasOwnProperty(key)) continue;
+
+            let magia = this.#magiasAtuais[key];
+            if( magia.nome == e.currentTarget.innerText ) {
+                magia.efeito();
+            }
+        }
+
+        this.#mudarVisibilidadeBotoes(5);
+        setTimeout(() =>{
+            this.#ataqueOponente();
+        }, 2000);
+
     }
 
     #ataquePoderoso = () => {
@@ -1248,7 +1303,7 @@ class jogin {
                     this.#mudarVisibilidadeBotoes(5);
                     setTimeout(() =>{
                         this.#ataqueOponente();
-                    }, 2500);
+                    }, 2000);
                 }
 
                 if(ultimoEvento.vida <= 0) {
@@ -1259,7 +1314,7 @@ class jogin {
                     this.#mudarVisibilidadeBotoes(5);
                     setTimeout(() => {
                         this.#ataqueOponente();
-                    }, 2500);
+                    }, 2000);
                 }          
 
                 break;
@@ -1283,6 +1338,7 @@ class jogin {
                     }
                 }
 
+                this.#cancelarToggle = false;
                 btnNenhum.removeEventListener('click', this.#nenhuma);
                 btnNenhum.addEventListener('click', this._cancelar);
                 break;
@@ -1295,6 +1351,7 @@ class jogin {
                 }
 
                 this.#mudarVisibilidadeBotoes(4);
+                this.#cancelarToggle = false;
                 btnNenhum.removeEventListener('click', this.#nenhuma);
                 btnNenhum.addEventListener('click', this._cancelar);
                 break;
@@ -1381,7 +1438,7 @@ class jogin {
                     this.#somaDano += vidaTirada;
                     setTimeout(() => {
                         this.#ataqueOponente();
-                    }, 2500);
+                    }, 2000);
                 }
                 break;
             }
@@ -1464,7 +1521,7 @@ class jogin {
             inv.removeEventListener('click', this.#atacarArma);
         });
 
-        this.#mudarVisibilidadeBotoes(3);
+        this.#mudarVisibilidadeBotoes(this.#cancelarToggle ? 1 : 3);
         btnNenhum.removeEventListener('click', this._cancelar);
     }
 
@@ -1550,8 +1607,8 @@ class jogin {
                                 switch(this.#ultimoEvento.tipo) {
                                     case 'armaCaC':
                                         contentSpan.innerText = this.#ultimoEvento.nome;
-                                        inv1.removeAttribute('title');
-                                        inv1.childNodes[0].replaceWith(contentSpan);
+                                        inv[0].removeAttribute('title');
+                                        inv[0].childNodes[0].replaceWith(contentSpan);
                                         divContent1.innerText = this.#ultimoEvento.descricao;
                                         imgContent1.setAttribute('src', this.#ultimoEvento.imgArma);
                                         hover[0].classList.add('hoverAtivo');
