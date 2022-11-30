@@ -1,8 +1,17 @@
 ﻿let dialogo = document.getElementById("dialogo");
 let btnContinuar = document.getElementById('continuar');
 
-let btnsAndar, btnsSN, btnsAcao, btnsAtq, btnsMais, btnsMenos, btnNenhum, 
-btnAtacar, btnDefender,btnPoderoso, btnItens;
+let btnsAndar = document.querySelectorAll('.botoes');
+let btnsSN = document.querySelectorAll('.botoesSN');
+let btnsAcao = document.querySelectorAll('.botoesAcao');
+let btnsAtq = document.querySelectorAll('.botoesAtq');
+let btnsMais = document.querySelectorAll('.btnMais');
+let btnsMenos = document.querySelectorAll('.btnMenos');
+let btnNenhum = document.getElementById('btnNenhuma');
+let btnAtacar = document.getElementById('btnAtacar');
+let btnDefender = document.getElementById('btnDefender');
+let btnPoderoso = document.getElementById('btnPoderoso');
+let btnItens = document.getElementById('btnItens');
 
 let respostas = document.getElementsByClassName('resposta')
 let infos = document.getElementsByClassName('infos');
@@ -29,8 +38,6 @@ let imgContent4 = document.getElementById('img-content4');
 let divContent4 = document.getElementById('div-content4');
 let imgContent5 = document.getElementById('img-content5');
 let divContent5 = document.getElementById('div-content5');
-
-let contentSpan = document.createElement('span');
 
 let buttonsAtqPod = [];
 
@@ -92,20 +99,6 @@ window.setInterval(() => {
          pontinhos[0].style.display = 'inline';
  }, 500);
 
-function recuperarBtns() {
-    btnsAndar = document.querySelectorAll('.botoes');
-    btnsSN = document.querySelectorAll('.botoesSN');
-    btnsAcao = document.querySelectorAll('.botoesAcao');
-    btnsAtq = document.querySelectorAll('.botoesAtq');
-    btnsMais = document.querySelectorAll('.btnMais');
-    btnsMenos = document.querySelectorAll('.btnMenos');
-    btnNenhum = document.getElementById('btnNenhuma');
-    btnAtacar = document.getElementById('btnAtacar');
-    btnDefender = document.getElementById('btnDefender');
-    btnPoderoso = document.getElementById('btnPoderoso');
-    btnItens = document.getElementById('btnItens');
-}
-
 function definirVida() {
     //vida nivel 0 = 10 pontos
     //a cada nivel aumenta 5 pontos totais e atuais
@@ -145,6 +138,7 @@ class jogin {
         agilidade: 6,
         sorte: 0,
     };
+    #adicionalDef = 0;
     #pontosVida = 20; 
     #pontosMana = 90;
     #vida = 100;
@@ -307,9 +301,9 @@ class jogin {
         
         // ---------------- itens ----------------
         {
-            id: 11,
+            id: 10,
             classe: 1,
-            nome: 'Arma 1',
+            nome: 'Espada enferrujada',
             tipo: 'armaCaC',
             imgArma: './img/testinho.png',
             descricao: '[Espada enferrujada, 1d6 + 4 de dano]',
@@ -320,62 +314,73 @@ class jogin {
         },
         
         {
+            id: 11,
+            classe: 1,
+            nome: 'Arco Tenebroso',
+            tipo: 'armaDis',
+            imgArma: '',
+            descricao: '[Arco Tenebroso, 1d6 + 6 de dano]',
+            msgMorte: 'Você atira uma flecha que passa direto pelo crânio da criatura a matando',
+            efeito: () => {
+                return this.#rolarDados('d3', 1) + 2;
+            },
+        },
+        
+        {
             id: 12,
             classe: 1,
-            nome: 'Esp. 2',
+            nome: 'Maçã',
             tipo: 'comida',
-            descricao: '[Espada de aço, 1d6 + 6 de dano]',
+            usavel: true,
+            imgArma: '',
+            descricao: '[Maçã, recupera 5pvs]',
+            efeito: () => {
+                this.#vida += this.#calcularVida(5);
+                progressbarVida.style.setProperty('--progress', this.#vida);
+            },
         },
         
         {
             id: 13,
             classe: 1,
-            nome: 'Arma 2',
-            tipo: 'arma',
-            imgArma: './img/testezinho.png',
-            descricao: '[Arco torto, 1d6 + 3 de dano]',
-            bonusCrt: 1,
+            nome: 'Amianto',
+            tipo: 'pocao',
+            usavel: true,
+            imgArma: '',
+            descricao: '[Amianto, recupera 5pms]',
             efeito: () => {
-                ultimoEvento.condicao = 'PARALIZIA';
-                return rolarDados('d6', 1) + 3
+                this.#mana += this.#calcularMana(5);
+                progressbarMana.style.setProperty('--progress', this.#mana);
             },
         },
         
         {
             id: 14,
             classe: 1,
-            nome: 'Esp. 4',
-            tipo: 'pocao',
-            descricao: '[Besta lenta, 1d6 + 4 de dano]',
-            dano: (Math.floor(Math.random() * (6 - 1)) + 1) + 4,
+            nome: 'Armadura feia',
+            tipo: 'armadura',
+            imgArma: '',
+            descricao: '[Armadura feia, resistência +5 a atqs armados]',
+            efeito: () => {
+                this.#adicionalDef += 5;
+            },
         },
         
         {
             id: 15,
             classe: 1,
-            nome: 'Arma 3',
-            tipo: 'arma',
-            imgArma: './img/miuu.png',
-            descricao: '[Espada rosa, 1d8 + 2]',
-            bonusCrt: 1,
+            nome: 'Amuleto desgraçado',
+            tipo: 'amuleto',
+            imgArma: '',
+            usavel: false,
+            descricao: '[Amuleto desgraçado, +2 de atq por nível]',
             efeito: () => {
-                return rolarDados('d8', 1) + 2
+
             },
         },
         
         {
             id: 16,
-            classe: 1,
-            nome: 'Esp. 6',
-            tipo: true,
-            descricao: '[Espadão, 2d6 + 8 de dano]',
-            bonusCrt: 1,
-            dano: (Math.floor(Math.random() * (6 - 1)) + 1) +
-                  (Math.floor(Math.random() * (6 - 1)) + 1) + 8,
-        },
-        
-        {
-            id: 17,
             classe: 1,
             nome: 'Arma 4',
             imgArma: './img/miuu.png',
@@ -388,7 +393,7 @@ class jogin {
         },
         
         {
-            id: 18,
+            id: 17,
             classe: 1,
             nome: 'Esp. 8',
             tipo: '',
@@ -398,7 +403,7 @@ class jogin {
         },
         
         {
-            id: 19,
+            id: 18,
             classe: 1,
             nome: 'Arma 5',
             tipo: 'arma',
@@ -413,7 +418,7 @@ class jogin {
         },
         
         {
-            id: 110,
+            id: 19,
             classe: 1,
             nome: 'Esp. 10',
             tipo: false,
@@ -462,9 +467,9 @@ class jogin {
             efeito: () => {
                 this.#eventos.forEach(evento => {
                     if(evento.id == 22)
-                        this.#mana -= this.#manaGasta(evento.gastoMana);
+                        this.#mana -= this.#calcularMana(evento.gastoMana);
                 });
-                this.#mana += this.#manaGasta(20);
+                this.#mana += this.#calcularMana(20);
                 progressbarMana.style.setProperty('--progress', this.#mana);
             }
         },
@@ -526,7 +531,6 @@ class jogin {
 
     //@follow-up --------------------- estilos -------------------------
     #mudarVisibilidadeBotoes(ctx) {
-        recuperarBtns();
         let botoes = [ btnsAndar, btnsAcao, btnsSN, btnsAtq ];
         botoes.forEach(e => {
             e.forEach(e => { e.style.display = 'none' });
@@ -555,7 +559,6 @@ class jogin {
     }
 
     #definirIntro() {
-        recuperarBtns();
         for (var i = btnsAndar.length - 1; i >= 0; i--) {
             //inline
             btnsAndar[i].style.display = 'none';
@@ -864,18 +867,18 @@ class jogin {
         return this.#atributos[atributo];
     }
 
-    #danoSofrido(dano) {
+    #calcularVida(dano) {
         return Math.floor((dano * 100) / this.#pontosVida);
     }
 
     #dano() {
-        this.#vida -= this.#danoSofrido(this.#ultimoEvento.dano());
+        this.#vida -= this.#calcularVida(this.#ultimoEvento.dano());
         progressbarVida.style.setProperty('--progress', this.#vida);
         contexto.append(this.#ultimoEvento.nome + ', ' + this.#ultimoEvento.textoAtaques[Math.floor(Math.random() * (this.#ultimoEvento.textoAtaques.length))] + '\n\n');
         contexto.scrollTop = contexto.scrollHeight;
     }
     
-    #manaGasta(mana) {
+    #calcularMana(mana) {
         return Math.floor((mana * 100) / this.#pontosMana);
     }
 
@@ -944,7 +947,7 @@ class jogin {
                     this.#dadosAtqPod.push(parseInt(this.#nivel)+(i+3));
                 let contar = 0;
                 this.#dadosAtqPod.forEach(dado => {
-                    if(this.#manaGasta(dado*2+5) > this.#mana)
+                    if(this.#calcularMana(dado*2+5) > this.#mana)
                         contar++;
                 });
                 if(contar < 3) {
@@ -1012,6 +1015,7 @@ class jogin {
     #definirDefesaPassiva(ctx) {
         let defesaPassiva = 5;
         if( ctx == 'vig' ) {
+            defesaPassiva += this.#adicionalDef;
             if(this.#recAtr('defesa') != 0)
                 defesaPassiva = ((this.#atributos.defesa + 1) * defesaPassiva) + 5;  
         } else {
@@ -1057,7 +1061,7 @@ class jogin {
                     for( let key in this.#magiasAtuais ) {
                         var magia = this.#magiasAtuais[key];
                         if( Object.keys(magia) != 0 && i < 2 )
-                            if( this.#mana < this.#manaGasta(magia.gastoMana) )
+                            if( this.#mana < this.#calcularMana(magia.gastoMana) )
                                 magiasSemMana.push(magia);
                             else
                                 toggleMag(true);
@@ -1087,6 +1091,7 @@ class jogin {
                 }, 2000);
                 break;
             case 'Itens/magia':
+                this.#furtivo = false;
                 this.#mudarVisibilidadeBotoes(4);
                 this.#cancelarToggle = true;
                 btnNenhum.removeEventListener('click', this.#nenhuma);
@@ -1100,7 +1105,6 @@ class jogin {
                     if( Object.keys(magia) != 0 )
                         magSup[i].addEventListener('click', this.#itensMagia);
                 }
-
                 break;
             default:
                 break;
@@ -1160,7 +1164,7 @@ class jogin {
             button.disabled = true;
         });
         for( let m = 0; m < this.#dadosAtqPod.length; m++ ) {
-            if( this.#manaGasta((this.#dadosAtqPod[m]*2+5)) <= this.#mana ) {
+            if( this.#calcularMana((this.#dadosAtqPod[m]*2+5)) <= this.#mana ) {
                 buttonsAtqPod[m].disabled = false;
                 buttonsAtqPod[m].addEventListener('click', this.#AddDadosAtqP);
             }
@@ -1171,7 +1175,7 @@ class jogin {
         this.#dadosAtqPod.forEach(dado => {
             if( e.currentTarget.innerText == ('+' + dado + 'd12') ) {
                 this.#acumuloAtqPod = this.#rolarDados('d12', dado);
-                this.#mana -= this.#manaGasta((dado*2+5));
+                this.#mana -= this.#calcularMana((dado*2+5));
                 progressbarMana.style.setProperty('--progress', this.#mana);
                 buttonsAtqPod.forEach(btn => {
                     btn.style.display = 'none';
@@ -1225,9 +1229,9 @@ class jogin {
                         }
     
                         if(this._rolarAcerto('vigor') <= this._rolarAcertoOponente('inteligencia'))
-                            this.#vida -= this.#danoSofrido(ultimoEvento.magias[numMagia].efeito());
+                            this.#vida -= this.#calcularVida(ultimoEvento.magias[numMagia].efeito());
                         else {
-                            this.#vida -= (this.#danoSofrido(ultimoEvento.magias[numMagia].efeito()) / 2);
+                            this.#vida -= (this.#calcularVida(ultimoEvento.magias[numMagia].efeito()) / 2);
                             console.log("metade do dano");
                         }
     
@@ -1326,7 +1330,7 @@ class jogin {
                 for (let i = 0; i < magAtq.length; i++) {
                     const magia = this.#magiasAtuais['mag' + (i+1)];
                     if( Object.keys(magia) != 0 ) {
-                        if(this.#mana < this.#manaGasta(magia.gastoMana)) {
+                        if(this.#mana < this.#calcularMana(magia.gastoMana)) {
                             magAtq[i].removeEventListener('mouseover', this.#semManaOver);
                             magAtq[i].addEventListener('mouseover', this.#semManaOver);
                         } else {
@@ -1424,7 +1428,7 @@ class jogin {
                     ultimoEvento.vida -= vidaTirada;
                 }
 
-                this.#mana -= this.#manaGasta(magia.gastoMana);
+                this.#mana -= this.#calcularMana(magia.gastoMana);
                 progressbarMana.style.setProperty('--progress', this.#mana);
                 contexto.append(`Você acerta sua magia com ${testeInt}, tirando ${vidaTirada} de vida. \n\n`);
                 contexto.scrollTop = contexto.scrollHeight;
@@ -1501,6 +1505,12 @@ class jogin {
     }
 
     _cancelar = () => {
+        invSup.forEach(invSup => {
+            invSup.removeEventListener('click', this.#itensMagia);
+        });
+        magSup.forEach(magSup => {
+            magSup.removeEventListener('click', this.#itensMagia);
+        });
         magAtq.forEach(e => {
             e.removeEventListener('mouseover', this.#semManaOver);
             e.removeEventListener('mouseout', this.#semManaOut);
@@ -1586,68 +1596,19 @@ class jogin {
                 this.#ultimoEvento = eventos[escolha];
 
             } else if(this.#mapaEscolhido == 1) {
-                const escolha = Math.floor(Math.random() * 1);
+                const escolha = Math.floor(Math.random() * 7);
                 contexto.append(eventos[escolha].descricao + "\n\n");
                 this.#ultimoEvento = eventos[escolha];
 
                 this.#mudarVisibilidadeBotoes(2);
-
-                const cntSN= document.getElementById('cntSN');
-                document.querySelectorAll('.botoesSN').forEach(e => {
-                    cntSN.replaceChild(e.cloneNode(1), e);
-                });
-
-                //@todo mudar o bagulho de substituir o botao pra tirar o eventlisstener
-                recuperarBtns();
                 btnsSN.forEach(e => {
-                    e.addEventListener("click", (e) => {
-                        const valor = e.currentTarget.innerHTML;
-                        switch(valor) {
-                            case "Sim":
-                                switch(this.#ultimoEvento.tipo) {
-                                    case 'armaCaC':
-                                        contentSpan.innerText = this.#ultimoEvento.nome;
-                                        inv[0].removeAttribute('title');
-                                        inv[0].childNodes[0].replaceWith(contentSpan);
-                                        divContent1.innerText = this.#ultimoEvento.descricao;
-                                        imgContent1.setAttribute('src', this.#ultimoEvento.imgArma);
-                                        hover[0].classList.add('hoverAtivo');
-                                        this.#inventario['slot1'] = this.#ultimoEvento;
-                                        dialogo.innerText = 'Pra onde você quer ir?';
-                                        this.#opcaoCaminhar();
-                                        break;
-                                    case 'armaDis':
-                                        this.#opcaoCaminhar();
-                                        break;
-                                    case 'comida':
-                                        this.#opcaoCaminhar();
-                                        break;
-                                    case 'pocao':
-                                        this.#opcaoCaminhar();
-                                        break;
-                                    case 'amuleto':
-                                        this.#opcaoCaminhar();
-                                        break;
-                                    case 'armadura':
-                                        this.#opcaoCaminhar();
-                                    default:
-                                        //por enquanto
-                                        this.#opcaoCaminhar();
-                                        break;
-                                }
-                                this.#mudarVazio();
-                                break;
-                            case "Não":
-                                dialogo.innerText = 'Pra onde você quer ir?';
-                                this.#opcaoCaminhar();
-                                break;
-                            default:
-                                break;
-                        }
-                    });
+                    e.removeEventListener("click", this.#btnSN);
+                });
+                btnsSN.forEach(e => {
+                    e.addEventListener("click", this.#btnSN);
                 });
                 
-            } else if(this.#mapaEscolhido == 2){
+            } else if(this.#mapaEscolhido == 2) {
                 const escolha = Math.floor(Math.random() * 3);
                 contexto.append(eventos[escolha].descricao + "\n\n");
                 this.#ultimoEvento = eventos[escolha];
@@ -1700,6 +1661,64 @@ class jogin {
 
         }
 
+    }
+
+    #btnSN = (e) => {
+        const valor = e.currentTarget.innerHTML;
+        let contentSpanAC = document.createElement('span');
+        let contentSpanAD = document.createElement('span');
+        let contentSpanCo = document.createElement('span');
+        let contentSpanPo = document.createElement('span');
+        let contentSpanAm = document.createElement('span');
+        let contentSpanAr = document.createElement('span');
+
+        switch(valor) {
+            case "Sim":
+                switch(this.#ultimoEvento.tipo) {
+                    case 'armaCaC':
+                        this.#adicionar(contentSpanAC, inv[0], divContent1, imgContent1, hover[0], 'slot1');
+                        break;
+                    case 'armaDis':
+                        this.#adicionar(contentSpanAD, inv[1], divContent2, imgContent2, hover[1], 'slot2');
+                        break;
+                    case 'armadura':
+                        this.#adicionar(contentSpanAr, inv[2], divContent3, imgContent3, hover[2], 'slot3');
+                        break;
+                    case 'pocao':
+                        dialogo.innerHTML = '<b>POÇÕES PODEM SUBSTITUIR COMIDAS</b>';
+                        this.#adicionar(contentSpanPo, inv[3], divContent4, imgContent4, hover[3], 'slot4');
+                        break;
+                    case 'comida':
+                        dialogo.innerHTML = '<b>COMIDAS PODEM SUBSTITUIR POÇÕES</b>';
+                        this.#adicionar(contentSpanCo, inv[3], divContent4, imgContent4, hover[3], 'slot4');
+                        break;
+                    case 'amuleto':
+                        this.#adicionar(contentSpanAm, inv[4], divContent5, imgContent5, hover[4], 'slot5');
+                        break;
+                    default:
+                        break;
+                }
+                this.#mudarVazio();
+                break;
+            case "Não":
+                dialogo.innerText = 'Pra onde você quer ir?';
+                this.#opcaoCaminhar();
+                break;
+            default:
+                break;
+        }
+    }
+
+    #adicionar(span, elemento, div, img, hover, slot) {
+        span.innerHTML = this.#ultimoEvento.nome;
+        elemento.removeAttribute('title');
+        elemento.childNodes[0].replaceWith(span);
+        div.innerText = this.#ultimoEvento.descricao;
+        img.setAttribute('src', this.#ultimoEvento.imgArma);
+        hover.classList.add('hoverAtivo');
+        this.#inventario[slot] = this.#ultimoEvento;
+        dialogo.innerText = 'Pra onde você quer ir?';
+        this.#opcaoCaminhar();
     }
 
 }
