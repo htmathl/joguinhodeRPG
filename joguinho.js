@@ -520,7 +520,7 @@ class jogin {
     ];
     
     constructor() {
-        this.#mudarVazio();
+        this._mudarVazio();
         this.#definirIntro();
         this.#definirCondicao();
     }
@@ -539,7 +539,7 @@ class jogin {
                    turnoBicho.style.display = 'none';
     }
 
-    #mudarVazio() {
+    _mudarVazio() {
         inv.forEach(e => {
             if( e.innerText != '[vazio]' )
                 e.style.color = 'white';
@@ -623,7 +623,7 @@ class jogin {
             if (n == 1) {
                 dialogo.innerText = "O sistema é bem fácil! \n \n" +
                                "1.Quantos mais pontos tiver em um atributo, mais fácil será obter sucesso em sua execução. \n \n" +
-                               "2.Itens te ajudará na recuperação de pontos ou auxiliará em seu dano. \n \n" +
+                               "2.Itens te ajudarão a recuperar pontos ou auxiliarão em outros aspectos. \n \n" +
                                "3.Pousando o mouse sobre os elementos, aparacerá dicas > [Tente aqui] <. O resto você descobre, eu confio.";
     
                 dialogo.setAttribute('title', 'Isso mesmo, é assim que faz')
@@ -667,6 +667,7 @@ class jogin {
         });
     }
 
+    //@todo ver essas duas funções que afinal sao bem uteis mas nao to usando por algum motivo ???
     escreverContexto(texto) {
         contexto.append(texto);
         contexto.scrollTop = contexto.scrollHeight;
@@ -849,18 +850,22 @@ class jogin {
         }
     }
 
-    _rolarAcertoOponente(atributo) {
+    #rolarAcertoOponente(atributo) {
         console.log('teste oponente: ' + atributo);
         return this.#rolarDados('d20', (this.#ultimoEvento[atributo] + 1));
     }
 
-    _rolarAcerto(atributo) {
+    #rolarAcerto(atributo) {
         console.log('teste viajante: ' + atributo);
         return this.#rolarDados('d20', (this.#recAtr(atributo) + 1));
     }
 
     #recAtr(atributo) {
         return this.#atributos[atributo];
+    }
+
+    #calcularMana(mana) {
+        return Math.floor((mana * 100) / this.#pontosMana);
     }
 
     #calcularVida(dano) {
@@ -873,10 +878,6 @@ class jogin {
         contexto.append(this.#ultimoEvento.nome + ', ' + this.#ultimoEvento.textoAtaques[Math.floor(Math.random() * (this.#ultimoEvento.textoAtaques.length))] + '\n\n');
         contexto.scrollTop = contexto.scrollHeight;
     }
-    
-    #calcularMana(mana) {
-        return Math.floor((mana * 100) / this.#pontosMana);
-    }
 
     #eventoUpar() {
         //@todo balancear
@@ -888,7 +889,7 @@ class jogin {
 
     #magicasAtq = (e) => {
         e.currentTarget.innerText = this.#ultimoEvento.nome;
-        this.#mudarVazio();
+        this._mudarVazio();
         e.currentTarget.setAttribute('title', this.#ultimoEvento.descricao);
         for( let i = 0; i < 2; i++ )
             if( magAtq[i].innerText == this.#ultimoEvento.nome )
@@ -902,7 +903,7 @@ class jogin {
     
     #magicasSup = (e) => {
         e.currentTarget.innerText = this.#ultimoEvento.nome;
-        this.#mudarVazio();
+        this._mudarVazio();
         e.currentTarget.setAttribute('title', this.#ultimoEvento.descricao);
         for( let i = 0; i < 2; i++ )
             if( magSup[i].innerText == this.#ultimoEvento.nome )
@@ -988,8 +989,8 @@ class jogin {
     }
 
     #rolarAtaqueFurtivo() {
-        let testeAgi = this._rolarAcerto('agilidade'),
-        testeIntOp = this._rolarAcertoOponente('inteligencia');
+        let testeAgi = this.#rolarAcerto('agilidade'),
+        testeIntOp = this.#rolarAcertoOponente('inteligencia');
     
         testeAgi > testeIntOp ? this.#furtivo = true :
                                 this.#furtivo = false;
@@ -1078,7 +1079,7 @@ class jogin {
     
                 break;
             case 'Defender':
-                this.#testeDefesa = this._rolarAcerto('defesa');
+                this.#testeDefesa = this.#rolarAcerto('defesa');
                 this.#furtivo = false;
 
                 this.#mudarVisibilidadeBotoes(5);
@@ -1091,7 +1092,7 @@ class jogin {
                 this.#mudarVisibilidadeBotoes(4);
                 this.#cancelarToggle = true;
                 btnNenhum.removeEventListener('click', this.#nenhuma);
-                btnNenhum.addEventListener('click', this._cancelar);   
+                btnNenhum.addEventListener('click', this.#cancelar);   
 
                 for( let i = 0; i < 2; i++ ) {
                     let item = this.#inventario['slot'+(i+4)];
@@ -1224,7 +1225,7 @@ class jogin {
                             contexto.scrollTop = contexto.scrollHeight;
                         }
     
-                        if(this._rolarAcerto('vigor') <= this._rolarAcertoOponente('inteligencia'))
+                        if(this.#rolarAcerto('vigor') <= this.#rolarAcertoOponente('inteligencia'))
                             this.#vida -= this.#calcularVida(ultimoEvento.magias[numMagia].efeito());
                         else {
                             this.#vida -= (this.#calcularVida(ultimoEvento.magias[numMagia].efeito()) / 2);
@@ -1240,10 +1241,10 @@ class jogin {
                     break;
                 case false:
                     if(this.#testeDefesa != 0) {
-                        if(this._rolarAcertoOponente('forca') >= this.#testeDefesa)
+                        if(this.#rolarAcertoOponente('forca') >= this.#testeDefesa)
                             this.#dano();
                     } else {
-                        if(this.#definirDefesaPassiva('vig') <= this._rolarAcertoOponente('forca'))
+                        if(this.#definirDefesaPassiva('vig') <= this.#rolarAcertoOponente('forca'))
                             this.#dano();
                     }
                     break;
@@ -1261,7 +1262,7 @@ class jogin {
     }
     
     #ataqueViajante = (e) => {
-        let vidaTirada = 0, testeForca = this._rolarAcerto('forca');
+        let vidaTirada = 0, testeForca = this.#rolarAcerto('forca');
         let ultimoEvento = this.#ultimoEvento;
 
         switch (e.currentTarget.innerText) {
@@ -1340,7 +1341,7 @@ class jogin {
 
                 this.#cancelarToggle = false;
                 btnNenhum.removeEventListener('click', this.#nenhuma);
-                btnNenhum.addEventListener('click', this._cancelar);
+                btnNenhum.addEventListener('click', this.#cancelar);
                 break;
             case 'Atq. armado':
                 console.log(this.#inventario);
@@ -1353,7 +1354,7 @@ class jogin {
                 this.#mudarVisibilidadeBotoes(4);
                 this.#cancelarToggle = false;
                 btnNenhum.removeEventListener('click', this.#nenhuma);
-                btnNenhum.addEventListener('click', this._cancelar);
+                btnNenhum.addEventListener('click', this.#cancelar);
                 break;
             default:
                 break;
@@ -1393,7 +1394,7 @@ class jogin {
         }
 
         let vidaTirada = 0,
-        testeInt = this._rolarAcerto('inteligencia');
+        testeInt = this.#rolarAcerto('inteligencia');
         let ultimoEvento = this.#ultimoEvento;
 
         for( var key in this.#magiasAtuais ) {
@@ -1415,7 +1416,7 @@ class jogin {
                             vidaTirada *= (i+2);
                         }
                 }
-                if(this._rolarAcertoOponente('vigor') <= testeInt) {
+                if(this.#rolarAcertoOponente('vigor') <= testeInt) {
                     vidaTirada += magia.efeito();
                     ultimoEvento.vida -= vidaTirada;
                 } else {
@@ -1451,7 +1452,7 @@ class jogin {
         });
 
         let ultimoEvento = this.#ultimoEvento, vidaTirada = 0;
-        let testeForca = this._rolarAcerto('forca');
+        let testeForca = this.#rolarAcerto('forca');
 
         for( let key in this.#inventario ) {
             if(!this.#inventario.hasOwnProperty(key)) continue;
@@ -1500,7 +1501,7 @@ class jogin {
         }
     }
 
-    _cancelar = () => {
+    #cancelar = () => {
         invSup.forEach(invSup => {
             invSup.removeEventListener('click', this.#itensMagia);
         });
@@ -1515,7 +1516,7 @@ class jogin {
         let i = 0;
         while(i < this.#intervaloValMags.length) {
             clearInterval(this.#intervaloValMags[i]);
-            this.#mudarVazio();
+            this._mudarVazio();
             i++;
         }
 
@@ -1528,7 +1529,7 @@ class jogin {
         });
 
         this.#mudarVisibilidadeBotoes(this.#cancelarToggle ? 1 : 3);
-        btnNenhum.removeEventListener('click', this._cancelar);
+        btnNenhum.removeEventListener('click', this.#cancelar);
     }
 
     #morteOponente(msg) {
@@ -1596,6 +1597,11 @@ class jogin {
                 contexto.append(eventos[escolha].descricao + "\n\n");
                 this.#ultimoEvento = eventos[escolha];
 
+                if(this.#ultimoEvento.tipo == 'pocao')
+                    dialogo.innerHTML = `<b style="color: yellow" > &#9888 Poções podem substituir comidas</b>`;
+                if(this.#ultimoEvento.tipo == 'comida')
+                    dialogo.innerHTML = `<b style="color: yellow" > &#9888 Comidas podem substituir poções</b>`;
+
                 this.#mudarVisibilidadeBotoes(2);
                 btnsSN.forEach(e => {
                     e.removeEventListener("click", this.#btnSN);
@@ -1611,7 +1617,7 @@ class jogin {
 
                 this.#mudarVisibilidadeBotoes(4);
 
-                btnNenhum.removeEventListener('click', this._cancelar);
+                btnNenhum.removeEventListener('click', this.#cancelar);
                 btnNenhum.addEventListener('click', this.#nenhuma);
 
                 if(this.#ultimoEvento.tipo == 'atq')
@@ -1631,14 +1637,14 @@ class jogin {
                 this.#ultimoEventoVida = this.#ultimoEvento.vida;
 
                 //ver quem começa
-                let testeAgi = this._rolarAcerto('agilidade'), testeAgiOp = this._rolarAcertoOponente('agilidade');
+                let testeAgi = this.#rolarAcerto('agilidade'), testeAgiOp = this.#rolarAcertoOponente('agilidade');
                 while(testeAgiOp == testeAgi) {
                     if( this.#atributos.agilidade != this.#ultimoEvento.agilidade ) {
                         testeAgi += this.#atributos.agilidade;
                         testeAgiOp += this.#ultimoEvento.agilidade;
                     } else {
-                        testeAgi = this._rolarAcerto('agilidade');
-                        testeAgiOp = this._rolarAcertoOponente('agilidade');
+                        testeAgi = this.#rolarAcerto('agilidade');
+                        testeAgiOp = this.#rolarAcertoOponente('agilidade');
                     }
                 }
 
@@ -1681,11 +1687,9 @@ class jogin {
                         this.#adicionar(contentSpanAr, inv[2], divContent3, imgContent3, hover[2], 'slot3');
                         break;
                     case 'pocao':
-                        dialogo.innerHTML = '<b>POÇÕES PODEM SUBSTITUIR COMIDAS</b>';
                         this.#adicionar(contentSpanPo, inv[3], divContent4, imgContent4, hover[3], 'slot4');
                         break;
                     case 'comida':
-                        dialogo.innerHTML = '<b>COMIDAS PODEM SUBSTITUIR POÇÕES</b>';
                         this.#adicionar(contentSpanCo, inv[3], divContent4, imgContent4, hover[3], 'slot4');
                         break;
                     case 'amuleto':
@@ -1694,7 +1698,7 @@ class jogin {
                     default:
                         break;
                 }
-                this.#mudarVazio();
+                this._mudarVazio();
                 break;
             case "Não":
                 dialogo.innerText = 'Pra onde você quer ir?';
@@ -1721,4 +1725,4 @@ class jogin {
 
 new jogin;
 
-let maaaaaaaaaaaaaa = 3;
+let maaaaaaaaaaaaaa = 1;
