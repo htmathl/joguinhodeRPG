@@ -6,6 +6,11 @@
     --bcBotoes: white;
 }
 
+/* @todo depois arrumar o css do hover dos itens // 
+adicionar nas magias // arrumar a responsividade // 
+colocar div pros pactos/habilidades (ainda nao sei como chamar) // 
+arrumar a organização geral, talvez deixar mais bonito */
+
 @font-face {
     font-family: fontinha;
     src: url(./fonts/Mahalo_brother.otf);
@@ -262,6 +267,9 @@ button:disabled > span {
 }
 
 .mag {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 10px 5px;
   width: 80px;
   border-width: 1.5px;
@@ -274,6 +282,9 @@ button:disabled > span {
 }
 
 .inv {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: calc(var(--paddingInv) * 2) var(--paddingInv);
   width: var(--larguraInv);
   border-width: 1.5px;
