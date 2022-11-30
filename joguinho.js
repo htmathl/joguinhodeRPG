@@ -100,16 +100,12 @@ window.setInterval(() => {
  }, 500);
 
 function definirVida() {
-    //vida nivel 0 = 10 pontos
-    //a cada nivel aumenta 5 pontos totais e atuais
-    //a cada 5 niveis os pontos adjascentes dobram
+    //vida nivel 0 = 20 pontos
   	progressbarVida.style.setProperty('--progress', 100);
 }
 
 function definirMana() {
-    //mana trabalha com porcentagem, resistencia nivel 0 = 0
-    //a cada nivel a resistencia aumenta em 0.5%
-    //resistencia - gasto da magia = percentual final
+    //mana nivel 0 = 20 pontos
 	progressbarMana.style.setProperty('--progress', 100);
 }
 
