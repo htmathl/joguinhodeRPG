@@ -667,16 +667,15 @@ class jogin {
         });
     }
 
-    //@todo ver essas duas funções que afinal sao bem uteis mas nao to usando por algum motivo ???
-    escreverContexto(texto) {
-        contexto.append(texto);
+    _escreverContexto(texto) {
+        contexto.append(texto + '\n\n');
         contexto.scrollTop = contexto.scrollHeight;
     }
 
-    inserirHtmlContexto(elemento, texto) {
+    _inserirHtmlContexto(elemento, texto, prop, value) {
         const elementoCriado = document.createElement(elemento);
         elementoCriado.innerText = `${texto} \n\n`;
-        elementoCriado.style.setProperty('text-decoration', 'underline');
+        elementoCriado.style.setProperty(prop, value);
         contexto.appendChild(elementoCriado);
         contexto.scrollTop = contexto.scrollHeight;
     }
@@ -830,7 +829,6 @@ class jogin {
                 }
     
                 result = Math.max.apply(null, dados);
-                result = 20;
                 if(result == 20)
                     this.#critico = true;
                 else
@@ -875,8 +873,7 @@ class jogin {
     #dano() {
         this.#vida -= this.#calcularVida(this.#ultimoEvento.dano());
         progressbarVida.style.setProperty('--progress', this.#vida);
-        contexto.append(this.#ultimoEvento.nome + ', ' + this.#ultimoEvento.textoAtaques[Math.floor(Math.random() * (this.#ultimoEvento.textoAtaques.length))] + '\n\n');
-        contexto.scrollTop = contexto.scrollHeight;
+        this._escreverContexto(this.#ultimoEvento.nome + ', ' + this.#ultimoEvento.textoAtaques[Math.floor(Math.random() * (this.#ultimoEvento.textoAtaques.length))]);
     }
 
     #eventoUpar() {
@@ -994,18 +991,13 @@ class jogin {
     
         testeAgi > testeIntOp ? this.#furtivo = true :
                                 this.#furtivo = false;
-    
         console.log(this.#furtivo);
-        //@todo trocar esse e o que muda pra branco colocar só btnsAcao[0]...
+        btnsAcao[1].innerText = 'Fugir';
         btnsAcao[0].style.setProperty('color', '#575CFA');
         btnsAcao[0].style.setProperty('--bcBotoes', '#575CFA' );
         btnsAtq[0].style.setProperty('color', '#575CFA');
         btnsAtq[0].style.setProperty('--bcBotoes', '#575CFA' );
-        let textoAtqFurt = 'Possibilidade de ataque furtivo! \n\n';
-        let span = document.createElement('span');
-        span.innerText = textoAtqFurt;
-        span.style.color = '#575CFA';
-        contexto.appendChild(span);
+        this._inserirHtmlContexto('span', 'Possibilidade de ataque furtivo!', 'color', '#575CFA');
         this.#iniciarBatalha();
     }
 
@@ -1103,6 +1095,25 @@ class jogin {
                         magSup[i].addEventListener('click', this.#itensMagia);
                 }
                 break;
+            case 'Fugir':
+                let testeSorte = this.#rolarAcerto('sorte');
+                let dt = this.#ultimoEvento.inteligencia * 5 + 5;
+                console.log('dt: ' + dt);
+                this.#furtivo = false;
+                if(testeSorte >= dt) {
+                    this._escreverContexto('Você Fugiu!');
+                    turno.innerText = '';
+                    this.#contagemTurno = 0;
+                    this.#somaDano = 0;
+                    this.#opcaoCaminhar();
+                } else {
+                    this._escreverContexto('Em um momento de desespero, você tenta fugir, mas a criatura te ataca.');
+                    this.#mudarVisibilidadeBotoes(5);
+                    setTimeout(() =>{
+                        this.#ataqueOponente();
+                    }, 3000);
+                }
+                break;
             default:
                 break;
         }
@@ -1190,6 +1201,7 @@ class jogin {
     }
 
     #ataqueOponente() {
+        btnsAcao[1].innerText = 'Defender';
         let usarMagias = false;
         let ultimoEvento = this.#ultimoEvento; 
     
@@ -1218,11 +1230,7 @@ class jogin {
                     if(this.#usos[this.#usos.length - 1] > 0) {
 
                         if(this.#testeDefesa != 0) {
-                            let span = document.createElement('span');
-                            span.innerText = 'Não há como defender ataques mágicos \n\n';
-                            span.style.setProperty('text-decoration', 'underline');
-                            contexto.appendChild(span);
-                            contexto.scrollTop = contexto.scrollHeight;
+                            this._inserirHtmlContexto('span', 'Não há como defender ataques mágicos', 'text-decoration', 'underline');
                         }
     
                         if(this.#rolarAcerto('vigor') <= this.#rolarAcertoOponente('inteligencia'))
@@ -1295,12 +1303,10 @@ class jogin {
                     this.#acumuloAtqPod = 0;
                     this.#furtivo = false;
 
-                    contexto.append(`Você da um soco, e acerta com ${testeForca}, tirando ${vidaTirada} de vida. \n\n`);
-                    contexto.scrollTop = contexto.scrollHeight;
+                    this._escreverContexto(`Você da um soco, e acerta com ${testeForca}, tirando ${vidaTirada} de vida.`);
                 } else {
                     //@todo fazer pra outros tipos de defesa alem de esquiva (se for implementado)
-                    contexto.append('Em um momento de desespero, você tenta dar um soco nesta criatura, que desvia com facilidade. \n\n');
-                    contexto.scrollTop = contexto.scrollHeight;
+                    this._escreverContexto('Em um momento de desespero, você tenta dar um soco nesta criatura, que desvia com facilidade.');
                     this.#mudarVisibilidadeBotoes(5);
                     setTimeout(() =>{
                         this.#ataqueOponente();
@@ -1427,8 +1433,7 @@ class jogin {
 
                 this.#mana -= this.#calcularMana(magia.gastoMana);
                 progressbarMana.style.setProperty('--progress', this.#mana);
-                contexto.append(`Você acerta sua magia com ${testeInt}, tirando ${vidaTirada} de vida. \n\n`);
-                contexto.scrollTop = contexto.scrollHeight;
+                this._escreverContexto(`Você acerta sua magia com ${testeInt}, tirando ${vidaTirada} de vida.`);
                 console.log('vida tirada: ' + ultimoEvento.vida);
         
                 if(ultimoEvento.vida <= 0) {
@@ -1478,8 +1483,7 @@ class jogin {
                     }
 
                     ultimoEvento.vida = ultimoEvento.vida - vidaTirada;
-                    contexto.append(`Você acerta com ${testeForca} em seu teste, tirando ${vidaTirada} de vida. \n\n`);
-                    contexto.scrollTop = contexto.scrollHeight;
+                    this._escreverContexto(`Você acerta com ${testeForca} em seu teste, tirando ${vidaTirada} de vida. `);
                     console.log('vida tirada: ' + ultimoEvento.vida);
                     console.log('defesa bicho: ' + this.#definirDefesaPassiva());
 
@@ -1533,7 +1537,7 @@ class jogin {
     }
 
     #morteOponente(msg) {
-        contexto.append(msg + '\n\n');
+        this._escreverContexto(msg);
         this.#ultimoEvento.vida = this.#ultimoEventoVida;
         this.#usos = [];
         turno.innerText = '';
@@ -1548,13 +1552,10 @@ class jogin {
     #eventoAndar = (e) => {
         this.#ultimoLugar = e.currentTarget.innerText.toLowerCase();
         this.#escolherMapa();
-        contexto.scrollTop = contexto.scrollHeight;
     }
 
     #opcaoCaminhar(){
         this.#mudarVisibilidadeBotoes(0);
-
-        contexto.scrollTop = contexto.scrollHeight;
 
         btnsAndar.forEach((btnsAndar) => {
             btnsAndar.removeEventListener('click', this.#eventoAndar);
@@ -1589,12 +1590,12 @@ class jogin {
 
             if(this.#mapaEscolhido == 0) {
                 const escolha = Math.floor(Math.random() * 10);
-                contexto.append(eventos[escolha].descricao[Math.floor(Math.random() * 5)] + "\n\n");
+                this._escreverContexto(eventos[escolha].descricao[Math.floor(Math.random() * 5)] + '');
                 this.#ultimoEvento = eventos[escolha];
 
             } else if(this.#mapaEscolhido == 1) {
                 const escolha = Math.floor(Math.random() * 7);
-                contexto.append(eventos[escolha].descricao + "\n\n");
+                this._escreverContexto(eventos[escolha].descricao);
                 this.#ultimoEvento = eventos[escolha];
 
                 if(this.#ultimoEvento.tipo == 'pocao')
@@ -1612,7 +1613,7 @@ class jogin {
                 
             } else if(this.#mapaEscolhido == 2) {
                 const escolha = Math.floor(Math.random() * 3);
-                contexto.append(eventos[escolha].descricao + "\n\n");
+                this._escreverContexto(eventos[escolha].descricao);
                 this.#ultimoEvento = eventos[escolha];
 
                 this.#mudarVisibilidadeBotoes(4);
@@ -1632,7 +1633,7 @@ class jogin {
             } else if(this.#mapaEscolhido == 3) {
                 dialogo.append(' Prepare-se para batalha');
                 const escolha = Math.floor(Math.random() * 1);
-                contexto.append(eventos[escolha].descricao + "\n\n");
+                this._escreverContexto(eventos[escolha].descricao);
                 this.#ultimoEvento = eventos[escolha];
                 this.#ultimoEventoVida = this.#ultimoEvento.vida;
 
@@ -1653,7 +1654,7 @@ class jogin {
             } else if(this.#mapaEscolhido == 4) {
                 dialogo.innerText = `Você andou para ${ultimaAndada} e encontrou... Para onde você quer ir?`
                 const escolha = "m" + this.#mapaEscolhido + (Math.floor(Math.random() * (1 - 1)) + 1);
-                contexto.append(eval(escolha).descricao + "\n\n");
+                this._escreverContexto(eventos[escolha].descricao);
                 ultimoEvento = eval(escolha);
                 iniciarBatalha();
             }
