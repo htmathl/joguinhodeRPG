@@ -42,6 +42,10 @@ arrumar a organização geral, talvez deixar mais bonito */
   border: 3px solid rgb(37, 30, 30);
 }
 
+html {
+  height: 100%;
+}
+
 body {
     background-color: rgb(37, 30, 30);
     color: #fff;
@@ -76,9 +80,12 @@ h1 {
 }*/
 
 #iContexto {
+  height: 100%;
   white-space: pre-line;
   overflow: auto;
   text-align: justify;
+  margin: 0;
+  padding-bottom: 0;
 }
 
 input {
@@ -176,19 +183,15 @@ button:disabled > span {
   margin: 6px 24px;
   height: 124.8px;
   word-break: break-word;
-  min-width: 220px;
-  max-width: 220px;
   text-align: start;
   display: flex;
   flex-direction: column;
   transition: all ease 0.5s;
 }
 
-.flexRow {
-  display: flex;
-  flex-direction: row;
-  margin: 0 6px;
-  justify-content: space-between;
+#contexto {
+  flex-grow: 3;
+  height: 500px;
 }
 
 .btnMais, .btnMenos {
@@ -202,7 +205,7 @@ button:disabled > span {
 .infos {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
 }
 
@@ -335,8 +338,8 @@ button:disabled > span {
 
 @media (min-width: 1000px) {
   .inputInfos {
-      min-width: 330px;
-      max-width: 330px;
+      min-width: 180px; 
+      /* max-width: 330px; */
       height: 187.2px;
       font-size: calc(var(--fonte) * 1.2);
   }
