@@ -4,6 +4,7 @@
     --larguraInv: 80px;
     --paddingInv: 5px;
     --bcBotoes: white;
+    --alturaContexto: 339px;
 }
 
 /* @todo depois arrumar o css do hover dos itens // 
@@ -42,16 +43,25 @@ arrumar a organização geral, talvez deixar mais bonito */
   border: 3px solid rgb(37, 30, 30);
 }
 
+@keyframes bouncy {
+  from, to { transform: scale(1, 1); }
+  25% { transform: scale(0.9, 1.1); }
+  50% { transform: scale(1.1, 0.9); }
+  75% { transform: scale(0.95, 1.05); }
+}
+
 html {
   height: 100%;
 }
 
 body {
-    background-color: rgb(37, 30, 30);
-    color: #fff;
-    margin: 12px;
-    text-align: center;
-    font-size: var(--fonte);
+  position: relative;
+  height: 100%;
+  background-color: rgb(37, 30, 30);
+  color: #fff;
+  margin: 0;
+  text-align: center;
+  font-size: var(--fonte);
 }
 
 h1 {
@@ -80,12 +90,10 @@ h1 {
 }*/
 
 #iContexto {
-  height: 100%;
   white-space: pre-line;
   overflow: auto;
   text-align: justify;
   margin: 0;
-  padding-bottom: 0;
 }
 
 input {
@@ -94,7 +102,7 @@ input {
 
 input, div.inputInfos {
   background-color: rgb(37, 30, 30);
-  border-width: 1.5px;
+  border-width: 2px;
   border-color: white;
   color: #fff;
   border-radius: 5px;
@@ -107,20 +115,18 @@ input, div.inputInfos {
   border: none;
   font-size: 20px;
   text-align: center;
+  margin-bottom: 20px;
 }
 
 button {
   background-color: rgba(0, 0, 0, 0);
   color: white;
-  margin: 12px 12px;
-  padding: 5px 0;
+  margin-top: 5px;
+  margin-bottom: 10px;
+  margin-inline: 40px;
   border: none;
   outline-style: none;
-  font-size: 20px;
-  width: 120px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-size: 25px;
   transition: all ease 0.2s;
 }
 
@@ -136,13 +142,13 @@ button::after {
     width: 0;
     display: block;
     transition: all ease 0.2s;
-    margin-top: 5px ;
-    margin-inline : auto;
+    margin-top: 5px;
+    margin-inline: auto;
 }
 
 button:hover::after {
     content: '';
-    width: 90%;
+    width: 100%;
     background-color: var(--bcBotoes);
 }
 
@@ -179,8 +185,18 @@ button:disabled > span {
   color: rgba(255, 255, 255, 0.499) !important;
 }
 
+.tituloInfos {
+  position: absolute;
+  top: -62px;
+  left: 50%;
+  text-align: center;
+  transform: translate(-50%);
+  min-width: max-content;
+  margin: 0 !important;
+}
+
 .inputInfos {
-  margin: 6px 24px;
+  margin: 0px 19px;
   height: 124.8px;
   word-break: break-word;
   text-align: start;
@@ -191,7 +207,6 @@ button:disabled > span {
 
 #contexto {
   flex-grow: 3;
-  height: 500px;
 }
 
 .btnMais, .btnMenos {
@@ -202,6 +217,10 @@ button:disabled > span {
   text-align: center;
 }
 
+#turno {
+  margin-top: 15px;
+}
+
 .infos {
   display: flex;
   flex-direction: row;
@@ -209,9 +228,36 @@ button:disabled > span {
   width: 100%;
 }
 
-.fichaNivel {
+#ficha, #miau {
   display: flex;
+  flex-direction: column;
   justify-content: center;
+}
+
+#ficha > div {
+  margin-right: 0 !important;
+  border-right: none;
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+}
+
+#habilidades, #iFicha {
+  position: relative;
+}
+
+#habilidades {
+  margin-left: 0 !important;
+  border-left: none;
+  border-bottom-left-radius: 0;
+  border-top-left-radius: 0;
+  /* min-height: var(--alturaContexto); */
+}
+
+.fichaNivel {
+  margin-top: 5px;
+  display: flex;
+  position: relative;
+  justify-content: flex-end;
 }
 
 .fichaNivel>div {
@@ -275,7 +321,7 @@ button:disabled > span {
   align-items: center;
   padding: 10px 5px;
   width: 80px;
-  border-width: 1.5px;
+  border-width: 2px;
   border-style: solid;
   border-radius: 5px;
   border-color: rgb(18, 1, 105);
@@ -290,7 +336,7 @@ button:disabled > span {
   align-items: center;
   padding: calc(var(--paddingInv) * 2) var(--paddingInv);
   width: var(--larguraInv);
-  border-width: 1.5px;
+  border-width: 2px;
   border-style: solid;
   border-radius: 5px;
   border-color: #fff;
@@ -320,6 +366,17 @@ button:disabled > span {
   transition: all 0.3s ease-in-out;
 }
 
+#barraXP {
+  position: absolute;
+  max-width: 150px;
+  height: 3.5px;
+  --progress: 0;
+  border-color: #065019;
+  bottom: -7px;
+  align-self: center;
+  right: 15px;
+}
+
 #barraVida::before {
   content: "";
   background-color: #8a0707;
@@ -336,12 +393,22 @@ button:disabled > span {
   border-radius: 2px;
 }
 
+#barraXP::before {
+  content: "";
+  width: calc(var(--progress) * 1%);
+  background-color: #065019;
+  transition: all 0.2s ease;
+  border-radius: 2px;
+}
+
 @media (min-width: 1000px) {
   .inputInfos {
-      min-width: 180px; 
-      /* max-width: 330px; */
+      min-width: 200px; 
       height: 187.2px;
       font-size: calc(var(--fonte) * 1.2);
+  }
+  #iContexto {
+    min-height: var(--alturaContexto);
   }
   .inputInfos > div {
       margin: 3px 6px;
@@ -359,7 +426,7 @@ button:disabled > span {
   display: none;
   border: 1.5px solid #fff;
   border-radius: 5px;
-  background-color: rgba(88, 78, 78, 0.356);
+  background-color: rgba(0, 0, 0, 0.356);
   width: 230px;
 }
 
@@ -378,4 +445,44 @@ button:disabled > span {
   position: absolute;
   margin-top: -250px;
   margin-left: -57px;
+}
+
+#blur {
+  position: absolute;
+  display: flex;
+  z-index: 2;
+  top: 0%;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.86);
+  justify-content: center;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+#tituloNiv {
+  transition: all 0.5s linear;
+  animation: bouncy 0.5s ease 0.1s;
+  height: fit-content;
+  opacity: 0;
+  font-size: 70px;
+  margin-top: 20%;
+}
+
+#telaUps {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  opacity: 0;
+  transition: all 0.2s linear;
+  position: fixed;
+}
+
+#upHabilidades {
+  min-width: 500px;
+}
+
+#tituloHb {
+  margin-top: 0;
 }

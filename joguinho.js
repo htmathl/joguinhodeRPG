@@ -43,6 +43,7 @@ let buttonsAtqPod = [];
 
 let progressbarVida = document.querySelector('#barraVida');
 let progressbarMana = document.querySelector('#barraMana');
+let progressbarXP = document.getElementById('barraXP');
 let lvl = document.getElementById('nivel');
 let pnts = document.getElementById('pontos');
 let turno = document.getElementById('turno');
@@ -178,6 +179,30 @@ class jogin {
     #intervaloValMag1;
     #intervaloValMags = [this.#intervaloValMag0, this.#intervaloValMag1];
     #cancelarToggle;
+
+    #habilidades = [ 
+        {
+            id: 1,
+            nome: 'Sangue Corrompido',
+            efeito: () => {
+                console.log('miau');
+            },
+        },
+        {
+            id: 2,
+            nome: 'aaaaaaa Corrompido',
+            efeito: () => {
+                console.log('miau');
+            },
+        },
+        {
+            id: 3,
+            nome: 'ghfhfh Corrompido',
+            efeito: () => {
+                console.log('miau');
+            },
+        },
+    ];
 
     //@todo rever os atributos dos bichos e tudo mias
     //@todo rever o bonus dos negocios ( +15 para 4 dados me parece muito ) ( pode ser tipo a cada numero impar ou par aumentar o bonus )
@@ -877,9 +902,18 @@ class jogin {
     }
 
     #eventoUpar() {
-        //@todo balancear
-        if(this.#experiencia >= (100*this.#nivel))
+        if(this.#experiencia >= (100*this.#nivel*2)) {
             lvl.innerText = 'Nível: ' + (parseInt(lvl.innerText.split(':')[1].trim()) + 1);
+            return true;
+        }
+        return false;
+    }
+
+    #upgradeAtributos() {
+        let blur = document.createElement('div');
+        blur.style.setProperty('position', 'fixed');
+        blur.style.setProperty('color', 'red');
+        document.appendChild(blur);
     }
 
     //@follow-up ----------------- adicionar magias ao inv --------------
@@ -1544,8 +1578,7 @@ class jogin {
         this.#contagemTurno = 0;
         this.#somaDano = 0;
         this.#experiencia += this.#ultimoEvento.exp;
-        this.#eventoUpar();
-        this.#opcaoCaminhar();
+        this.#eventoUpar() ? this.#upgradeAtributos() : this.#opcaoCaminhar();
     }
 
     //@follow-up -------------- definir o que rolou ------------------
@@ -1598,10 +1631,14 @@ class jogin {
                 this._escreverContexto(eventos[escolha].descricao);
                 this.#ultimoEvento = eventos[escolha];
 
-                if(this.#ultimoEvento.tipo == 'pocao')
+                if(this.#ultimoEvento.tipo == 'pocao') {
                     dialogo.innerHTML = `<b style="color: yellow" > &#9888 Poções podem substituir comidas</b>`;
-                if(this.#ultimoEvento.tipo == 'comida')
+                    invSup[0].style.color = 'yellow';
+                }
+                if(this.#ultimoEvento.tipo == 'comida') {
                     dialogo.innerHTML = `<b style="color: yellow" > &#9888 Comidas podem substituir poções</b>`;
+                    invSup[0].style.color = 'yellow';
+                }
 
                 this.#mudarVisibilidadeBotoes(2);
                 btnsSN.forEach(e => {
@@ -1674,6 +1711,7 @@ class jogin {
         let contentSpanPo = document.createElement('span');
         let contentSpanAm = document.createElement('span');
         let contentSpanAr = document.createElement('span');
+        this._mudarVazio();
 
         switch(valor) {
             case "Sim":
@@ -1727,3 +1765,78 @@ class jogin {
 new jogin;
 
 let maaaaaaaaaaaaaa = 1;
+
+let habilidadess = [ 
+    {
+        id: 1,
+        nome: 'Sangue Corrompido',
+        efeito: () => {
+            console.log('miau');
+        },
+    },
+    {
+        id: 2,
+        nome: 'aaaaaaa Corrompido',
+        efeito: () => {
+            console.log('miau');
+        },
+    },
+    {
+        id: 3,
+        nome: 'ghfhfh Corrompido',
+        efeito: () => {
+            console.log('miau');
+        },
+    },
+];
+
+function upgradeAtributos() {
+    let blur = document.createElement('div');
+    blur.setAttribute('id', 'blur');
+    document.body.appendChild(blur);
+    let titulo = document.createElement('h1');
+    titulo.setAttribute('id', 'tituloNiv');
+    titulo.innerText = 'Subiu de nível !';
+    blur.appendChild(titulo);
+    setTimeout(() => {
+        titulo.style.opacity = '1';
+    }, 200);
+    setTimeout(() => {
+        titulo.style.margin = '10px';
+        titulo.style.width = '100%';
+    }, 1200);
+    let telaUps = document.createElement('div');
+    telaUps.setAttribute('id', 'telaUps');
+    let upHabilidades = document.createElement('div');
+    upHabilidades.setAttribute('id', 'upHabilidades');
+    let tituloHb = document.createElement('h3');
+    tituloHb.setAttribute('id', 'upHabilidades');
+    tituloHb.innerText = 'Habilidades:';
+    upHabilidades.appendChild(tituloHb);
+    let buttonHbs = document.createElement('ul');
+    habilidadess.forEach(k => {
+        let liHbs = document.createElement('li');
+        liHbs.innerText = k.nome;
+        buttonHbs.appendChild(liHbs);
+    });
+    upHabilidades.appendChild(buttonHbs);
+    let linha = document.createElement('div');
+    linha.style.borderLeft = '6px solid white';
+    linha.style.height = '500px';
+    let atributos = document.createElement('div');
+    atributos.style.minWidth = '500px';
+    let tituloAt = document.createElement('h3');
+    tituloAt.style.marginTop = '0';
+    tituloAt.innerText = 'Atributos:';
+    atributos.appendChild(tituloAt);
+    telaUps.appendChild(upHabilidades);
+    telaUps.appendChild(linha);
+    telaUps.appendChild(atributos);
+    blur.appendChild(telaUps);
+    setTimeout(() => {
+        telaUps.style.position = 'static';
+        telaUps.style.opacity = '1';
+    }, 2000);
+}
+
+// upgradeAtributos();
