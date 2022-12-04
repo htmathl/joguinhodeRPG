@@ -448,7 +448,7 @@ button:disabled > span {
 }
 
 #blur {
-  position: absolute;
+  position: fixed;
   display: flex;
   z-index: 2;
   top: 0%;
@@ -458,6 +458,7 @@ button:disabled > span {
   justify-content: center;
   flex-wrap: wrap;
   align-content: flex-start;
+  
 }
 
 #tituloNiv {
@@ -472,17 +473,53 @@ button:disabled > span {
 #telaUps {
   width: 100%;
   display: flex;
-  flex-direction: row;
   justify-content: space-around;
   opacity: 0;
   transition: all 0.2s linear;
   position: fixed;
 }
 
-#upHabilidades {
-  min-width: 500px;
+#upHabilidades, #upAtributos {
+  min-width: 45vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-#tituloHb {
+#tituloHb, #tituloAt {
   margin-top: 0;
+  margin-bottom: 30px;
+  font-size: 40px;
+}
+
+#listaHB, #listaAt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 23px;
+}
+
+input[type=checkbox] {
+  display: none;
+}
+
+label {
+  cursor: pointer;
+}
+
+#listaHB > div {
+  margin-bottom: 30px;
+}
+
+#listaAt > div > div {
+  padding-left: 80px;
+}
+
+#listaAt > div > div > button {
+  margin: 0;
+}
+
+#linha {
+  border-left: 6px solid white;
+  height: 80vh;
 }

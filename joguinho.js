@@ -1769,6 +1769,7 @@ let maaaaaaaaaaaaaa = 1;
 let habilidadess = [ 
     {
         id: 1,
+        idHTML: 'sangueCorrompido',
         nome: 'Sangue Corrompido',
         efeito: () => {
             console.log('miau');
@@ -1776,6 +1777,7 @@ let habilidadess = [
     },
     {
         id: 2,
+        idHTML: 'sangueCorrompido2',
         nome: 'aaaaaaa Corrompido',
         efeito: () => {
             console.log('miau');
@@ -1783,6 +1785,7 @@ let habilidadess = [
     },
     {
         id: 3,
+        idHTML: 'sangueCorrompido3',
         nome: 'ghfhfh Corrompido',
         efeito: () => {
             console.log('miau');
@@ -1810,28 +1813,66 @@ function upgradeAtributos() {
     let upHabilidades = document.createElement('div');
     upHabilidades.setAttribute('id', 'upHabilidades');
     let tituloHb = document.createElement('h3');
-    tituloHb.setAttribute('id', 'upHabilidades');
+    tituloHb.setAttribute('id', 'tituloHb');
     tituloHb.innerText = 'Habilidades:';
     upHabilidades.appendChild(tituloHb);
-    let buttonHbs = document.createElement('ul');
+    let divListaHB = document.createElement('div');
+    divListaHB.setAttribute('id', 'listaHB');
     habilidadess.forEach(k => {
-        let liHbs = document.createElement('li');
-        liHbs.innerText = k.nome;
-        buttonHbs.appendChild(liHbs);
+        let divChecks = document.createElement('div');
+        let listaHB = document.createElement('input');
+        listaHB.setAttribute('type', 'checkbox');
+        let labelHB = document.createElement('label');
+        listaHB.setAttribute('id', k.idHTML);
+        labelHB.setAttribute('for', k.idHTML);
+        labelHB.innerText = k.nome;
+        labelHB.addEventListener('click', () => {
+            setTimeout(() => {
+                if(listaHB.checked) {
+                    labelHB.style.color = 'red';
+                } else {
+                    labelHB.style.color = 'white';
+                }
+            }, 1);
+        });
+        divChecks.appendChild(listaHB);
+        divChecks.appendChild(labelHB);
+        divListaHB.appendChild(divChecks);
     });
-    upHabilidades.appendChild(buttonHbs);
+    upHabilidades.appendChild(divListaHB);
     let linha = document.createElement('div');
-    linha.style.borderLeft = '6px solid white';
-    linha.style.height = '500px';
-    let atributos = document.createElement('div');
-    atributos.style.minWidth = '500px';
+    linha.setAttribute('id', 'linha');
+    let upAtributos = document.createElement('div');
+    upAtributos.setAttribute('id', 'upAtributos');
     let tituloAt = document.createElement('h3');
-    tituloAt.style.marginTop = '0';
+    tituloAt.setAttribute('id', 'tituloAt');
     tituloAt.innerText = 'Atributos:';
-    atributos.appendChild(tituloAt);
+    upAtributos.appendChild(tituloAt);
+    let listaAt = document.createElement('div');
+    listaAt.setAttribute('id', 'listaAt');
+    const atri = document.querySelectorAll('.atributos');
+    atri.forEach(e => {
+        const div = document.createElement('div');
+        div.style.display = 'flex';
+        div.style.width = '100%';
+        div.style.justifyContent = 'space-between';
+        const divBtns = document.createElement('div');
+        let btnMais = document.createElement('button');
+        btnMais.setAttribute('id', `mais${e.innerText.split(':')[0]}`);
+        btnMais.innerText = '+';
+        let btnMenos = document.createElement('button');
+        btnMenos.setAttribute('id', `menos${e.innerText.split(':')[0]}`);
+        btnMenos.innerText = '-';
+        div.append(e.innerText);
+        divBtns.appendChild(btnMais);
+        divBtns.appendChild(btnMenos);
+        div.appendChild(divBtns);
+        listaAt.appendChild(div);
+    });
+    upAtributos.appendChild(listaAt);
     telaUps.appendChild(upHabilidades);
     telaUps.appendChild(linha);
-    telaUps.appendChild(atributos);
+    telaUps.appendChild(upAtributos);
     blur.appendChild(telaUps);
     setTimeout(() => {
         telaUps.style.position = 'static';
@@ -1839,4 +1880,4 @@ function upgradeAtributos() {
     }, 2000);
 }
 
-// upgradeAtributos();
+upgradeAtributos();
