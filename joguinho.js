@@ -44,6 +44,7 @@ let progressbarMana = document.querySelector('#barraMana');
 let progressbarXP = document.getElementById('barraXP');
 let lvl = document.getElementById('nivel');
 let pnts = document.getElementById('pontos');
+let btnUpar = document.getElementById('btnUpar');
 let turno = document.getElementById('turno');
 let condicao = document.getElementById('condicao');
 
@@ -142,6 +143,7 @@ class jogin {
     #nivel = 0;
     #pontos = 0;
     #todosPontos;
+    #validarUpar = false;
     #inventario = {
         slot1: {
         },
@@ -549,6 +551,8 @@ class jogin {
     ];
     
     constructor() {
+        btnUpar.addEventListener('mouseover' , this.#mouseOverUpar);
+        btnUpar.addEventListener('mouseout' , this.#mouseOutUpar);
         this._mudarVazio();
         this.#definirIntro();
         this.#definirCondicao();
@@ -904,7 +908,8 @@ class jogin {
         if(this.#experiencia >= (this.#nivel+dtNivel)) {
             this.#nivel ++;
             lvl.innerText = 'Nível: ' + this.#nivel;
-            this.#pontos = this.#nivel + 5;
+            this.#pontos += this.#nivel + 5;
+            pnts.innerText = 'Pontos: ' + this.#pontos;
             this.#todosPontos = this.#pontos;
             let obValues = Object.values(this.#atributos);
             obValues.forEach(obValue => {
@@ -912,6 +917,14 @@ class jogin {
             });
             this.#nivel > 0 ? this.#numHabilidades = 2 : this.#numHabilidades = this.#nivel + 2;
             this.#constNumHab = this.#numHabilidades;
+            btnUpar.innerText = 'Você pode subir de nível';
+            btnUpar.style.color = 'green';
+            btnUpar.style.padding = '2px 10px 2px 5px';
+            setTimeout(() => {
+                btnUpar.innerText = '+';
+                btnUpar.style.color = 'white';
+                btnUpar.style.padding = '2px 2px 2px 5px';
+            }, 5000);
             return true;
         }
         return false;
@@ -1052,6 +1065,31 @@ class jogin {
         }, 2000);
     }
 
+    #mouseOverUpar = () => {
+        btnUpar.removeEventListener('click', this.#clickUpar);
+        btnUpar.style.color = 'white';
+        if(this.#validarUpar) {
+            btnUpar.innerText = 'Você pode subir de nível';
+            btnUpar.style.padding = '2px 10px 2px 5px';
+            if(this.#ultimoMapa != 3 && this.#ultimoMapa != 4) {
+                btnUpar.addEventListener('click', this.#clickUpar);
+            } else btnUpar.innerText = 'Não da para upar agora';;
+        } else {
+            btnUpar.innerText = 'Sem níveis para subir';
+            btnUpar.style.padding = '2px 10px 2px 5px';
+        }
+    }
+
+    #mouseOutUpar = () => {
+        btnUpar.innerText = '+';
+        btnUpar.style.padding = '2px 2px 2px 5px';
+    }
+
+    #clickUpar = () => {
+        btnUpar.removeEventListener('click', this.#clickUpar);
+        this.#upgradeAtributos();
+    }
+
     #clickHabilidades = e => {
         const key = e.currentTarget;
         for(let i = 0; i < elDivChecks.length; i++) {
@@ -1137,6 +1175,8 @@ class jogin {
             habilidade.toggle = false;
         });
         document.body.removeChild(blurr);
+        this.#validarUpar = false;
+        pnts.innerText = 'Pontos: ' + this.#pontos;
     }
 
     //@follow-up ----------------- adicionar magias ao inv --------------
@@ -1556,10 +1596,6 @@ class jogin {
                     console.log('defesa bicho: ' + this.#definirDefesaPassiva(null));
                     this.#somaDano += vidaTirada;
 
-                    //tirar furtivo e atq poderoso
-                    this.#acumuloAtqPod = 0;
-                    this.#furtivo = false;
-
                     this._escreverContexto(`Você da um soco, e acerta com ${testeForca}, tirando ${vidaTirada} de vida.`);
                 } else {
                     //@todo fazer pra outros tipos de defesa alem de esquiva (se for implementado)
@@ -1569,6 +1605,10 @@ class jogin {
                         this.#ataqueOponente();
                     }, 2000);
                 }
+
+                 //tirar furtivo e atq poderoso
+                 this.#acumuloAtqPod = 0;
+                 this.#furtivo = false;
 
                 if(ultimoEvento.vida <= 0) {
                     //@todo colocar cada vez menos chance de encontrar o bicho que ja matou
@@ -1583,9 +1623,6 @@ class jogin {
 
                 break;
             case 'Atq. mágico':
-                //@todo bloquear botao de atq magico caso for atq furtivo ou poderoso (provavelmente em funcao anterior a esse botao)
-                this.#furtivo = false;
-
                 this.#mudarVisibilidadeBotoes(4);
                 for (let i = 0; i < magAtq.length; i++) {
                     const magia = this.#magiasAtuais['mag' + (i+1)];
@@ -1744,9 +1781,9 @@ class jogin {
                     console.log('vida tirada: ' + ultimoEvento.vida);
                     console.log('defesa bicho: ' + this.#definirDefesaPassiva());
 
-                    //remover furtivo e atq poderoso
-                    this.#acumuloAtqPod = 0;
-                    this.#furtivo = false;
+                     //remover furtivo e atq poderoso
+                     this.#acumuloAtqPod = 0;
+                     this.#furtivo = false;
 
                     if(ultimoEvento.vida <= 0) {
                         this.#morteOponente(armaAtual.msgMorte);
@@ -1801,6 +1838,8 @@ class jogin {
         this.#contagemTurno = 0;
         this.#somaDano = 0;
         this.#experiencia += this.#ultimoEvento.exp;
+        this.#ultimoMapa = 0;
+        if(this.#eventoUpar()) this.#validarUpar = true;
         this.#opcaoCaminhar();
     }
 
@@ -1811,17 +1850,8 @@ class jogin {
     }
 
     #opcaoCaminhar(){
+
         this.#mudarVisibilidadeBotoes(0);
-
-        //tirar eventos do up
-        btnMenos ? btnMenos.forEach(btn => {
-            btn.removeEventListener('click', this.#clickBtnMenos);
-        }) : '';
-        btnMais ? btnMais.forEach(btn => {
-            btn.removeEventListener('click', this.#clickBtnMais);
-        }) : '';
-
-        this.#eventoUpar() ? this.#upgradeAtributos() : '';
 
         btnsAndar.forEach((btnsAndar) => {
             btnsAndar.removeEventListener('click', this.#eventoAndar);
@@ -1840,10 +1870,100 @@ class jogin {
 
         this.#mapaEscolhido = maaaaaaaaaaaaaa;
 
-        if(this.#ultimoMapa == this.#mapaEscolhido && this.#ultimoMapa != 0) {
-            this.#escolherMapa();
-        } else {
+        // if(this.#ultimoMapa == this.#mapaEscolhido  &&  this.#ultimoMapa != 0) {
+        //     this.#escolherMapa();
+        // } else {
 
+        //     if(this.#nivel < 5 && this.#mapaEscolhido == 4)
+        //         this.#mapaEscolhido = 0;
+
+        //     this.#eventos.forEach(e => {
+        //         if( e.classe == this.#mapaEscolhido )
+        //             eventos.push(e);
+        //     });
+
+        //     dialogo.innerText = `Você andou para ${ultimaAndada} e encontrou...`
+
+        //     if(this.#mapaEscolhido == 0) {
+        //         const escolha = Math.floor(Math.random() * 10);
+        //         this._escreverContexto(eventos[escolha].descricao[Math.floor(Math.random() * 5)] + '');
+        //         this.#ultimoEvento = eventos[escolha];
+
+        //     } else if(this.#mapaEscolhido == 1) {
+        //         const escolha = Math.floor(Math.random() * 7);
+        //         this._escreverContexto(eventos[escolha].descricao);
+        //         this.#ultimoEvento = eventos[escolha];
+
+        //         if(this.#ultimoEvento.tipo == 'pocao') {
+        //             dialogo.innerHTML = `<b style="color: yellow" > &#9888 Poções podem substituir comidas</b>`;
+        //             invSup[0].style.color = 'yellow';
+        //         }
+        //         if(this.#ultimoEvento.tipo == 'comida') {
+        //             dialogo.innerHTML = `<b style="color: yellow" > &#9888 Comidas podem substituir poções</b>`;
+        //             invSup[0].style.color = 'yellow';
+        //         }
+
+        //         this.#mudarVisibilidadeBotoes(2);
+        //         btnsSN.forEach(e => {
+        //             e.removeEventListener("click", this.#btnSN);
+        //         });
+        //         btnsSN.forEach(e => {
+        //             e.addEventListener("click", this.#btnSN);
+        //         });
+                
+        //     } else if(this.#mapaEscolhido == 2) {
+        //         const escolha = Math.floor(Math.random() * 3);
+        //         this._escreverContexto(eventos[escolha].descricao);
+        //         this.#ultimoEvento = eventos[escolha];
+
+        //         this.#mudarVisibilidadeBotoes(4);
+
+        //         btnNenhum.removeEventListener('click', this.#cancelar);
+        //         btnNenhum.addEventListener('click', this.#nenhuma);
+
+        //         if(this.#ultimoEvento.tipo == 'atq')
+        //             magAtq.forEach(magAtq => {
+        //                 magAtq.addEventListener('click', this.#magicasAtq);
+        //             });
+        //         else if(this.#ultimoEvento.tipo == 'sup')
+        //             magSup.forEach(magSup => {
+        //                 magSup.addEventListener('click', this.#magicasSup);
+        //             });
+
+        //     } else if(this.#mapaEscolhido == 3) {
+        //         dialogo.append(' Prepare-se para batalha');
+        //         const escolha = Math.floor(Math.random() * 1);
+        //         this._escreverContexto(eventos[escolha].descricao);
+        //         this.#ultimoEvento = eventos[escolha];
+        //         this.#ultimoEventoVida = this.#ultimoEvento.vida;
+
+        //         //ver quem começa
+        //         let testeAgi = this.#rolarAcerto('agilidade'), testeAgiOp = this.#rolarAcertoOponente('agilidade');
+        //         while(testeAgiOp == testeAgi) {
+        //             if( this.#atributos.agilidade != this.#ultimoEvento.agilidade ) {
+        //                 testeAgi += this.#atributos.agilidade;
+        //                 testeAgiOp += this.#ultimoEvento.agilidade;
+        //             } else {
+        //                 testeAgi = this.#rolarAcerto('agilidade');
+        //                 testeAgiOp = this.#rolarAcertoOponente('agilidade');
+        //             }
+        //         }
+
+        //         testeAgi >= testeAgiOp ? this.#rolarAtaqueFurtivo() : this.#iniciarTurnoOp();                 
+
+        //     } else if(this.#mapaEscolhido == 4) {
+        //         dialogo.innerText = `Você andou para ${ultimaAndada} e encontrou... Para onde você quer ir?`
+        //         const escolha = "m" + this.#mapaEscolhido + (Math.floor(Math.random() * (1 - 1)) + 1);
+        //         this._escreverContexto(eventos[escolha].descricao);
+        //         ultimoEvento = eval(escolha);
+        //         iniciarBatalha();
+        //     }
+
+        //     this.#ultimoMapa = this.#mapaEscolhido;
+        //     console.log('ultima escolha ' + this.#ultimoMapa);
+
+        // }
+        
             if(this.#nivel < 5 && this.#mapaEscolhido == 4)
                 this.#mapaEscolhido = 0;
 
@@ -1929,11 +2049,7 @@ class jogin {
                 iniciarBatalha();
             }
 
-            //this.#ultimoMapa = this.#mapaEscolhido;
-            console.log('ultima escolha ' + this.#ultimoMapa);
-
-        }
-
+            this.#ultimoMapa = this.#mapaEscolhido;
     }
 
     #btnSN = (e) => {

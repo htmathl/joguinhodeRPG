@@ -401,6 +401,20 @@ button:disabled > span {
   border-radius: 2px;
 }
 
+#btnUpar {
+  position: absolute;
+  margin: 0;
+  bottom: -50px;
+  border:  2px solid #fff;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius:  5px;
+  border-right: 0 ;
+  padding: 2px 2px 2px 5px;
+  transition: all 0.2s linear;
+  min-height: 22px;
+  line-height: 22px;
+}
+
 @media (min-width: 1000px) {
   .inputInfos {
       min-width: 200px; 
@@ -500,10 +514,6 @@ button:disabled > span {
   height: 30vh;
   white-space: pre-line;
   overflow: auto;
-}
-
-input[type=checkbox] {
-  /* display: none; */
 }
 
 label {
