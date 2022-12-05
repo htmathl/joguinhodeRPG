@@ -458,7 +458,6 @@ button:disabled > span {
   justify-content: center;
   flex-wrap: wrap;
   align-content: flex-start;
-  
 }
 
 #tituloNiv {
@@ -468,6 +467,7 @@ button:disabled > span {
   opacity: 0;
   font-size: 70px;
   margin-top: 20%;
+  width: 100%;
 }
 
 #telaUps {
@@ -487,8 +487,8 @@ button:disabled > span {
 }
 
 #tituloHb, #tituloAt {
-  margin-top: 0;
-  margin-bottom: 30px;
+  margin-top: 20px;
+  margin-bottom: 35px;
   font-size: 40px;
 }
 
@@ -497,10 +497,13 @@ button:disabled > span {
   flex-direction: column;
   align-items: flex-start;
   font-size: 23px;
+  height: 30vh;
+  white-space: pre-line;
+  overflow: auto;
 }
 
 input[type=checkbox] {
-  display: none;
+  /* display: none; */
 }
 
 label {
@@ -521,5 +524,19 @@ label {
 
 #linha {
   border-left: 6px solid white;
-  height: 80vh;
+  height: 70vh;
+}
+
+#ptns, #divQntsHab {
+  font-size: 23px;
+  margin-top: 20px;
+}
+
+#divQntsHab {
+  color: gray;
+}
+
+#btnPronto {
+  font-size: 40px;
+  opacity: 0;
 }

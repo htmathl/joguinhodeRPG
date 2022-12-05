@@ -5,8 +5,6 @@ let btnsAndar = document.querySelectorAll('.botoes');
 let btnsSN = document.querySelectorAll('.botoesSN');
 let btnsAcao = document.querySelectorAll('.botoesAcao');
 let btnsAtq = document.querySelectorAll('.botoesAtq');
-let btnsMais = document.querySelectorAll('.btnMais');
-let btnsMenos = document.querySelectorAll('.btnMenos');
 let btnNenhum = document.getElementById('btnNenhuma');
 let btnAtacar = document.getElementById('btnAtacar');
 let btnDefender = document.getElementById('btnDefender');
@@ -49,7 +47,7 @@ let pnts = document.getElementById('pontos');
 let turno = document.getElementById('turno');
 let condicao = document.getElementById('condicao');
 
-let dlg;
+let dlg, btnMais, btnMenos, elDivChecks, blurr;
 
 inv.forEach(inv =>{
     inv.setAttribute('title', 'Você está se sentindo leve, mas desprotegido, é melhor pegar alguns itens... Alías, inventário, viajante, viajante, inventário.');
@@ -128,11 +126,11 @@ class jogin {
     #usos = [];
     #nome;
     #atributos = { 
-        forca: 5,
-        vigor: 0,
-        inteligencia: 0,
+        forca: 0,
         defesa: 0,
-        agilidade: 6,
+        inteligencia: 0,
+        vigor: 0,
+        agilidade: 0,
         sorte: 0,
     };
     #adicionalDef = 0;
@@ -141,8 +139,9 @@ class jogin {
     #vida = 100;
     #mana = 100;
     #experiencia = 0;
-    #nivel = 1;
+    #nivel = 0;
     #pontos = 0;
+    #todosPontos;
     #inventario = {
         slot1: {
         },
@@ -165,6 +164,7 @@ class jogin {
         mag4: {
         },
     };
+    #habilidadesAtuais = [];
     #critico = false;
     #furtivo;
     #validarPoderoso;
@@ -179,7 +179,8 @@ class jogin {
     #intervaloValMag1;
     #intervaloValMags = [this.#intervaloValMag0, this.#intervaloValMag1];
     #cancelarToggle;
-
+    #numHabilidades = 0;
+    #constNumHab;
     #habilidades = [ 
         {
             id: 1,
@@ -187,6 +188,7 @@ class jogin {
             efeito: () => {
                 console.log('miau');
             },
+            toggle: false,
         },
         {
             id: 2,
@@ -194,6 +196,7 @@ class jogin {
             efeito: () => {
                 console.log('miau');
             },
+            toggle: false,
         },
         {
             id: 3,
@@ -201,6 +204,7 @@ class jogin {
             efeito: () => {
                 console.log('miau');
             },
+            toggle: false,
         },
     ];
 
@@ -502,7 +506,7 @@ class jogin {
             classe: 3,
             nome: 'um zumbi de gelo',
             descricao: 'uma descrição de um bicho',
-            vida: 500,
+            vida: 1,
             defesa: 0,
             forca: 1,
             inteligencia: 1,
@@ -600,13 +604,6 @@ class jogin {
         //flex
         infos[0].style.display = 'none';
         hud[0].style.display = 'none';
-        //block
-        btnsMais.forEach(btnMais => {
-            btnMais.style.display = 'none';
-        });
-        btnsMenos.forEach(btnMenos => {
-            btnMenos.style.display = 'none';
-        });
     
         dialogo.innerText = "Que bom que você esteja aqui!";
     
@@ -902,18 +899,244 @@ class jogin {
     }
 
     #eventoUpar() {
-        if(this.#experiencia >= (100*this.#nivel*2)) {
-            lvl.innerText = 'Nível: ' + (parseInt(lvl.innerText.split(':')[1].trim()) + 1);
+        let dtNivel;
+        this.#nivel == 0 ? dtNivel = 200 : dtNivel = 100*this.#nivel*3;
+        if(this.#experiencia >= (this.#nivel+dtNivel)) {
+            this.#nivel ++;
+            lvl.innerText = 'Nível: ' + this.#nivel;
+            this.#pontos = this.#nivel + 5;
+            this.#todosPontos = this.#pontos;
+            let obValues = Object.values(this.#atributos);
+            obValues.forEach(obValue => {
+                this.#todosPontos += obValue;
+            });
+            this.#nivel > 0 ? this.#numHabilidades = 2 : this.#numHabilidades = this.#nivel + 2;
+            this.#constNumHab = this.#numHabilidades;
             return true;
         }
         return false;
     }
 
     #upgradeAtributos() {
-        let blur = document.createElement('div');
-        blur.style.setProperty('position', 'fixed');
-        blur.style.setProperty('color', 'red');
-        document.appendChild(blur);
+        blurr = document.createElement('div');
+        blurr.setAttribute('id', 'blur');
+        document.body.appendChild(blurr);
+
+        let tituloUp = document.createElement('h1');
+        tituloUp.setAttribute('id', 'tituloNiv');
+        tituloUp.innerText = 'Subiu de nível !';
+        blurr.appendChild(tituloUp);
+
+        setTimeout(() => {
+            tituloUp.style.opacity = '1';
+        }, 200);
+        setTimeout(() => {
+            tituloUp.style.margin = '10px';
+            tituloUp.style.width = '100%';
+        }, 1200);
+
+        let telaUps = document.createElement('div');
+        telaUps.setAttribute('id', 'telaUps');
+        let upHabilidades = document.createElement('div');
+        upHabilidades.setAttribute('id', 'upHabilidades');
+
+        let tituloHb = document.createElement('h3');
+        tituloHb.setAttribute('id', 'tituloHb');
+        tituloHb.innerText = 'Habilidades:';
+        upHabilidades.appendChild(tituloHb);
+
+        let divListaHB = document.createElement('div');
+        divListaHB.setAttribute('id', 'listaHB');
+        this.#habilidades.forEach(k => {
+            let divChecks = document.createElement('div');
+            divChecks.setAttribute('class', 'divChecks');
+            divChecks.innerText = k.nome;
+            divListaHB.appendChild(divChecks);
+        });
+        upHabilidades.appendChild(divListaHB);
+
+        let divQntsHab = document.createElement('div');
+        divQntsHab.setAttribute('id', 'divQntsHab');
+        divQntsHab.innerText = 'Você pode escolher até ' + this.#numHabilidades + ' habilidades';
+        upHabilidades.appendChild(divQntsHab);
+
+        let linha = document.createElement('div');
+        linha.setAttribute('id', 'linha');
+
+        let upAtributos = document.createElement('div');
+        upAtributos.setAttribute('id', 'upAtributos');
+
+        let tituloAt = document.createElement('h3');
+        tituloAt.setAttribute('id', 'tituloAt');
+        tituloAt.innerText = 'Atributos:';
+        upAtributos.appendChild(tituloAt);
+
+        let listaAt = document.createElement('div');
+        listaAt.setAttribute('id', 'listaAt');
+
+        let ptns = document.createElement('div');
+        ptns.setAttribute('id', 'ptns');
+        ptns.innerText = 'Pontos: ' + this.#pontos;
+
+        let obKeys = Object.keys(this.#atributos);
+        let atriIndex = 0;
+        const atri = document.querySelectorAll('.atributos');
+        atri.forEach(e => {
+            const div = document.createElement('div');
+            div.style.display = 'flex';
+            div.style.width = '100%';
+            div.style.justifyContent = 'space-between';
+
+            const divBtns = document.createElement('div');
+
+            let btnMais = document.createElement('button');
+            btnMais.setAttribute('id', `${obKeys[atriIndex]}`);
+            btnMais.setAttribute('class', 'btnsMais');
+            btnMais.innerText = '+';
+
+            let btnMenos = document.createElement('button');
+            btnMenos.setAttribute('id', `${obKeys[atriIndex]}`);
+            btnMenos.setAttribute('class', 'btnsMenos');
+            btnMenos.innerText = '-';
+
+            divBtns.appendChild(btnMais);
+            divBtns.appendChild(btnMenos);
+
+            const divAtrs = document.createElement('span');
+            divAtrs.setAttribute('id', 'divAtrs');
+            divAtrs.innerText = e.innerText.split(':')[0] + ': ' + this.#atributos[obKeys[atriIndex]];
+            div.appendChild(divAtrs);
+            div.appendChild(divBtns);
+            listaAt.appendChild(div);
+
+            atriIndex++;
+        });
+
+        upAtributos.appendChild(listaAt);
+        upAtributos.appendChild(ptns);
+        telaUps.appendChild(upHabilidades);
+        telaUps.appendChild(linha);
+        telaUps.appendChild(upAtributos);
+
+        let btnPronto = document.createElement('button');
+        btnPronto.setAttribute('id', 'btnPronto');
+        btnPronto.innerText = 'Pronto';
+
+        setTimeout(() => {
+            blurr.appendChild(telaUps);
+            blurr.appendChild(btnPronto);
+
+            elDivChecks = document.querySelectorAll('.divChecks');
+            elDivChecks.forEach(div => {
+                div.addEventListener('click', this.#clickHabilidades);
+            });
+            
+            btnMais = document.querySelectorAll('.btnsMais');
+            btnMenos = document.querySelectorAll('.btnsMenos');
+            btnMais.forEach(btn => {
+                btn.addEventListener('click', this.#clickBtnMais);
+            });
+            btnMenos.forEach(btn => {
+                btn.addEventListener('click', this.#clickBtnMenos);
+            });
+
+            btnPronto.addEventListener('click',this.#clickPronto);
+
+            setTimeout(() => {
+                telaUps.style.position = 'static';
+                telaUps.style.opacity = '1';
+                btnPronto.style.opacity = '1';
+                blurr.style.alignContent = 'space-around';
+            }, 200);
+
+        }, 2000);
+    }
+
+    #clickHabilidades = e => {
+        const key = e.currentTarget;
+        for(let i = 0; i < elDivChecks.length; i++) {
+            if(key.innerText == this.#habilidades[i].nome) {
+                if(this.#numHabilidades > 0 && !this.#habilidades[i].toggle)  {
+                    key.style.color = 'red';
+                    this.#habilidades[i].toggle = true;
+                    this.#numHabilidades --;
+                    return;
+                }
+                if(this.#numHabilidades > 0 && this.#habilidades[i].toggle) {
+                    key.style.color = 'white';
+                    this.#habilidades[i].toggle = false;
+                    this.#numHabilidades ++;
+                    return;
+                }
+                if(this.#numHabilidades == 0 && this.#habilidades[i].toggle) {
+                    key.style.color = 'white';
+                    this.#habilidades[i].toggle = false;
+                    this.#numHabilidades ++;
+                    return;
+                }
+                if(this.#numHabilidades == 0 && !this.#habilidades[i].toggle) {
+                    for(let j = 0; j < elDivChecks.length; j++) {
+                        this.#habilidades[j].toggle = false;
+                        elDivChecks[j].style.color = 'white'; 
+                    }
+                    if(this.#constNumHab > 1) {
+                        this.#numHabilidades = this.#constNumHab-1;
+                    }
+                    key.style.color = 'red';
+                    this.#habilidades[i].toggle = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    #clickBtnMais = mais => {
+        let obKeys = Object.keys(this.#atributos);
+        const ptns = document.getElementById('ptns');
+        const divAtrs = document.querySelectorAll('#divAtrs');
+        for(let m = 0; m < obKeys.length; m++) {
+                const key = mais.currentTarget.id;
+                if(key == obKeys[m] && this.#pontos > 0) {
+                    this.#atributos[key]++;
+                    this.#pontos--;
+                    divAtrs[m].innerText = divAtrs[m].innerText.split(':')[0] + ': ' + this.#atributos[key];
+                    ptns.innerText = 'Pontos: ' + this.#pontos;
+                    console.log(this.#atributos);
+                }
+            }
+    }
+
+    #clickBtnMenos = menos => {
+        let obKeys = Object.keys(this.#atributos);
+        const ptns = document.getElementById('ptns');
+        const divAtrs = document.querySelectorAll('#divAtrs');
+        for(let m = 0; m < obKeys.length; m++) {
+            const key = menos.currentTarget.id;
+            if(key == obKeys[m] && this.#atributos[key] > 0 && this.#pontos <= this.#todosPontos) {
+                this.#atributos[key]--;
+                this.#pontos++;
+                divAtrs[m].innerText = divAtrs[m].innerText.split(':')[0] + ': ' + this.#atributos[key];
+                ptns.innerText = 'Pontos: ' + this.#pontos;
+            }
+        }
+    }
+
+    #clickPronto = () => {
+        //@todo colocar confirmação depois (nao deixar pontos sobrando tbm)
+        const atri = document.querySelectorAll('.atributos');
+        const obValues = Object.values(this.#atributos);
+        const habilidades = document.getElementById('habilidades');
+        for(let i = 0; i < atri.length; i++) {
+            atri[i].innerText = atri[i].innerText.split(':')[0] + ': ' + obValues[i];
+        }
+        this.#habilidades.forEach(habilidade => {
+            if(habilidade.toggle)
+                habilidades.append(habilidade.nome);
+        });
+        this.#habilidades.forEach(habilidade => {
+            habilidade.toggle = false;
+        });
+        document.body.removeChild(blurr);
     }
 
     //@follow-up ----------------- adicionar magias ao inv --------------
@@ -1578,7 +1801,7 @@ class jogin {
         this.#contagemTurno = 0;
         this.#somaDano = 0;
         this.#experiencia += this.#ultimoEvento.exp;
-        this.#eventoUpar() ? this.#upgradeAtributos() : this.#opcaoCaminhar();
+        this.#opcaoCaminhar();
     }
 
     //@follow-up -------------- definir o que rolou ------------------
@@ -1589,6 +1812,16 @@ class jogin {
 
     #opcaoCaminhar(){
         this.#mudarVisibilidadeBotoes(0);
+
+        //tirar eventos do up
+        btnMenos ? btnMenos.forEach(btn => {
+            btn.removeEventListener('click', this.#clickBtnMenos);
+        }) : '';
+        btnMais ? btnMais.forEach(btn => {
+            btn.removeEventListener('click', this.#clickBtnMais);
+        }) : '';
+
+        this.#eventoUpar() ? this.#upgradeAtributos() : '';
 
         btnsAndar.forEach((btnsAndar) => {
             btnsAndar.removeEventListener('click', this.#eventoAndar);
@@ -1764,120 +1997,4 @@ class jogin {
 
 new jogin;
 
-let maaaaaaaaaaaaaa = 1;
-
-let habilidadess = [ 
-    {
-        id: 1,
-        idHTML: 'sangueCorrompido',
-        nome: 'Sangue Corrompido',
-        efeito: () => {
-            console.log('miau');
-        },
-    },
-    {
-        id: 2,
-        idHTML: 'sangueCorrompido2',
-        nome: 'aaaaaaa Corrompido',
-        efeito: () => {
-            console.log('miau');
-        },
-    },
-    {
-        id: 3,
-        idHTML: 'sangueCorrompido3',
-        nome: 'ghfhfh Corrompido',
-        efeito: () => {
-            console.log('miau');
-        },
-    },
-];
-
-function upgradeAtributos() {
-    let blur = document.createElement('div');
-    blur.setAttribute('id', 'blur');
-    document.body.appendChild(blur);
-    let titulo = document.createElement('h1');
-    titulo.setAttribute('id', 'tituloNiv');
-    titulo.innerText = 'Subiu de nível !';
-    blur.appendChild(titulo);
-    setTimeout(() => {
-        titulo.style.opacity = '1';
-    }, 200);
-    setTimeout(() => {
-        titulo.style.margin = '10px';
-        titulo.style.width = '100%';
-    }, 1200);
-    let telaUps = document.createElement('div');
-    telaUps.setAttribute('id', 'telaUps');
-    let upHabilidades = document.createElement('div');
-    upHabilidades.setAttribute('id', 'upHabilidades');
-    let tituloHb = document.createElement('h3');
-    tituloHb.setAttribute('id', 'tituloHb');
-    tituloHb.innerText = 'Habilidades:';
-    upHabilidades.appendChild(tituloHb);
-    let divListaHB = document.createElement('div');
-    divListaHB.setAttribute('id', 'listaHB');
-    habilidadess.forEach(k => {
-        let divChecks = document.createElement('div');
-        let listaHB = document.createElement('input');
-        listaHB.setAttribute('type', 'checkbox');
-        let labelHB = document.createElement('label');
-        listaHB.setAttribute('id', k.idHTML);
-        labelHB.setAttribute('for', k.idHTML);
-        labelHB.innerText = k.nome;
-        labelHB.addEventListener('click', () => {
-            setTimeout(() => {
-                if(listaHB.checked) {
-                    labelHB.style.color = 'red';
-                } else {
-                    labelHB.style.color = 'white';
-                }
-            }, 1);
-        });
-        divChecks.appendChild(listaHB);
-        divChecks.appendChild(labelHB);
-        divListaHB.appendChild(divChecks);
-    });
-    upHabilidades.appendChild(divListaHB);
-    let linha = document.createElement('div');
-    linha.setAttribute('id', 'linha');
-    let upAtributos = document.createElement('div');
-    upAtributos.setAttribute('id', 'upAtributos');
-    let tituloAt = document.createElement('h3');
-    tituloAt.setAttribute('id', 'tituloAt');
-    tituloAt.innerText = 'Atributos:';
-    upAtributos.appendChild(tituloAt);
-    let listaAt = document.createElement('div');
-    listaAt.setAttribute('id', 'listaAt');
-    const atri = document.querySelectorAll('.atributos');
-    atri.forEach(e => {
-        const div = document.createElement('div');
-        div.style.display = 'flex';
-        div.style.width = '100%';
-        div.style.justifyContent = 'space-between';
-        const divBtns = document.createElement('div');
-        let btnMais = document.createElement('button');
-        btnMais.setAttribute('id', `mais${e.innerText.split(':')[0]}`);
-        btnMais.innerText = '+';
-        let btnMenos = document.createElement('button');
-        btnMenos.setAttribute('id', `menos${e.innerText.split(':')[0]}`);
-        btnMenos.innerText = '-';
-        div.append(e.innerText);
-        divBtns.appendChild(btnMais);
-        divBtns.appendChild(btnMenos);
-        div.appendChild(divBtns);
-        listaAt.appendChild(div);
-    });
-    upAtributos.appendChild(listaAt);
-    telaUps.appendChild(upHabilidades);
-    telaUps.appendChild(linha);
-    telaUps.appendChild(upAtributos);
-    blur.appendChild(telaUps);
-    setTimeout(() => {
-        telaUps.style.position = 'static';
-        telaUps.style.opacity = '1';
-    }, 2000);
-}
-
-upgradeAtributos();
+let maaaaaaaaaaaaaa = 3;
