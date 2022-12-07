@@ -134,12 +134,15 @@ class jogin {
         agilidade: 0,
         sorte: 0,
     };
+    #resistenciaFisica = 0;
     #adicionalDef = 0;
     _constVigor;
+    #margemCritico = 20;
     #pontosVida = 20; 
-    #pontosMana = 90;
+    #pontosMana = 20;
     #vida = 100;
     #mana = 100;
+    #resistenciaMana = 0;
     #experiencia = 0;
     #nivel = 0;
     #pontos = 0;
@@ -157,6 +160,11 @@ class jogin {
         slot5: {
         }
     };
+    //@todo implementar isso para aumentar a cada 2 niveis upados
+    #raridadeItem = 0;
+    #itensExtras = 0;
+    #itensPorBau = 0;
+    #prevencao = 0;
     #magiasAtuais = {
         mag1: {
         },
@@ -167,6 +175,8 @@ class jogin {
         mag4: {
         },
     };
+    #condicao = 'NORMAL';
+    #efeitoAoSeuToque = 'NORMAL';
     #habilidadesAtuais = [];
     #critico = false;
     #furtivo;
@@ -184,13 +194,24 @@ class jogin {
     #cancelarToggle;
     #numHabilidades = 0;
     #constNumHab;
+    #addModsHab = {
+        forca: 0,
+        defesa: 0,
+        inteligencia: 0,
+        vigor:  0,
+        agilidade: 0,
+        sorte: 0
+    };
     #habilidades = [ 
         {
             id: 'hab1',
             nome: 'Treinamento',
             descricao: 'Você ganha +5 pontos em todos os testes de FOR, DEF e VIG',
             efeito: () => {
-                return 5;
+                const mod = ['forca', 'defesa', 'vigor'];
+                mod.forEach(key => {
+                    this.#addModsHab[key] += 5;
+                });
             },
             toggle: false,
             adiquirida: false,
@@ -201,7 +222,10 @@ class jogin {
             nome: 'Meditação',
             descricao: 'Você ganha +5 pontos em todos os testes de INT, AGI e SOR',
             efeito: () => {
-                return 5;
+                const mod = ['agilidade', 'inteligencia', 'sorte'];
+                mod.forEach(key => {
+                    this.#addModsHab[key] += 5;
+                });
             },
             toggle: false,
             adiquirida: false,
@@ -212,7 +236,7 @@ class jogin {
             nome: 'Sortudo',
             descricao: 'Sua margem de crítico dobra',
             efeito: () => {
-                return 2;
+                this.#margemCritico = 19;
             },
             toggle: false,
             adiquirida: false,
@@ -223,7 +247,7 @@ class jogin {
             nome: 'Catalisador',
             descricao: 'Você desenvolve resistência de +3 em gastos de mana',
             efeito: () => {
-                return 2;
+                this.#resistenciaMana = 3;
             },
             toggle: false,
             adiquirida: false,
@@ -232,9 +256,9 @@ class jogin {
         {
             id: 'hab5',
             nome: 'Investigador',
-            descricao: 'Com está habilidade você podera encontrar itens raros',
+            descricao: 'Com está habilidade você podera encontrar itens extra raros',
             efeito: () => {
-                return ;
+               this.#itensExtras = 1;
             },
             toggle: false,
             adiquirida: false,
@@ -245,7 +269,7 @@ class jogin {
             nome: 'Vidente',
             descricao: 'Você terá 40% de chance em prever armadilhas',
             efeito: () => {
-                return ;
+                this.#prevencao = 40;
             },
             toggle: false,
             adiquirida: false,
@@ -256,10 +280,12 @@ class jogin {
             nome: 'Embaralhar',
             descricao: '1. Ao chegar a 20% ou menos de vida você ganhará 2 clones que aumentarão sua defesa em 10 pontos cada \n 2. Quando você for atacado perderá um clone',
             efeito: () => {
-                return ;
+                if(this.#vida <= 20) 
+                    this.#resistenciaFisica += 20;
             },
             toggle: false,
             adiquirida: false,
+            contexto: 1,
             nivel: 2,
         },
         {
@@ -267,7 +293,7 @@ class jogin {
             nome: 'Estática',
             descricao: 'Ao sofrer qualquer ataque corpo-a-corpo, seu oponente ficará paralizado',
             efeito: () => {
-                return ;
+                this.#efeitoAoSeuToque = 'PARALIZADO';
             },
             toggle: false,
             adiquirida: false,
@@ -276,9 +302,10 @@ class jogin {
         {
             id: 'hab9',
             nome: 'Tudo em dobro',
-            descricao: 'Você terá 35% de chance de achar dois ítens por baú',
+            descricao: 'Você terá 35% de chance de achar um ítem a mais por baú',
             efeito: () => {
-                return ;
+                const chance = Math.floor(Math.random() * 100);
+                chance >= 35 ? this.#itensPorBau += 1 : '';
             },
             toggle: false,
             adiquirida: false,
@@ -289,7 +316,8 @@ class jogin {
             nome: 'Nutricionista',
             descricao: 'Suas comidas com menos de 7 pontos de restauração terão o dobro de eficiência',
             efeito: () => {
-                return ;
+                if(this.#inventario['slot4'].tipo == 'Comida' && this.#inventario['slot4'].rec < 7 )
+                    this.#inventario['slot4'].rec *= 2;
             },
             toggle: false,
             adiquirida: false,
@@ -300,7 +328,10 @@ class jogin {
             nome: 'Veterano',
             descricao: '1. Esta substitui a habilidade (Treinamento) \n 2. Você ganhará +10 em todos os testes de FOR, DEF e VIG',
             efeito: () => {
-                return 10;
+                const mod = ['forca', 'defesa', 'vigor'];
+                mod.forEach(key => {
+                    this.#addModsHab[key] += 5;
+                });
             },
             toggle: false,
             adiquirida: false,
@@ -311,7 +342,10 @@ class jogin {
             nome: 'Namastê',
             descricao: '1. Esta substitui a habilidade (Meditação) \n 2. Você ganhará +10 em todos os testes de INT, AGI e SOR',
             efeito: () => {
-                return 10;
+                const mod = ['inteligencia', 'agilidade', 'sorte'];
+                mod.forEach(key => {
+                    this.#addModsHab[key] += 5;
+                });
             },
             toggle: false,
             adiquirida: false,
@@ -331,7 +365,7 @@ class jogin {
         {
             id: 'hab14',
             nome: 'Tanque de guerra',
-            descricao: 'Você ganhará 5 + (nivel) pontos a sua resistência a golpes e +5 em resistência a ataques mágicos',
+            descricao: 'Você ganhará 5 + (nivel) pontos a sua resistência a golpes físicos',
             efeito: () => {
                 return 10;
             },
@@ -593,7 +627,6 @@ class jogin {
                 return this.#rolarDados('d3', 1) + 2;
             },
         },
-        
         {
             id: 12,
             classe: 1,
@@ -602,12 +635,12 @@ class jogin {
             usavel: true,
             imgArma: '',
             descricao: '[Maçã, recupera 5pvs]',
+            rec: 5,
             efeito: () => {
-                this.#vida += this.#calcularVida(5);
+                this.#vida += this.#calcularVida(this.#eventos[12].rec);
                 progressbarVida.style.setProperty('--progress', this.#vida);
             },
         },
-        
         {
             id: 13,
             classe: 1,
@@ -1100,11 +1133,12 @@ class jogin {
                 }
     
                 result = Math.max.apply(null, dados);
-                if(result == 20)
+                result = 20;
+                if(result == this.#margemCritico)
                     this.#critico = true;
                 else
                     this.#critico = false;
-    
+                
                 console.log(dados);
                 console.log(tipoDados + ':' + result);
     
@@ -1122,7 +1156,9 @@ class jogin {
 
     #rolarAcerto(atributo) {
         console.log('teste viajante: ' + atributo);
-        return this.#rolarDados('d20', (this.#recAtr(atributo) + 1));
+        let teste = this.#rolarDados('d20', (this.#recAtr(atributo) + 1)) + this.#addModsHab[atributo];
+        console.log(teste);
+        return teste;
     }
 
     #recAtr(atributo) {
@@ -1130,7 +1166,7 @@ class jogin {
     }
 
     #calcularMana(mana) {
-        return Math.floor((mana * 100) / this.#pontosMana);
+        return Math.floor( (mana * 100) / this.#pontosMana - this.#resistenciaMana);
     }
 
     #calcularVida(vida) {
@@ -1443,6 +1479,10 @@ class jogin {
             habilidade.toggle = false;
         });
 
+        this.#habilidadesAtuais.forEach(habilidade => {
+            habilidade.efeito();
+        });
+
         document.body.removeChild(blurr);
         this.#validarUpar = false;
     }
@@ -1587,6 +1627,7 @@ class jogin {
         this.#testeDefesa = 0;
         switch(e.currentTarget.innerText) {
             case 'Atacar':
+                //@todo ao invés do ataque sempre ganhar se empatar em apenas 20 somam-se a defesa e o ataque em seus devidos testes e compara (quem tiver mais defesa ou quem tiver mais ataque ganhará)
                 //armas
                 if( Object.keys( this.#inventario['slot1'] ) != 0 || Object.keys( this.#inventario['slot2'] ) != 0 ) {
                     btnsAtq[1].disabled = false;
