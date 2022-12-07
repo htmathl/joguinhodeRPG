@@ -250,7 +250,18 @@ button:disabled > span {
   border-left: none;
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
-  /* min-height: var(--alturaContexto); */
+}
+
+#divHab {
+  display: flex;
+  flex-direction: column;
+  white-space: pre-line;
+  overflow: auto;
+  margin: 0;
+}
+
+#divHab > span {
+  margin: 10px;
 }
 
 .fichaNivel {
@@ -397,7 +408,7 @@ button:disabled > span {
   content: "";
   width: calc(var(--progress) * 1%);
   background-color: #065019;
-  transition: all 0.2s ease;
+  transition: all 1s ease;
   border-radius: 2px;
 }
 
@@ -533,7 +544,7 @@ label {
 }
 
 #linha {
-  border-left: 6px solid white;
+  border-left: 3px solid white;
   height: 70vh;
 }
 
@@ -547,6 +558,6 @@ label {
 }
 
 #btnPronto {
-  font-size: 40px;
+  font-size: 30px;
   opacity: 0;
 }

@@ -135,6 +135,7 @@ class jogin {
         sorte: 0,
     };
     #adicionalDef = 0;
+    _constVigor;
     #pontosVida = 20; 
     #pontosMana = 90;
     #vida = 100;
@@ -185,28 +186,268 @@ class jogin {
     #constNumHab;
     #habilidades = [ 
         {
-            id: 1,
-            nome: 'Sangue Corrompido',
+            id: 'hab1',
+            nome: 'Treinamento',
+            descricao: 'Você ganha +5 pontos em todos os testes de FOR, DEF e VIG',
             efeito: () => {
-                console.log('miau');
+                return 5;
             },
             toggle: false,
+            adiquirida: false,
+            nivel: 1,
         },
         {
-            id: 2,
-            nome: 'aaaaaaa Corrompido',
+            id: 'hab2',
+            nome: 'Meditação',
+            descricao: 'Você ganha +5 pontos em todos os testes de INT, AGI e SOR',
             efeito: () => {
-                console.log('miau');
+                return 5;
             },
             toggle: false,
+            adiquirida: false,
+            nivel: 1,
         },
         {
-            id: 3,
-            nome: 'ghfhfh Corrompido',
+            id: 'hab3',
+            nome: 'Sortudo',
+            descricao: 'Sua margem de crítico dobra',
             efeito: () => {
-                console.log('miau');
+                return 2;
             },
             toggle: false,
+            adiquirida: false,
+            nivel: 1,
+        },
+        {
+            id: 'hab4',
+            nome: 'Catalisador',
+            descricao: 'Você desenvolve resistência de +3 em gastos de mana',
+            efeito: () => {
+                return 2;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 1,
+        },
+        {
+            id: 'hab5',
+            nome: 'Investigador',
+            descricao: 'Com está habilidade você podera encontrar itens raros',
+            efeito: () => {
+                return ;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 2,
+        },
+        {
+            id: 'hab6',
+            nome: 'Vidente',
+            descricao: 'Você terá 40% de chance em prever armadilhas',
+            efeito: () => {
+                return ;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 2,
+        },
+        {
+            id: 'hab7',
+            nome: 'Embaralhar',
+            descricao: '1. Ao chegar a 20% ou menos de vida você ganhará 2 clones que aumentarão sua defesa em 10 pontos cada \n 2. Quando você for atacado perderá um clone',
+            efeito: () => {
+                return ;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 2,
+        },
+        {
+            id: 'hab8',
+            nome: 'Estática',
+            descricao: 'Ao sofrer qualquer ataque corpo-a-corpo, seu oponente ficará paralizado',
+            efeito: () => {
+                return ;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 2,
+        },
+        {
+            id: 'hab9',
+            nome: 'Tudo em dobro',
+            descricao: 'Você terá 35% de chance de achar dois ítens por baú',
+            efeito: () => {
+                return ;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 2,
+        },
+        {
+            id: 'hab10',
+            nome: 'Nutricionista',
+            descricao: 'Suas comidas com menos de 7 pontos de restauração terão o dobro de eficiência',
+            efeito: () => {
+                return ;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 2,
+        },
+        {
+            id: 'hab11',
+            nome: 'Veterano',
+            descricao: '1. Esta substitui a habilidade (Treinamento) \n 2. Você ganhará +10 em todos os testes de FOR, DEF e VIG',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 3,
+        },
+        {
+            id: 'hab12',
+            nome: 'Namastê',
+            descricao: '1. Esta substitui a habilidade (Meditação) \n 2. Você ganhará +10 em todos os testes de INT, AGI e SOR',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 3,
+        },
+        {
+            id: 'hab13',
+            nome: 'Melancólico',
+            descricao: 'Você não será mais afetado por condições mentais mas não poderá fazer ataques furtivos e terá 5% de errar golpes que usem FOR',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 3,
+        },
+        {
+            id: 'hab14',
+            nome: 'Tanque de guerra',
+            descricao: 'Você ganhará 5 + (nivel) pontos a sua resistência a golpes e +5 em resistência a ataques mágicos',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 3,
+        },
+        {
+            id: 'hab15',
+            nome: 'Engenhosidade',
+            descricao: 'Para cada ponto de inteligência suas armas atuais ganharão +(nivel) pontos',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 4,
+        },
+        {
+            id: 'hab16',
+            nome: 'Desarmar',
+            descricao: 'Caso seu oponente possua uma arma, ao conseguir contra-atacar você poderá desarmar seu oponente',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 4,
+        },
+        {
+            id: 'hab17',
+            nome: 'Mutação',
+            descricao: 'Suas magias te darão uma condição aleatória, mas causará +15 de dano',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 4,
+        },
+        {
+            id: 'hab18',
+            nome: 'Inspiração resoluta',
+            descricao: 'Quando sua barra estar em 10% ou menos, você ganhará 10 pontos de mana',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 4,
+        },
+        {
+            id: 'hab19',
+            nome: 'Última chance',
+            descricao: 'Ao morrer, você reviverá com 1 ponto de vida',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 5,
+        },
+        {
+            id: 'hab20',
+            nome: 'Venda sua alma',
+            descricao: '1. Ao ficar com a vida abaixo de 15% você invocará 2 demônios \n 2. Esses demônios tem como vida igual aos seus pontos de inteligência + 5 \n 3. O dano que esses demônios darão será igual a seus pontos de sorte \n 4. Seu o ponente não poderá te atacar em quanto não matar os demôniios.',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 5,
+        },
+        {
+            id: 'hab21',
+            nome: 'Proficiência',
+            descricao: '1. Esta substitui as habilidades (Veterano) (Namastê) e seus anteriores \n 2. Você ganhará +15 pontos para todos os testes com atributos',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 5,
+        },
+        {
+            id: 'hab22',
+            nome: 'Um por um',
+            descricao: 'Ao acertar um golpe que tire 50% da vida ou mais você poderá atacar novamente em seguida',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 5,
+        },
+        {
+            id: 'hab23',
+            nome: 'Doce veneno',
+            descricao: 'Toda vez que você estiver envenenado ao invés de perder vida você recuperará (Isto não anula outros efeitos negativos do envenenamento)',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 5,
+        },
+        {
+            id: 'hab24',
+            nome: 'Espirito de ódio',
+            descricao: 'Ao chegar em 40% de vida você causará cade vez mais dano para cada 5% de vida perdidos',
+            efeito: () => {
+                return 10;
+            },
+            toggle: false,
+            adiquirida: false,
+            nivel: 5,
         },
     ];
 
@@ -733,6 +974,10 @@ class jogin {
         clearInterval(this.#intervaloProMana);
     }
 
+    #definirExp(xp) {
+        progressbarXP.style.setProperty('--progress', parseFloat(xp));
+    }
+
     // @follow-up --------------- explicação da condição -------------- 
     #definirCondicao() {
         switch(condicao.innerText) {
@@ -860,10 +1105,6 @@ class jogin {
                 else
                     this.#critico = false;
     
-                for (let i = 2; i <= dados.length; i++) {
-                    result += 5;
-                }
-    
                 console.log(dados);
                 console.log(tipoDados + ':' + result);
     
@@ -892,8 +1133,8 @@ class jogin {
         return Math.floor((mana * 100) / this.#pontosMana);
     }
 
-    #calcularVida(dano) {
-        return Math.floor((dano * 100) / this.#pontosVida);
+    #calcularVida(vida) {
+        return Math.floor((vida * 100) / this.#pontosVida);
     }
 
     #dano() {
@@ -905,18 +1146,25 @@ class jogin {
     #eventoUpar() {
         let dtNivel;
         this.#nivel == 0 ? dtNivel = 200 : dtNivel = 100*this.#nivel*3;
-        if(this.#experiencia >= (this.#nivel+dtNivel)) {
+
+        let xp = this.#experiencia/(dtNivel/100);
+        this.#definirExp(xp);
+        
+        if(this.#experiencia >= dtNivel) {
             this.#nivel ++;
             lvl.innerText = 'Nível: ' + this.#nivel;
             this.#pontos += this.#nivel + 5;
             pnts.innerText = 'Pontos: ' + this.#pontos;
+            this._constVigor = this.#recAtr('vigor');
             this.#todosPontos = this.#pontos;
             let obValues = Object.values(this.#atributos);
             obValues.forEach(obValue => {
                 this.#todosPontos += obValue;
             });
-            this.#nivel > 0 ? this.#numHabilidades = 2 : this.#numHabilidades = this.#nivel + 2;
+            this.#nivel == 1 ? this.#numHabilidades = 2 : this.#numHabilidades = this.#nivel + 2;
             this.#constNumHab = this.#numHabilidades;
+            this.#experiencia = 0;
+            this.#definirExp(this.#experiencia);
             btnUpar.innerText = 'Você pode subir de nível';
             btnUpar.style.color = 'green';
             btnUpar.style.padding = '2px 10px 2px 5px';
@@ -924,7 +1172,7 @@ class jogin {
                 btnUpar.innerText = '+';
                 btnUpar.style.color = 'white';
                 btnUpar.style.padding = '2px 2px 2px 5px';
-            }, 5000);
+            }, 2000);
             return true;
         }
         return false;
@@ -961,10 +1209,14 @@ class jogin {
         let divListaHB = document.createElement('div');
         divListaHB.setAttribute('id', 'listaHB');
         this.#habilidades.forEach(k => {
-            let divChecks = document.createElement('div');
-            divChecks.setAttribute('class', 'divChecks');
-            divChecks.innerText = k.nome;
-            divListaHB.appendChild(divChecks);
+            if(k.nivel <= this.#nivel && !k.adiquirida) {
+                let divChecks = document.createElement('div');
+                divChecks.setAttribute('class', 'divChecks');
+                divChecks.setAttribute('id', k.id);
+                divChecks.setAttribute('title', k.descricao);
+                divChecks.innerText = k.nome;
+                divListaHB.appendChild(divChecks);
+            }
         });
         upHabilidades.appendChild(divListaHB);
 
@@ -1073,7 +1325,7 @@ class jogin {
             btnUpar.style.padding = '2px 10px 2px 5px';
             if(this.#ultimoMapa != 3 && this.#ultimoMapa != 4) {
                 btnUpar.addEventListener('click', this.#clickUpar);
-            } else btnUpar.innerText = 'Não da para upar agora';;
+            } else btnUpar.innerText = 'Não da para upar agora';
         } else {
             btnUpar.innerText = 'Sem níveis para subir';
             btnUpar.style.padding = '2px 10px 2px 5px';
@@ -1092,7 +1344,7 @@ class jogin {
 
     #clickHabilidades = e => {
         const key = e.currentTarget;
-        for(let i = 0; i < elDivChecks.length; i++) {
+        for(let i = 0; i < this.#habilidades.length; i++) {
             if(key.innerText == this.#habilidades[i].nome) {
                 if(this.#numHabilidades > 0 && !this.#habilidades[i].toggle)  {
                     key.style.color = 'red';
@@ -1160,23 +1412,39 @@ class jogin {
     }
 
     #clickPronto = () => {
-        //@todo colocar confirmação depois (nao deixar pontos sobrando tbm)
         const atri = document.querySelectorAll('.atributos');
         const obValues = Object.values(this.#atributos);
         const habilidades = document.getElementById('habilidades');
-        for(let i = 0; i < atri.length; i++) {
+        
+        for(let i = 0; i < atri.length; i++)
             atri[i].innerText = atri[i].innerText.split(':')[0] + ': ' + obValues[i];
+        pnts.innerText = 'Pontos: ' + this.#pontos;
+        this.#pontosVida += this.#nivel * 5;
+        if( this.#atributos['vigor'] - this._constVigor > 0 ) {
+            this.#vida += this.#calcularVida((this.#atributos['vigor'] - this._constVigor) * this.#nivel + 10);
+            this.#vida > 100 ? this.#vida = 100 : ''; 
         }
+        progressbarVida.style.setProperty('--progress', this.#vida);
+
+        const divHab = document.getElementById('divHab');
         this.#habilidades.forEach(habilidade => {
-            if(habilidade.toggle)
-                habilidades.append(habilidade.nome);
+            if(habilidade.toggle) {
+                habilidade.adiquirida = true;
+                const span = document.createElement('span');
+                span.innerText = habilidade.nome;
+                span.setAttribute('title', habilidade.descricao);
+                divHab.append(span);
+                this.#habilidadesAtuais.push(habilidade);
+            }
         });
+        habilidades.append(divHab);
+
         this.#habilidades.forEach(habilidade => {
             habilidade.toggle = false;
         });
+
         document.body.removeChild(blurr);
         this.#validarUpar = false;
-        pnts.innerText = 'Pontos: ' + this.#pontos;
     }
 
     //@follow-up ----------------- adicionar magias ao inv --------------
@@ -1837,8 +2105,8 @@ class jogin {
         turno.innerText = '';
         this.#contagemTurno = 0;
         this.#somaDano = 0;
-        this.#experiencia += this.#ultimoEvento.exp;
         this.#ultimoMapa = 0;
+        this.#experiencia += this.#ultimoEvento.exp;  
         if(this.#eventoUpar()) this.#validarUpar = true;
         this.#opcaoCaminhar();
     }
