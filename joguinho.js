@@ -118,7 +118,9 @@ function limparInvGri() {
     });
 }
 
-class jogin {
+import Mapas from './mapas.js';
+
+class jogin extends Mapas {
     #mapaEscolhido;
     #ultimoMapa;
     #ultimoLugar;
@@ -135,6 +137,7 @@ class jogin {
         sorte: 0,
     };
     #resistenciaFisica = 0;
+    #bonusDefesaPassiva = 0;
     #adicionalDef = 0;
     _constVigor;
     #margemCritico = 20;
@@ -210,11 +213,13 @@ class jogin {
             efeito: () => {
                 const mod = ['forca', 'defesa', 'vigor'];
                 mod.forEach(key => {
-                    this.#addModsHab[key] += 5;
+                    this.#addModsHab[key] = 5;
                 });
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 1,
         },
         {
@@ -224,11 +229,13 @@ class jogin {
             efeito: () => {
                 const mod = ['agilidade', 'inteligencia', 'sorte'];
                 mod.forEach(key => {
-                    this.#addModsHab[key] += 5;
+                    this.#addModsHab[key] = 5;
                 });
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 1,
         },
         {
@@ -240,6 +247,8 @@ class jogin {
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 1,
         },
         {
@@ -251,6 +260,8 @@ class jogin {
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 1,
         },
         {
@@ -262,6 +273,8 @@ class jogin {
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 2,
         },
         {
@@ -273,6 +286,8 @@ class jogin {
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 2,
         },
         {
@@ -280,11 +295,11 @@ class jogin {
             nome: 'Embaralhar',
             descricao: '1. Ao chegar a 20% ou menos de vida você ganhará 2 clones que aumentarão sua defesa em 10 pontos cada \n 2. Quando você for atacado perderá um clone',
             efeito: () => {
-                if(this.#vida <= 20) 
-                    this.#resistenciaFisica += 20;
+                if(this.#vida <= 20) this.#bonusDefesaPassiva += 20;
             },
             toggle: false,
             adiquirida: false,
+            unico: 1,
             contexto: 1,
             nivel: 2,
         },
@@ -297,6 +312,8 @@ class jogin {
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 2,
         },
         {
@@ -305,10 +322,12 @@ class jogin {
             descricao: 'Você terá 35% de chance de achar um ítem a mais por baú',
             efeito: () => {
                 const chance = Math.floor(Math.random() * 100);
-                chance >= 35 ? this.#itensPorBau += 1 : '';
+                chance <= 35 ? this.#itensPorBau += 1 : '';
             },
             toggle: false,
             adiquirida: false,
+            unico: 1,
+            contexto: 2,
             nivel: 2,
         },
         {
@@ -321,6 +340,8 @@ class jogin {
             },
             toggle: false,
             adiquirida: false,
+            unico: 1,
+            contexto: 0,
             nivel: 2,
         },
         {
@@ -330,11 +351,13 @@ class jogin {
             efeito: () => {
                 const mod = ['forca', 'defesa', 'vigor'];
                 mod.forEach(key => {
-                    this.#addModsHab[key] += 5;
+                    this.#addModsHab[key] = 10;
                 });
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 3,
         },
         {
@@ -344,11 +367,13 @@ class jogin {
             efeito: () => {
                 const mod = ['inteligencia', 'agilidade', 'sorte'];
                 mod.forEach(key => {
-                    this.#addModsHab[key] += 5;
+                    this.#addModsHab[key] = 10;
                 });
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 3,
         },
         {
@@ -360,6 +385,8 @@ class jogin {
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 3,
         },
         {
@@ -367,10 +394,12 @@ class jogin {
             nome: 'Tanque de guerra',
             descricao: 'Você ganhará 5 + (nivel) pontos a sua resistência a golpes físicos',
             efeito: () => {
-                return 10;
+                this.#resistenciaFisica = (this.#nivel+5);
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 3,
         },
         {
@@ -378,10 +407,17 @@ class jogin {
             nome: 'Engenhosidade',
             descricao: 'Para cada ponto de inteligência suas armas atuais ganharão +(nivel) pontos',
             efeito: () => {
-                return 10;
+                const lista = [this.#inventario['slot1'], this.#inventario['slot2']];
+                lista.forEach(key => {
+                    if(key != '[vazio]') {
+                        key.bonusHab = this.#atributos['inteligencia'] + this.#nivel;
+                    }
+                });
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 4,
         },
         {
@@ -393,23 +429,26 @@ class jogin {
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 3,
             nivel: 4,
         },
         {
             id: 'hab17',
             nome: 'Mutação',
-            descricao: 'Suas magias te darão uma condição aleatória, mas causará +15 de dano',
+            descricao: 'Suas magias te darão uma condição aleatória por batalha, mas causarão +15 pontos de dano',
             efeito: () => {
                 return 10;
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
             nivel: 4,
         },
         {
             id: 'hab18',
             nome: 'Inspiração resoluta',
-            descricao: 'Quando sua barra estar em 10% ou menos, você ganhará 10 pontos de mana',
+            descricao: 'Quando sua mana estiver abaixo de 10%, você ganhará 10 pontos de mana temporários',
             efeito: () => {
                 return 10;
             },
@@ -426,12 +465,13 @@ class jogin {
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
             nivel: 5,
         },
         {
             id: 'hab20',
             nome: 'Venda sua alma',
-            descricao: '1. Ao ficar com a vida abaixo de 15% você invocará 2 demônios \n 2. Esses demônios tem como vida igual aos seus pontos de inteligência + 5 \n 3. O dano que esses demônios darão será igual a seus pontos de sorte \n 4. Seu o ponente não poderá te atacar em quanto não matar os demôniios.',
+            descricao: '1. Ao ficar com a vida abaixo de 15% você invocará 2 demônios \n 2. Esses demônios tem como vida igual aos seus pontos de inteligência + 5 \n 3. O dano que esses demônios darão será igual a seus pontos de sorte \n 4. Seu o ponente não poderá te atacar em quanto não matar os demônios.',
             efeito: () => {
                 return 10;
             },
@@ -442,12 +482,17 @@ class jogin {
         {
             id: 'hab21',
             nome: 'Proficiência',
-            descricao: '1. Esta substitui as habilidades (Veterano) (Namastê) e seus anteriores \n 2. Você ganhará +15 pontos para todos os testes com atributos',
+            descricao: '1. Esta substitui as habilidades (Veterano) (Namastê) e seus anteriores \n 2. Você ganhará +15 pontos para todos seus atributos',
             efeito: () => {
-                return 10;
+                for( let key in this.#addModsHab ) {
+                    if(!this.#addModsHab.hasOwnProperty(key)) continue;
+                    this.#addModsHab[key] = 15;
+                }
             },
             toggle: false,
             adiquirida: false,
+            unico: 0,
+            contexto: 0,
             nivel: 5,
         },
         {
@@ -610,11 +655,11 @@ class jogin {
             imgArma: './img/testinho.png',
             descricao: '[Espada enferrujada, 1d6 + 4 de dano]',
             msgMorte: 'Um corte rápido que arranca o braço da criatura faz com que ela morra de hemorragia',
+            bonusHab: 0,
             efeito: () => {
-                return this.#rolarDados('d6', 1) + 4;
+                return this.#rolarDados('d6', 1) + 4 + this.#eventos[10].bonusHab ? this.#eventos[10].bonusHab : undefined;
             },
         },
-        
         {
             id: 11,
             classe: 1,
@@ -623,8 +668,9 @@ class jogin {
             imgArma: '',
             descricao: '[Arco Tenebroso, 1d6 + 6 de dano]',
             msgMorte: 'Você atira uma flecha que passa direto pelo crânio da criatura a matando',
+            bonusHab: 0,
             efeito: () => {
-                return this.#rolarDados('d3', 1) + 2;
+                return this.#rolarDados('d3', 1) + 2 + this.#eventos[11].bonusHab ? this.#eventos[11].bonusHab : undefined;
             },
         },
         {
@@ -825,6 +871,7 @@ class jogin {
     ];
     
     constructor() {
+        super();
         btnUpar.addEventListener('mouseover' , this.#mouseOverUpar);
         btnUpar.addEventListener('mouseout' , this.#mouseOutUpar);
         this._mudarVazio();
@@ -1403,7 +1450,7 @@ class jogin {
                 if(this.#numHabilidades == 0 && !this.#habilidades[i].toggle) {
                     for(let j = 0; j < elDivChecks.length; j++) {
                         this.#habilidades[j].toggle = false;
-                        elDivChecks[j].style.color = 'white'; 
+                        elDivChecks[j].style.color = 'white';
                     }
                     if(this.#constNumHab > 1) {
                         this.#numHabilidades = this.#constNumHab-1;
@@ -1458,7 +1505,7 @@ class jogin {
         this.#pontosVida += this.#nivel * 5;
         if( this.#atributos['vigor'] - this._constVigor > 0 ) {
             this.#vida += this.#calcularVida((this.#atributos['vigor'] - this._constVigor) * this.#nivel + 10);
-            this.#vida > 100 ? this.#vida = 100 : ''; 
+            this.#vida > 100 ? this.#vida = 100 : '';
         }
         progressbarVida.style.setProperty('--progress', this.#vida);
 
@@ -1607,7 +1654,7 @@ class jogin {
     }
 
     #definirDefesaPassiva(ctx) {
-        let defesaPassiva = 5;
+        let defesaPassiva = 5 + this.#bonusDefesaPassiva;
         if( ctx == 'vig' ) {
             defesaPassiva += this.#adicionalDef;
             if(this.#recAtr('defesa') != 0)
