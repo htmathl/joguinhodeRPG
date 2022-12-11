@@ -1,32 +1,29 @@
-﻿import Habilidades from "./habilidades.js";
+import { Mixin } from 'ts-mixer';
 
 let dialogo = document.getElementById("dialogo");
 let btnContinuar = document.getElementById('continuar');
 
-let btnsAndar = document.querySelectorAll('.botoes');
-let btnsSN = document.querySelectorAll('.botoesSN');
-let btnsAcao = document.querySelectorAll('.botoesAcao');
-let btnsAtq = document.querySelectorAll('.botoesAtq');
+let btnsAndar = document.querySelectorAll<HTMLElement>('.botoes');
+let btnsSN = document.querySelectorAll<HTMLElement>('.botoesSN');
+let btnsAcao = document.querySelectorAll<HTMLElement>('.botoesAcao');
+let btnsAtq = document.querySelectorAll<HTMLElement>('.botoesAtq');
 let btnNenhum = document.getElementById('btnNenhuma');
-let btnAtacar = document.getElementById('btnAtacar');
-let btnDefender = document.getElementById('btnDefender');
 let btnPoderoso = document.getElementById('btnPoderoso');
-let btnItens = document.getElementById('btnItens');
 
-let respostas = document.getElementsByClassName('resposta')
-let infos = document.getElementsByClassName('infos');
+let respostas = document.querySelectorAll<HTMLElement>('.resposta')
+let infos = document.querySelectorAll<HTMLElement>('.infos');
 let contexto = document.getElementById('iContexto');
-let hud = document.getElementsByClassName('hud');
+let hud = document.querySelectorAll<HTMLElement>('.hud');
 
-let mag = document.querySelectorAll('.mag');
-let magAtq = document.querySelectorAll('.mag-atq');
-let magSup = document.querySelectorAll('.mag-sup');
-let inv = document.querySelectorAll('.inv');
+let mag = document.querySelectorAll<HTMLElement>('.mag');
+let magAtq = document.querySelectorAll<HTMLElement>('.mag-atq');
+let magSup = document.querySelectorAll<HTMLElement>('.mag-sup');
+let inv = document.querySelectorAll<HTMLElement>('.inv');
 let inv4 = document.getElementById('inv4');
 let inv5 = document.getElementById('inv5');
 let invSup = [ inv4, inv5 ];
 let hover = document.querySelectorAll('.hover');
-let pontinhos = document.querySelectorAll('.pontinho');
+let pontinhos = document.querySelectorAll<HTMLElement>('.pontinho');
 let turnoBicho = document.getElementById('turnoBicho');
 let imgContent1 = document.getElementById('img-content1');
 let divContent1 = document.getElementById('div-content1');
@@ -39,10 +36,10 @@ let divContent4 = document.getElementById('div-content4');
 let imgContent5 = document.getElementById('img-content5');
 let divContent5 = document.getElementById('div-content5');
 
-let buttonsAtqPod = [];
+let buttonsAtqPod:any = [];
 
-let progressbarVida = document.querySelector('#barraVida');
-let progressbarMana = document.querySelector('#barraMana');
+let progressbarVida = document.getElementById('barraVida');
+let progressbarMana = document.getElementById('barraMana');
 let progressbarXP = document.getElementById('barraXP');
 let lvl = document.getElementById('nivel');
 let pnts = document.getElementById('pontos');
@@ -50,7 +47,7 @@ let btnUpar = document.getElementById('btnUpar');
 let turno = document.getElementById('turno');
 let condicao = document.getElementById('condicao');
 
-let dlg, btnMais, btnMenos, elDivChecks, blurr;
+let dlg:string, btnMais, btnMenos, elDivChecks:any, blurr:HTMLElement | null;
 
 inv.forEach(inv =>{
     inv.setAttribute('title', 'Você está se sentindo leve, mas desprotegido, é melhor pegar alguns itens... Alías, inventário, viajante, viajante, inventário.');
@@ -103,12 +100,12 @@ window.setInterval(() => {
 
 function definirVida() {
     //vida nivel 0 = 20 pontos
-  	progressbarVida.style.setProperty('--progress', 100);
+  	progressbarVida?.style.setProperty('--progress', '100');
 }
 
 function definirMana() {
     //mana nivel 0 = 20 pontos
-	progressbarMana.style.setProperty('--progress', 100);
+	progressbarMana?.style.setProperty('--progress', '100');
 }
 
 function limparInvGri() {
@@ -120,235 +117,36 @@ function limparInvGri() {
     });
 }
 
-class Jogin extends Habilidades {
-    #mapaEscolhido;
+import Eventos from './eventos.js';
+import Habilidades from './habilidades.js';
+import Viajante from './viajante.js';
+
+class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
+    #mapaEscolhido = 0;
     #ultimoMapa;
     #ultimoLugar;
-    #ultimoEvento;
-    #ultimoEventoVida;
-    #usos = [];
-    #nome;
-    #atributos = { 
-        forca: 0,
-        defesa: 0,
-        inteligencia: 0,
-        vigor: 0,
-        agilidade: 0,
-        sorte: 0,
-    };
-    #resistenciaFisica = 0;
-    #bonusDefesaPassiva = 0;
-    #adicionalDef = 0;
-    _constVigor;
-    #margemCritico = 20;
-    #pontosVida = 20; 
-    #pontosMana = 20;
-    #vida = 100;
-    #mana = 100;
-    #resistenciaMana = 0;
-    #experiencia = 0;
-    #nivel = 0;
-    #pontos = 0;
+    #usos:number;
     #todosPontos;
-    #validarUpar = false;
-    #inventario = {
-        slot1: {
-        },
-        slot2: {
-        },
-        slot3: {
-        },
-        slot4: {
-        },
-        slot5: {
-        }
-    };
-    //@todo implementar isso para aumentar a cada 2 niveis upados
-    #raridadeItem = 0;
-    #itensExtras = 0;
-    #itensPorBau = 0;
-    #prevencao = 0;
-    #magiasAtuais = {
-        mag1: {
-        },
-        mag2: {
-        },
-        mag3: {
-        },
-        mag4: {
-        },
-    };
-    #condicao = 'NORMAL';
-    #efeitoAoSeuToque = 'NORMAL';
-    #habilidadesAtuais = [];
-    #critico = false;
+    #validarUpar;
+    #inventario;
+    #magiasAtuais;
+    #condicao;
+    #habilidadesAtuais:object[];
     #furtivo;
     #validarPoderoso;
-    #dadosAtqPod = [];
-    #testeDefesa = 0;
-    #contadorDano = 0;
-    #somaDano = 0;
-    #acumuloAtqPod = 0;
-    #contagemTurno = 0;
-    #intervaloProMana;
+    #dadosAtqPod:number[];
+    #testeDefesa;
+    #contadorDano;
+    #somaDano;
+    #acumuloAtqPod;
+    #contagemTurno;
+    #intervaloProMana:any;
     #intervaloValMag0;
     #intervaloValMag1;
-    #intervaloValMags = [this.#intervaloValMag0, this.#intervaloValMag1];
+    #intervaloValMags:any[];
     #cancelarToggle;
-    #numHabilidades = 0;
+    #numHabilidades;
     #constNumHab;
-    #addModsHab = {
-        forca: 0,
-        defesa: 0,
-        inteligencia: 0,
-        vigor:  0,
-        agilidade: 0,
-        sorte: 0
-    };
-    #habilidades = [
-        {
-            efeito: () => {
-                const mod = ['forca', 'defesa', 'vigor'];
-                mod.forEach(key => {
-                    this.#addModsHab[key] = 5;
-                });
-            },
-        },
-        {
-            efeito: () => {
-                const mod = ['agilidade', 'inteligencia', 'sorte'];
-                mod.forEach(key => {
-                    this.#addModsHab[key] = 5;
-                });
-            },
-        },
-        {
-            efeito: () => {
-                this.#margemCritico = 19;
-            },
-        },
-        {
-            efeito: () => {
-                this.#resistenciaMana = 3;
-            },
-        },
-        {
-            efeito: () => {
-               this.#itensExtras = 1;
-            },
-        },
-        {
-            efeito: () => {
-                this.#prevencao = 40;
-            },
-        },
-        {
-            efeito: () => {
-                if(this.#vida <= 20) this.#bonusDefesaPassiva += 20;
-            },
-        },
-        {
-            efeito: () => {
-                this.#efeitoAoSeuToque = 'PARALIZADO';
-            },
-        },
-        {
-            efeito: () => {
-                const chance = Math.floor(Math.random() * 100);
-                chance <= 35 ? this.#itensPorBau += 1 : '';
-            },
-        },
-        {
-            efeito: () => {
-                if(this.#inventario['slot4'].tipo == 'Comida' && this.#inventario['slot4'].rec < 7 )
-                    this.#inventario['slot4'].rec *= 2;
-            },
-        },
-        {
-            efeito: () => {
-                const mod = ['forca', 'defesa', 'vigor'];
-                mod.forEach(key => {
-                    this.#addModsHab[key] = 10;
-                });
-            },
-        },
-        {
-            efeito: () => {
-                const mod = ['inteligencia', 'agilidade', 'sorte'];
-                mod.forEach(key => {
-                    this.#addModsHab[key] = 10;
-                });
-            },
-        },
-        {
-            efeito: () => {
-                return 10;
-            },
-        },
-        {
-            efeito: () => {
-                this.#resistenciaFisica = (this.#nivel+5);
-            },
-        },
-        {
-            efeito: () => {
-                const lista = [this.#inventario['slot1'], this.#inventario['slot2']];
-                lista.forEach(key => {
-                    if(key != '[vazio]') {
-                        key.bonusHab = this.#atributos['inteligencia'] + this.#nivel;
-                    }
-                });
-            },
-        },
-        {
-            efeito: () => {
-                return 10;
-            },
-        },
-        {
-            efeito: () => {
-                return 10;
-            },
-        },
-        {
-            efeito: () => {
-                return 10;
-            },
-        },
-        {
-            efeito: () => {
-                return 10;
-            },
-        },
-        {
-            efeito: () => {
-                return 10;
-            },
-        },
-        {
-            efeito: () => {
-                for( let key in this.#addModsHab ) {
-                    if(!this.#addModsHab.hasOwnProperty(key)) continue;
-                    this.#addModsHab[key] = 15;
-                }
-            },
-        },
-        {
-            efeito: () => {
-                return 10;
-            },
-        },
-        {
-            efeito: () => {
-                return 10;
-            },
-        },
-        {
-            efeito: () => {
-                return 10;
-            },
-        },
-    ];
 
     //@todo rever os atributos dos bichos e tudo mias
     //@todo rever o bonus dos negocios ( +15 para 4 dados me parece muito ) ( pode ser tipo a cada numero impar ou par aumentar o bonus )
@@ -361,365 +159,82 @@ class Jogin extends Habilidades {
     //mapa com magias = 2
     //mapa com monstro = 3
     //mapa com boss = 4
-    #eventos = [
-        // ---------------- eventos aleatórios ----------------
-        {
-            id: 0,
-            classe: 0,
-            descricao: ['Nada, além de um silêncio calmante...', 
-            'Uma pedra? Não parece ser nada.',
-            'Há um som estranho no ambiente... você olha para a frente e se depara com nada.',
-            'Parabéns, viajante, você encontrou nada...',
-            'Hmmm, melhor continuar, nada por aqui.',
-            ],
-        },
-        {
-            id: 1,
-            classe: 0,
-            descricao: ['Nada, além de um silêncio calmante...', 
-            'Uma pedra? Não parece ser nada.',
-            'Há um som estranho no ambiente... você olha para a frente e se depara com nada.',
-            'Parabéns, viajante, você encontrou nada...',
-            'Hmmm, melhor continuar, nada por aqui.',
-            ],
-        },
-        {
-            id: 2,
-            classe: 0,
-            descricao: ['Nada, além de um silêncio calmante...', 
-            'Uma pedra? Não parece ser nada.',
-            'Há um som estranho no ambiente... você olha para a frente e se depara com nada.',
-            'Parabéns, viajante, você encontrou nada...',
-            'Hmmm, melhor continuar, nada por aqui.',
-            ],
-        },
-        {
-            id: 3,
-            classe: 0,
-            descricao: ['Nada, além de um silêncio calmante...', 
-            'Uma pedra? Não parece ser nada.',
-            'Há um som estranho no ambiente... você olha para a frente e se depara com nada.',
-            'Parabéns, viajante, você encontrou nada...',
-            'Hmmm, melhor continuar, nada por aqui.',
-            ],
-        },
-        {
-            id: 4,
-            classe: 0,
-            descricao: ['Nada, além de um silêncio calmante...', 
-            'Uma pedra? Não parece ser nada.',
-            'Há um som estranho no ambiente... você olha para a frente e se depara com nada.',
-            'Parabéns, viajante, você encontrou nada...',
-            'Hmmm, melhor continuar, nada por aqui.',
-            ],
-        },
-        {
-            id: 5,
-            classe: 0,
-            descricao: ['Nada, além de um silêncio calmante...', 
-            'Uma pedra? Não parece ser nada.',
-            'Há um som estranho no ambiente... você olha para a frente e se depara com nada.',
-            'Parabéns, viajante, você encontrou nada...',
-            'Hmmm, melhor continuar, nada por aqui.',
-            ],
-        },
-        {
-            id: 6,
-            classe: 0,
-            descricao: ['Nada, além de um silêncio calmante...', 
-            'Uma pedra? Não parece ser nada.',
-            'Há um som estranho no ambiente... você olha para a frente e se depara com nada.',
-            'Parabéns, viajante, você encontrou nada...',
-            'Hmmm, melhor continuar, nada por aqui.',
-            ],
-        },
-        {
-            id: 7,
-            classe: 0,
-            descricao: ['Nada, além de um silêncio calmante...', 
-            'Uma pedra? Não parece ser nada.',
-            'Há um som estranho no ambiente... você olha para a frente e se depara com nada.',
-            'Parabéns, viajante, você encontrou nada...',
-            'Hmmm, melhor continuar, nada por aqui.',
-            ],
-        },
-        {
-            id: 8,
-            classe: 0,
-            descricao: ['Nada, além de um silêncio calmante...', 
-            'Uma pedra? Não parece ser nada.',
-            'Há um som estranho no ambiente... você olha para a frente e se depara com nada.',
-            'Parabéns, viajante, você encontrou nada...',
-            'Hmmm, melhor continuar, nada por aqui.',
-            ],
-        },
-        {
-            id: 9,
-            classe: 0,
-            descricao: ['Nada, além de um silêncio calmante...', 
-            'Uma pedra? Não parece ser nada.',
-            'Há um som estranho no ambiente... você olha para a frente e se depara com nada.',
-            'Parabéns, viajante, você encontrou nada...',
-            'Hmmm, melhor continuar, nada por aqui.',
-            ],
-        },
-
-        //@todo colocar outros eventos que nada ^ (ate o 10)
-        
-        // ---------------- itens ----------------
-        {
-            id: 10,
-            classe: 1,
-            nome: 'Espada enferrujada',
-            tipo: 'armaCaC',
-            imgArma: './img/testinho.png',
-            descricao: '[Espada enferrujada, 1d6 + 4 de dano]',
-            msgMorte: 'Um corte rápido que arranca o braço da criatura faz com que ela morra de hemorragia',
-            bonusHab: 0,
-            efeito: () => {
-                return this.#rolarDados('d6', 1) + 4 + this.#eventos[10].bonusHab ? this.#eventos[10].bonusHab : undefined;
-            },
-        },
-        {
-            id: 11,
-            classe: 1,
-            nome: 'Arco Tenebroso',
-            tipo: 'armaDis',
-            imgArma: '',
-            descricao: '[Arco Tenebroso, 1d6 + 6 de dano]',
-            msgMorte: 'Você atira uma flecha que passa direto pelo crânio da criatura a matando',
-            bonusHab: 0,
-            efeito: () => {
-                return this.#rolarDados('d3', 1) + 2 + this.#eventos[11].bonusHab ? this.#eventos[11].bonusHab : undefined;
-            },
-        },
-        {
-            id: 12,
-            classe: 1,
-            nome: 'Maçã',
-            tipo: 'comida',
-            usavel: true,
-            imgArma: '',
-            descricao: '[Maçã, recupera 5pvs]',
-            rec: 5,
-            efeito: () => {
-                this.#vida += this.#calcularVida(this.#eventos[12].rec);
-                progressbarVida.style.setProperty('--progress', this.#vida);
-            },
-        },
-        {
-            id: 13,
-            classe: 1,
-            nome: 'Amianto',
-            tipo: 'pocao',
-            usavel: true,
-            imgArma: '',
-            descricao: '[Amianto, recupera 5pms]',
-            efeito: () => {
-                this.#mana += this.#calcularMana(5);
-                progressbarMana.style.setProperty('--progress', this.#mana);
-            },
-        },
-        
-        {
-            id: 14,
-            classe: 1,
-            nome: 'Armadura feia',
-            tipo: 'armadura',
-            imgArma: '',
-            descricao: '[Armadura feia, resistência +5 a atqs armados]',
-            efeito: () => {
-                this.#adicionalDef += 5;
-            },
-        },
-        
-        {
-            id: 15,
-            classe: 1,
-            nome: 'Amuleto desgraçado',
-            tipo: 'amuleto',
-            imgArma: '',
-            usavel: false,
-            descricao: '[Amuleto desgraçado, +2 de atq por nível]',
-            efeito: () => {
-
-            },
-        },
-        
-        {
-            id: 16,
-            classe: 1,
-            nome: 'Arma 4',
-            imgArma: './img/miuu.png',
-            tipo: 'arma',
-            descricao: '[Espada do chacau, 1d12]',
-            bonusCrt: 2,
-            efeito: () => {
-                return rolarDados('d12', 1);
-            },
-        },
-        
-        {
-            id: 17,
-            classe: 1,
-            nome: 'Esp. 8',
-            tipo: '',
-            descricao: '[Lança gigante, 2d12 de dano]',
-            dano: (Math.floor(Math.random() * (12 - 1)) + 1) +
-                  (Math.floor(Math.random() * (12 - 1)) + 1),
-        },
-        
-        {
-            id: 18,
-            classe: 1,
-            nome: 'Arma 5',
-            tipo: 'arma',
-            imgArma: './img/miuu.png',
-            descricao: '[Machadinha, 1d6 + 2]',
-            bonusCrt: 1,
-            efeito: () => {
-                //ver se essa linha ta funcionando como deve
-                ultimoEvento.condicao = 'VULNERAVEL';
-                return rolarDados('d6', 1) + 2;
-            },
-        },
-        
-        {
-            id: 19,
-            classe: 1,
-            nome: 'Esp. 10',
-            tipo: false,
-            descricao: '[Foice da morte, 2d12 + 6 de dano]',
-            dano: (Math.floor(Math.random() * (12 - 1)) + 1) +
-                  (Math.floor(Math.random() * (12 - 1)) + 1) + 6,
-        },
-        
-        // ---------------- magias ----------------
-        
-        {
-            id: 20,
-            classe: 2,
-            nome: 'magia',
-            tipo: 'atq',
-            descricao: 'descrição de uma magia 1',
-            efeito: () => {
-                this.#ultimoEvento.condicao = 'AMALDICOADO';
-                return this.#rolarDados('d10', 1);
-            },
-            gastoMana: 16,
-            bonusCrt: 1,
-        },
-
-        {
-            id: 21,
-            classe: 2,
-            nome: 'magia 3',
-            tipo: 'atq',
-            descricao: 'descrição de uma magia 3',
-            efeito: () => {
-                this.#ultimoEvento.condicao = 'AMALDICOADO';
-                return this.#rolarDados('d10', 5);
-            },
-            gastoMana: 4,
-            bonusCrt: 1,
-        },
-        
-        {
-            id: 22,
-            classe: 2,
-            nome: 'magia 2',
-            tipo: 'sup',
-            descricao: 'recupera 20 pontos de mana',
-            gastoMana: 5,
-            efeito: () => {
-                this.#eventos.forEach(evento => {
-                    if(evento.id == 22)
-                        this.#mana -= this.#calcularMana(evento.gastoMana);
-                });
-                this.#mana += this.#calcularMana(20);
-                progressbarMana.style.setProperty('--progress', this.#mana);
-            }
-        },
-        
-        // ---------------- bichos ---------------- 
-        
-        {
-            id: 31,
-            classe: 3,
-            nome: 'um zumbi de gelo',
-            descricao: 'uma descrição de um bicho',
-            vida: 1,
-            defesa: 0,
-            forca: 1,
-            inteligencia: 1,
-            vigor: 0,
-            agilidade: 1,
-            condicao: 'NORMAL',
-            exp: 100, //teste
-            dano: () => {
-                return Math.floor(Math.random() * (4 - 1) + 1);
-            },
-            magias: {
-                0: {
-                    nome: 'Geada',
-                    descricao: 'causará 1d6 de dano e adicionará a condição de congelamento',
-                    efeito: () => {
-                        condicao.innerText = 'CONGELAMENTO';
-                        return Math.floor(Math.random() * (7 - 1) + 1);
-                    },
-                    usos: 2,
-                }
-            },
-            textoAtaques: [
-                //0-4 erro
-                //5-9 acerto
-                //10-14 acerto muito
-                //15-19 acerto critico
-                'te acerta suas garras em sua barriga, fazendo um corte liso.',
-                'te acerta e crava suas garras em seu ombro.',
-                'te acerta '
-            ],
-            finalizacao: '',
-        },
-
-        // ----------------- boss -----------------
-        {
-            id: 41,
-            classe: 4,
-            descricao: 'um boss',
-        },
-    ];
     
     constructor() {
         super();
-        btnUpar.addEventListener('mouseover' , this.#mouseOverUpar);
-        btnUpar.addEventListener('mouseout' , this.#mouseOutUpar);
+        this.#ultimoMapa = 0;
+        this.#ultimoLugar = '';
+        this.#usos = 0;
+        this.#todosPontos = 0;
+        this.#validarUpar = false;
+        this.#inventario = {
+            slot1: {
+            },
+            slot2: {
+            },
+            slot3: {
+            },
+            slot4: {
+            },
+            slot5: {
+            }
+        };
+        this.#magiasAtuais = {
+            mag1: {
+            },
+            mag2: {
+            },
+            mag3: {
+            },
+            mag4: {
+            },
+        };
+        this.#condicao = 'NORMAL';
+        this.#habilidadesAtuais = [];
+        this.#furtivo = false;
+        this.#validarPoderoso = false;
+        this.#dadosAtqPod = [];
+        this.#testeDefesa = 0;
+        this.#contadorDano = 0;
+        this.#somaDano = 0;
+        this.#acumuloAtqPod = 0;
+        this.#contagemTurno = 0;
+        this.#intervaloProMana = 0;
+        this.#intervaloValMag0 = 0;
+        this.#intervaloValMag1 = 0;
+        this.#intervaloValMags = [this.#intervaloValMag0, this.#intervaloValMag1];
+        this.#cancelarToggle = false;
+        this.#numHabilidades = 0;
+        this.#constNumHab = 0;
+
+        btnUpar?.addEventListener('mouseover' , this.#mouseOverUpar);
+        btnUpar?.addEventListener('mouseout' , this.#mouseOutUpar);
         //@todo ver depois porque falta certas propriedades (como o contexto) que estao sendo definidas como undefined => console.log(this.#habilidades);
-        let hab = this.getHabilidades();
-        for( let i = 0; i < this.#habilidades.length; i++ ) {
-            for(let m = 0; m < 8; m++)
-                this.#habilidades[i][Object.keys(hab[i])[m]] = Object.values(hab[i])[m];
-        }
+        // let hab = this.getHabilidades();
+        // for( let i = 0; i < this.#habilidades.length; i++ ) {
+        //     for(let m = 0; m < 8; m++)
+        //         this.#habilidades[i][Object.keys(hab[i])[m]] = Object.values(hab[i])[m];
+        // }
         this._mudarVazio();
         this.#definirIntro();
         this.#definirCondicao();
     }
 
     //@follow-up --------------------- estilos -------------------------
-    #mudarVisibilidadeBotoes(ctx) {
+    #mudarVisibilidadeBotoes(ctx:number):void {
         let botoes = [ btnsAndar, btnsAcao, btnsSN, btnsAtq ];
         botoes.forEach(e => {
             e.forEach(e => { e.style.display = 'none' });
         });
         if( ctx <= 3 ) 
             botoes[ctx].forEach(e => { e.style.display = 'inline' });
-        ctx == 4 ? btnNenhum.style.display = 'inline' : 
-                   btnNenhum.style.display = 'none';
-        ctx == 5 ? turnoBicho.style.display = 'block':
-                   turnoBicho.style.display = 'none';
+        ctx == 4 ? btnNenhum &&( btnNenhum.style.display = 'inline') : 
+                   btnNenhum &&( btnNenhum.style.display = 'none');
+        ctx == 5 ? turnoBicho&&( turnoBicho.style.display = 'block'):
+                   turnoBicho&&( turnoBicho.style.display = 'none');
     }
 
-    _mudarVazio() {
+    _mudarVazio():void {
         inv.forEach(e => {
             if( e.innerText != '[vazio]' )
                 e.style.color = 'white';
@@ -734,7 +249,7 @@ class Jogin extends Habilidades {
         });
     }
 
-    #definirIntro() {
+    #definirIntro():void {
         for (var i = btnsAndar.length - 1; i >= 0; i--) {
             //inline
             btnsAndar[i].style.display = 'none';
@@ -749,120 +264,122 @@ class Jogin extends Habilidades {
             btnsAtq[i].style.display = 'none';
         }
         //inline
-        btnNenhum.style.display = 'none';
+        btnNenhum&&(btnNenhum.style.display = 'none');
         //block
         respostas[0].style.display = 'none';
         //flex
         infos[0].style.display = 'none';
         hud[0].style.display = 'none';
     
-        dialogo.innerText = "Que bom que você esteja aqui!";
+        dialogo&&(dialogo.innerText = "Que bom que você esteja aqui!");
     
         //@todo quando for tirar isso para voltar a ter intro, lembrar de atualizar todo if do n == 3
         let n = 3;
         if(n == 3) {   
-            dialogo.innerText = "Vamos começar com seu nome:";
-            btnContinuar.style.display = 'none';
+            dialogo&&(dialogo.innerText = "Vamos começar com seu nome:");
+            btnContinuar&&(btnContinuar.style.display = 'none');
             respostas[0].style.display = 'block';
             infos[0].style.display = 'flex';
             hud[0].style.display = 'flex';
             definirVida();
             definirMana();
             // limparInvGri(); <- por enquanto
-            contexto.append('A luz da lua irradia pela a fresta sobre sua cabeça, o ambiente está gelado, você consegue ver algo escrito na parede a sua frente. \n\n');
-            const resposta = document.getElementById('inputResposta');
-                resposta.focus();
-                resposta.addEventListener('keyup', (e) => {
-                    var key = e.which || e.keyCode;
-                        if (key == 13) {
-                            if(resposta.value != "") {
-                                this.#nome = resposta.value;
-                                dialogo.innerText = "Olá " + this.#nome + ", para onde você quer ir?"
-                                inputResposta.style.display = "none"
-                                this.#opcaoCaminhar();
-                            } else {
-                                resposta.placeholder = 'Não entendi o seu nome';
-                            }
-                        }
-                });
-        }
-    
-        btnContinuar.addEventListener('click', () => {
-            if(n == 0) {
-                dialogo.innerText = "Seu objetivo é só meter porrada em tudo que ver...";
-                n = 1;
-                return;
-            }
-            if (n == 1) {
-                dialogo.innerText = "O sistema é bem fácil! \n \n" +
-                               "1.Quantos mais pontos tiver em um atributo, mais fácil será obter sucesso em sua execução. \n \n" +
-                               "2.Itens te ajudarão a recuperar pontos ou auxiliarão em outros aspectos. \n \n" +
-                               "3.Pousando o mouse sobre os elementos, aparacerá dicas > [Tente aqui] <. O resto você descobre, eu confio.";
-    
-                dialogo.setAttribute('title', 'Isso mesmo, é assim que faz')
-                n = 2;
-                return;
-            }
-            if(n == 2) {
-                dialogo.innerText = "Ah! Mais uma coisa, não esquece, é importante, se recarregar a página, você perderá todo preogresso. Boa sorte!";
-                dialogo.removeAttribute('title');
-                n = 3;
-                return;
-            }
-            if(n == 3) {
-                dialogo.innerText = "Vamos começar com seu nome:";
-                btnContinuar.style.display = 'none';
-                respostas[0].style.display = 'block';
-                infos[0].style.display = 'flex';
-                hud[0].style.display = 'flex';
-                definirVida();
-                definirMana();
-                // limparInvGri(); <- por enquanto
-                // ----------------- nome -----------------
-                function resposta() {
-                    const resposta = document.getElementById('inputResposta');
-                    resposta.addEventListener('keyup', (e) => {
-                    var key = e.which || e.keyCode;
+            contexto&&(contexto.append('A luz da lua irradia pela a fresta sobre sua cabeça, o ambiente está gelado, você consegue ver algo escrito na parede a sua frente. \n\n'));
+            const resposta = document.querySelector<HTMLInputElement>('#inputResposta');
+            resposta?.focus();
+            resposta?.addEventListener('keyup', (e) => {
+                var key = e.which || e.keyCode;
                     if (key == 13) {
-                        if(resposta.value != "") {
-                            nome = resposta.value;
-                            dialogo.innerText = "Olá " + nome + ", para onde você quer ir?"
-                            inputResposta.style.display = "none"
-                            opcaoCaminhar();
+                        if(resposta&&(resposta.value != "")) {
+                            this._nome = resposta.value;
+                            dialogo&&(dialogo.innerText = "Olá " + this._nome + ", para onde você quer ir?");
+                            resposta.style.display = "none"
+                            this.#opcaoCaminhar();
                         } else {
                             resposta.placeholder = 'Não entendi o seu nome';
                         }
                     }
-                    });
-                }
-                resposta();
-            }
-        });
+            });
+        }
+    
+        //@todo concertar depois
+        // btnContinuar?.addEventListener('click', () => {
+        //     if(n == 0) {
+        //         dialogo.innerText = "Seu objetivo é só meter porrada em tudo que ver...";
+        //         n = 1;
+        //         return;
+        //     }
+        //     if (n == 1) {
+        //         dialogo.innerText = "O sistema é bem fácil! \n \n" +
+        //                        "1.Quantos mais pontos tiver em um atributo, mais fácil será obter sucesso em sua execução. \n \n" +
+        //                        "2.Itens te ajudarão a recuperar pontos ou auxiliarão em outros aspectos. \n \n" +
+        //                        "3.Pousando o mouse sobre os elementos, aparacerá dicas > [Tente aqui] <. O resto você descobre, eu confio.";
+    
+        //         dialogo.setAttribute('title', 'Isso mesmo, é assim que faz')
+        //         n = 2;
+        //         return;
+        //     }
+        //     if(n == 2) {
+        //         dialogo.innerText = "Ah! Mais uma coisa, não esquece, é importante, se recarregar a página, você perderá todo preogresso. Boa sorte!";
+        //         dialogo.removeAttribute('title');
+        //         n = 3;
+        //         return;
+        //     }
+        //     if(n == 3) {
+        //         dialogo.innerText = "Vamos começar com seu nome:";
+        //         btnContinuar.style.display = 'none';
+        //         respostas[0].style.display = 'block';
+        //         infos[0].style.display = 'flex';
+        //         hud[0].style.display = 'flex';
+        //         definirVida();
+        //         definirMana();
+        //         // limparInvGri(); <- por enquanto
+        //         // ----------------- nome -----------------
+        //         function resposta() {
+        //             const resposta = document.getElementById('inputResposta');
+        //             resposta.addEventListener('keyup', (e) => {
+        //             var key = e.which || e.keyCode;
+        //             if (key == 13) {
+        //                 if(resposta.value != "") {
+        //                     nome = resposta.value;
+        //                     dialogo.innerText = "Olá " + nome + ", para onde você quer ir?"
+        //                     inputResposta.style.display = "none"
+        //                     opcaoCaminhar();
+        //                 } else {
+        //                     resposta.placeholder = 'Não entendi o seu nome';
+        //                 }
+        //             }
+        //             });
+        //         }
+        //         resposta();
+        //     }
+        // });
     }
 
-    _escreverContexto(texto) {
-        contexto.append(texto + '\n\n');
-        contexto.scrollTop = contexto.scrollHeight;
+    _escreverContexto(texto:string):void {
+        contexto?.append(texto + '\n\n');
+        contexto&&(contexto.scrollTop = contexto.scrollHeight);
     }
 
-    _inserirHtmlContexto(elemento, texto, prop, value) {
+    _inserirHtmlContexto(elemento:string, texto:string, prop:string, value:string):void {
         const elementoCriado = document.createElement(elemento);
         elementoCriado.innerText = `${texto} \n\n`;
         elementoCriado.style.setProperty(prop, value);
-        contexto.appendChild(elementoCriado);
-        contexto.scrollTop = contexto.scrollHeight;
+        contexto?.appendChild(elementoCriado);
+        contexto&&(contexto.scrollTop = contexto.scrollHeight);
     }
 
     #semManaOver = () => {
-        dlg = dialogo.innerText;
-        dialogo.style.color = '#DB4B55';
-        dialogo.innerText = 'Mana insuficiente';
+        dlg = dialogo?.innerText+'';
+        dialogo&&(dialogo.style.color = '#DB4B55');
+        dialogo&&(dialogo.innerText = 'Mana insuficiente');
         this.#intervaloProMana = setInterval(() => {
-            if( progressbarMana.style.backgroundColor == '' ) {
+            if( progressbarMana?.style.backgroundColor == '' ) {
                 progressbarMana.style.backgroundColor = 'rgba(219, 75, 85, 0.25)';
-            } else {
-                progressbarMana.style.backgroundColor = '';
+                return;
             }
+            progressbarMana&&(progressbarMana.style.backgroundColor = '');
+            
         }, 500);
 
         magAtq.forEach(e => {
@@ -874,19 +391,19 @@ class Jogin extends Habilidades {
     }
 
     #semManaOut = () => {
-        dialogo.style.color = 'white';
-        dialogo.innerText = dlg;
-        progressbarMana.style.backgroundColor = '';
+        dialogo&&(dialogo.style.color = 'white');
+        dialogo&&(dialogo.innerText = dlg);
+        progressbarMana&&(progressbarMana.style.backgroundColor = '');
         clearInterval(this.#intervaloProMana);
     }
 
-    #definirExp(xp) {
-        progressbarXP.style.setProperty('--progress', parseFloat(xp));
+    #definirExp(xp:any) {
+        progressbarXP?.style.setProperty('--progress', parseFloat(xp)+'');
     }
 
     // @follow-up --------------- explicação da condição -------------- 
     #definirCondicao() {
-        switch(condicao.innerText) {
+        switch(condicao?.innerText) {
             case 'NORMAL':
                 condicao.setAttribute('title', 'Nada está acontecendo, pelo menos, eu acho.');
                 break;
@@ -956,131 +473,63 @@ class Jogin extends Habilidades {
             this.#mapaEscolhido = 4;
     }
 
-    #rolarDados(tipoDados, qntDados) {
-        let dados = [], result = 0;
-        switch (tipoDados) {
-            case 'd3':
-                //dano (verificar se é preciso colocar um tipo de rolada, ex: dano, teste aleatório, teste...).
-                for(var i = 1; i <= qntDados; i++) {
-                    result += Math.floor(Math.random() * (4 - 1) + 1);
-                }
-    
-                console.log(tipoDados + ':' + result);
-    
-                return result;
-            case 'd6':
-                for(var i = 1; i <= qntDados; i++) {
-                    result += Math.floor(Math.random() * (7 - 1) + 1);
-                }
-    
-                console.log(tipoDados + ':' + result);
-    
-                return result;
-            case 'd8':
-                for(var i = 1; i <= qntDados; i++) {
-                    result += Math.floor(Math.random() * (9 - 1) + 1);
-                }
-    
-                console.log(tipoDados + ':' + result);
-    
-                return result;
-            case 'd10':
-                for(var i = 1; i <= qntDados; i++) {
-                    result += Math.floor(Math.random() * (11 - 1) + 1);
-                }
-    
-                console.log(tipoDados + ':' + result);
-    
-                return result;
-            case 'd12':
-                for(var i = 1; i <= qntDados; i++) {
-                    result += Math.floor(Math.random() * (13 - 1) + 1);
-                }
-    
-                console.log(tipoDados + ':' + result);
-    
-                return result;
-            case 'd20':
-                for(var i = 1; i <= qntDados; i++) {
-                    dados.push(Math.floor(Math.random() * (21 - 1) + 1));
-                }
-    
-                result = Math.max.apply(null, dados);
-                result = 20;
-                if(result == this.#margemCritico)
-                    this.#critico = true;
-                else
-                    this.#critico = false;
-                
-                console.log(dados);
-                console.log(tipoDados + ':' + result);
-    
-                return result;
-            default:
-                console.log('Escolha um dado adequado');
-                break;
-        }
-    }
-
-    #rolarAcertoOponente(atributo) {
+    #rolarAcertoOponente(atributo:string):number {
         console.log('teste oponente: ' + atributo);
-        return this.#rolarDados('d20', (this.#ultimoEvento[atributo] + 1));
+        const a = this._ultimoEvento;
+        return this._rolarDados('d20', (this._ultimoEvento[atributo as keyof typeof a] + 1));
     }
 
-    #rolarAcerto(atributo) {
+    #rolarAcerto(atributo:string):number {
         console.log('teste viajante: ' + atributo);
-        let teste = this.#rolarDados('d20', (this.#recAtr(atributo) + 1)) + this.#addModsHab[atributo];
+        const a = this.addModsHab;
+        let teste = this._rolarDados('d20', (this.#recAtr(atributo) + 1)) + this.addModsHab[atributo as keyof typeof a];
         console.log(teste);
         return teste;
     }
 
-    #recAtr(atributo) {
-        return this.#atributos[atributo];
-    }
-
-    #calcularMana(mana) {
-        return Math.floor( (mana * 100) / this.#pontosMana - this.#resistenciaMana);
-    }
-
-    #calcularVida(vida) {
-        return Math.floor((vida * 100) / this.#pontosVida);
+    #recAtr(atributo:string):number {
+        const a = this._atributos;
+        return this._atributos[atributo as keyof typeof a];
     }
 
     #dano() {
-        this.#vida -= this.#calcularVida(this.#ultimoEvento.dano());
-        progressbarVida.style.setProperty('--progress', this.#vida);
-        this._escreverContexto(this.#ultimoEvento.nome + ', ' + this.#ultimoEvento.textoAtaques[Math.floor(Math.random() * (this.#ultimoEvento.textoAtaques.length))]);
+        this._vida -= this._calcularVida(this._ultimoEvento.efeito ? this._ultimoEvento.efeito() : 0);
+        progressbarVida?.style.setProperty('--progress', this._vida+'');
+        if(this._ultimoEvento.textoAtaques)
+            this._escreverContexto(this._ultimoEvento.nome + ', ' + this._ultimoEvento.textoAtaques[Math.floor(Math.random() * (this._ultimoEvento.textoAtaques.length))]);
+        else
+            console.log('ERRO TOTAL linha 951');
     }
 
-    #eventoUpar() {
+    #eventoUpar():boolean {
         let dtNivel;
-        this.#nivel == 0 ? dtNivel = 200 : dtNivel = 100*this.#nivel*3;
+        this._nivel == 0 ? dtNivel = 200 : dtNivel = 100*this._nivel*3;
 
-        let xp = this.#experiencia/(dtNivel/100);
+        let xp = this._experiencia/(dtNivel/100);
         this.#definirExp(xp);
         
-        if(this.#experiencia >= dtNivel) {
-            this.#nivel ++;
-            lvl.innerText = 'Nível: ' + this.#nivel;
-            this.#pontos += this.#nivel + 5;
-            pnts.innerText = 'Pontos: ' + this.#pontos;
+        if(this._experiencia >= dtNivel) {
+            this._nivel ++;
+            lvl&&(lvl.innerText = 'Nível: ' + this._nivel);
+            this._pontos += this._nivel + 5;
+            pnts&&(pnts.innerText = 'Pontos: ' + this._pontos);
             this._constVigor = this.#recAtr('vigor');
-            this.#todosPontos = this.#pontos;
-            let obValues = Object.values(this.#atributos);
-            obValues.forEach(obValue => {
+            this.#todosPontos = this._pontos;
+            let obValues = Object.values(this._atributos);
+            obValues.forEach((obValue:any) => {
                 this.#todosPontos += obValue;
             });
-            this.#nivel == 1 ? this.#numHabilidades = 2 : this.#numHabilidades = this.#nivel + 2;
+            this._nivel == 1 ? this.#numHabilidades = 2 : this.#numHabilidades = this._nivel + 2;
             this.#constNumHab = this.#numHabilidades;
-            this.#experiencia = 0;
-            this.#definirExp(this.#experiencia);
-            btnUpar.innerText = 'Você pode subir de nível';
-            btnUpar.style.color = 'green';
-            btnUpar.style.padding = '2px 10px 2px 5px';
+            this._experiencia = 0;
+            this.#definirExp(this._experiencia);
+            (btnUpar as HTMLButtonElement).innerText = 'Você pode subir de nível';
+            (btnUpar as HTMLButtonElement).style.color = 'green';
+            (btnUpar as HTMLButtonElement).style.padding = '2px 10px 2px 5px';
             setTimeout(() => {
-                btnUpar.innerText = '+';
-                btnUpar.style.color = 'white';
-                btnUpar.style.padding = '2px 2px 2px 5px';
+                (btnUpar as HTMLButtonElement).innerText = '+';
+                (btnUpar as HTMLButtonElement).style.color = 'white';
+                (btnUpar as HTMLButtonElement).style.padding = '2px 2px 2px 5px';
             }, 2000);
             return true;
         }
@@ -1117,8 +566,8 @@ class Jogin extends Habilidades {
 
         let divListaHB = document.createElement('div');
         divListaHB.setAttribute('id', 'listaHB');
-        this.#habilidades.forEach(k => {
-            if(k.nivel <= this.#nivel && !k.adiquirida) {
+        this.habilidades.forEach((k:any) => {
+            if(k.nivel <= this._nivel && !k.adiquirida) {
                 let divChecks = document.createElement('div');
                 divChecks.setAttribute('class', 'divChecks');
                 divChecks.setAttribute('id', k.id);
@@ -1150,12 +599,12 @@ class Jogin extends Habilidades {
 
         let ptns = document.createElement('div');
         ptns.setAttribute('id', 'ptns');
-        ptns.innerText = 'Pontos: ' + this.#pontos;
+        ptns.innerText = 'Pontos: ' + this._pontos;
 
-        let obKeys = Object.keys(this.#atributos);
+        let obKeys = Object.keys(this._atributos);
         let atriIndex = 0;
         const atri = document.querySelectorAll('.atributos');
-        atri.forEach(e => {
+        atri.forEach(el => {
             const div = document.createElement('div');
             div.style.display = 'flex';
             div.style.width = '100%';
@@ -1178,7 +627,9 @@ class Jogin extends Habilidades {
 
             const divAtrs = document.createElement('span');
             divAtrs.setAttribute('id', 'divAtrs');
-            divAtrs.innerText = e.innerText.split(':')[0] + ': ' + this.#atributos[obKeys[atriIndex]];
+            const obs = obKeys[atriIndex];
+            const t = this._atributos;
+            divAtrs.innerText = (el as HTMLElement).innerText.split(':')[0] + ': ' + this._atributos[obs as keyof typeof t];
             div.appendChild(divAtrs);
             div.appendChild(divBtns);
             listaAt.appendChild(div);
@@ -1197,21 +648,21 @@ class Jogin extends Habilidades {
         btnPronto.innerText = 'Pronto';
 
         setTimeout(() => {
-            blurr.appendChild(telaUps);
-            blurr.appendChild(btnPronto);
+            blurr?.appendChild(telaUps);
+            blurr?.appendChild(btnPronto);
 
             elDivChecks = document.querySelectorAll('.divChecks');
-            elDivChecks.forEach(div => {
+            elDivChecks.forEach((div:HTMLElement) => {
                 div.addEventListener('click', this.#clickHabilidades);
             });
             
             btnMais = document.querySelectorAll('.btnsMais');
             btnMenos = document.querySelectorAll('.btnsMenos');
             btnMais.forEach(btn => {
-                btn.addEventListener('click', this.#clickBtnMais);
+                (btn as HTMLButtonElement).addEventListener('click', this.#clickBtnMais);
             });
             btnMenos.forEach(btn => {
-                btn.addEventListener('click', this.#clickBtnMenos);
+                (btn as HTMLButtonElement).addEventListener('click', this.#clickBtnMenos);
             });
 
             btnPronto.addEventListener('click',this.#clickPronto);
@@ -1220,217 +671,228 @@ class Jogin extends Habilidades {
                 telaUps.style.position = 'static';
                 telaUps.style.opacity = '1';
                 btnPronto.style.opacity = '1';
-                blurr.style.alignContent = 'space-around';
+                blurr&&(blurr.style.alignContent = 'space-around');
             }, 200);
 
         }, 2000);
     }
 
     #mouseOverUpar = () => {
-        btnUpar.removeEventListener('click', this.#clickUpar);
-        btnUpar.style.color = 'white';
+        btnUpar?.removeEventListener('click', this.#clickUpar);
+        btnUpar&&(btnUpar.style.color = 'white');
         if(this.#validarUpar) {
-            btnUpar.innerText = 'Você pode subir de nível';
-            btnUpar.style.padding = '2px 10px 2px 5px';
+            btnUpar&&(btnUpar.innerText = 'Você pode subir de nível');
+            btnUpar&&(btnUpar.style.padding = '2px 10px 2px 5px');
             if(this.#ultimoMapa != 3 && this.#ultimoMapa != 4) {
-                btnUpar.addEventListener('click', this.#clickUpar);
-            } else btnUpar.innerText = 'Não da para upar agora';
+                btnUpar?.addEventListener('click', this.#clickUpar);
+            } else btnUpar&&(btnUpar.innerText = 'Não da para upar agora');
         } else {
-            btnUpar.innerText = 'Sem níveis para subir';
-            btnUpar.style.padding = '2px 10px 2px 5px';
+            btnUpar&&(btnUpar.innerText = 'Sem níveis para subir');
+            btnUpar&&(btnUpar.style.padding = '2px 10px 2px 5px');
         }
     }
 
     #mouseOutUpar = () => {
-        btnUpar.innerText = '+';
-        btnUpar.style.padding = '2px 2px 2px 5px';
+        btnUpar&&(btnUpar.innerText = '+');
+        btnUpar&&(btnUpar.style.padding = '2px 2px 2px 5px');
     }
 
     #clickUpar = () => {
-        btnUpar.removeEventListener('click', this.#clickUpar);
+        btnUpar?.removeEventListener('click', this.#clickUpar);
         this.#upgradeAtributos();
     }
 
-    #clickHabilidades = e => {
-        const key = e.currentTarget;
-        for(let i = 0; i < this.#habilidades.length; i++) {
-            if(key.innerText == this.#habilidades[i].nome) {
-                if(this.#numHabilidades > 0 && !this.#habilidades[i].toggle)  {
+    #clickHabilidades = (e:MouseEvent) => {
+        const key = e.currentTarget as HTMLElement;
+        for(let i = 0; i < this.habilidades.length; i++) {
+            if(key.innerText == this.habilidades[i].nome) {
+                if(this.#numHabilidades > 0 && !this.habilidades[i].toggle)  {
                     key.style.color = 'red';
-                    this.#habilidades[i].toggle = true;
+                    this.habilidades[i].toggle = true;
                     this.#numHabilidades --;
                     return;
                 }
-                if(this.#numHabilidades > 0 && this.#habilidades[i].toggle) {
+                if(this.#numHabilidades > 0 && this.habilidades[i].toggle) {
                     key.style.color = 'white';
-                    this.#habilidades[i].toggle = false;
+                    this.habilidades[i].toggle = false;
                     this.#numHabilidades ++;
                     return;
                 }
-                if(this.#numHabilidades == 0 && this.#habilidades[i].toggle) {
+                if(this.#numHabilidades == 0 && this.habilidades[i].toggle) {
                     key.style.color = 'white';
-                    this.#habilidades[i].toggle = false;
+                    this.habilidades[i].toggle = false;
                     this.#numHabilidades ++;
                     return;
                 }
-                if(this.#numHabilidades == 0 && !this.#habilidades[i].toggle) {
+                if(this.#numHabilidades == 0 && !this.habilidades[i].toggle) {
                     for(let j = 0; j < elDivChecks.length; j++) {
-                        this.#habilidades[j].toggle = false;
+                        this.habilidades[j].toggle = false;
                         elDivChecks[j].style.color = 'white';
                     }
                     if(this.#constNumHab > 1) {
                         this.#numHabilidades = this.#constNumHab-1;
                     }
                     key.style.color = 'red';
-                    this.#habilidades[i].toggle = true;
+                    this.habilidades[i].toggle = true;
                     return;
                 }
             }
         }
     }
 
-    #clickBtnMais = mais => {
-        let obKeys = Object.keys(this.#atributos);
+    #clickBtnMais = (mais:MouseEvent) => {
+        const target = mais.currentTarget as HTMLElement;
+        let obKeys = Object.keys(this._atributos);
         const ptns = document.getElementById('ptns');
         const divAtrs = document.querySelectorAll('#divAtrs');
+        const g = this._atributos;
         for(let m = 0; m < obKeys.length; m++) {
-                const key = mais.currentTarget.id;
-                if(key == obKeys[m] && this.#pontos > 0) {
-                    this.#atributos[key]++;
-                    this.#pontos--;
-                    divAtrs[m].innerText = divAtrs[m].innerText.split(':')[0] + ': ' + this.#atributos[key];
-                    ptns.innerText = 'Pontos: ' + this.#pontos;
-                    console.log(this.#atributos);
+                const key = target.id;
+                if(key == obKeys[m] && this._pontos > 0) {
+                    this._atributos[key as keyof typeof g]++;
+                    this._pontos--;
+                    
+                    (divAtrs[m] as HTMLElement).innerText = (divAtrs[m] as HTMLElement).innerText.split(':')[0] + ': ' + this._atributos[key as keyof typeof g];
+                    ptns&&(ptns.innerText = 'Pontos: ' + this._pontos);
+                    console.log(this._atributos);
                 }
             }
     }
 
-    #clickBtnMenos = menos => {
-        let obKeys = Object.keys(this.#atributos);
+    #clickBtnMenos = (menos:MouseEvent) => {
+        const target = menos.currentTarget as HTMLElement;
+        let obKeys = Object.keys(this._atributos);
         const ptns = document.getElementById('ptns');
         const divAtrs = document.querySelectorAll('#divAtrs');
+        const a = this._atributos;
         for(let m = 0; m < obKeys.length; m++) {
-            const key = menos.currentTarget.id;
-            if(key == obKeys[m] && this.#atributos[key] > 0 && this.#pontos <= this.#todosPontos) {
-                this.#atributos[key]--;
-                this.#pontos++;
-                divAtrs[m].innerText = divAtrs[m].innerText.split(':')[0] + ': ' + this.#atributos[key];
-                ptns.innerText = 'Pontos: ' + this.#pontos;
+            const key = target.id;
+            if(key == obKeys[m] && this._atributos[key as keyof typeof a] > 0 && this._pontos <= this.#todosPontos) {
+                this._atributos[key as keyof typeof a]--;
+                this._pontos++;
+                (divAtrs[m] as HTMLElement).innerText = (divAtrs[m] as HTMLElement).innerText.split(':')[0] + ': ' + this._atributos[key as keyof typeof a];
+                (ptns as HTMLElement).innerText = 'Pontos: ' + this._pontos;
             }
         }
     }
 
     #clickPronto = () => {
         const atri = document.querySelectorAll('.atributos');
-        const obValues = Object.values(this.#atributos);
+        const obValues = Object.values(this._atributos);
         const habilidades = document.getElementById('habilidades');
         
         for(let i = 0; i < atri.length; i++)
-            atri[i].innerText = atri[i].innerText.split(':')[0] + ': ' + obValues[i];
-        pnts.innerText = 'Pontos: ' + this.#pontos;
-        this.#pontosVida += this.#nivel * 5;
-        if( this.#atributos['vigor'] - this._constVigor > 0 ) {
-            this.#vida += this.#calcularVida((this.#atributos['vigor'] - this._constVigor) * this.#nivel + 10);
-            this.#vida > 100 ? this.#vida = 100 : '';
+            (atri[i] as HTMLElement).innerText = (atri[i] as HTMLElement).innerText.split(':')[0] + ': ' + obValues[i];
+        (pnts as HTMLElement).innerText = 'Pontos: ' + this._pontos;
+        this._pontosVida += this._nivel * 5;
+        if( this._atributos['vigor'] - this._constVigor > 0 ) {
+            this._vida += this._calcularVida((this._atributos['vigor'] - this._constVigor) * this._nivel + 10);
+            this._vida > 100 ? this._vida = 100 : '';
         }
-        progressbarVida.style.setProperty('--progress', this.#vida);
+        progressbarVida?.style.setProperty('--progress', this._vida+'');
 
         const divHab = document.getElementById('divHab');
-        this.#habilidades.forEach(habilidade => {
+        this.habilidades.forEach((habilidade:any) => {
             if(habilidade.toggle) {
                 habilidade.adiquirida = true;
                 const span = document.createElement('span');
                 span.innerText = habilidade.nome;
                 span.setAttribute('title', habilidade.descricao);
-                divHab.append(span);
+                divHab?.append(span);
                 this.#habilidadesAtuais.push(habilidade);
             }
         });
-        habilidades.append(divHab);
+        habilidades?.append(divHab? divHab : 'ERROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO linha 1242');
 
-        this.#habilidades.forEach(habilidade => {
+        this.habilidades.forEach((habilidade:any) => {
             habilidade.toggle = false;
         });
 
-        this.#habilidadesAtuais.forEach(habilidade => {
+        this.#habilidadesAtuais.forEach((habilidade:any) => {
             habilidade.efeito();
         });
 
-        document.body.removeChild(blurr);
+        blurr ? document.body.removeChild(blurr) : console.log('ERRO EXTREMO linha 1252');
         this.#validarUpar = false;
     }
 
     //@follow-up ----------------- adicionar magias ao inv --------------
 
-    #magicasAtq = (e) => {
-        e.currentTarget.innerText = this.#ultimoEvento.nome;
+    //@todo cdg repitindo ---------------
+    #magicasAtq = (e:MouseEvent) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        target.innerText = this._ultimoEvento.nome+'';
         this._mudarVazio();
-        e.currentTarget.setAttribute('title', this.#ultimoEvento.descricao);
+        target.setAttribute('title', this._ultimoEvento.descricao+'');
+        const g = this.#magiasAtuais;
         for( let i = 0; i < 2; i++ )
-            if( magAtq[i].innerText == this.#ultimoEvento.nome )
-                this.#magiasAtuais['mag' + (i+1)] = this.#ultimoEvento;
+            if( magAtq[i].innerText == this._ultimoEvento.nome )
+                this.#magiasAtuais[('mag' + (i+1)) as keyof typeof g] = this._ultimoEvento;
         mag.forEach((mag) => {
             mag.removeEventListener('click', this.#magicasAtq);
         });
-        dialogo.innerText = 'Pra onde você quer ir?';
+        dialogo&&(dialogo.innerText = 'Pra onde você quer ir?');
         this.#opcaoCaminhar();
     }
     
-    #magicasSup = (e) => {
-        e.currentTarget.innerText = this.#ultimoEvento.nome;
+    #magicasSup = (e:MouseEvent) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        target.innerText = this._ultimoEvento.nome+'';
         this._mudarVazio();
-        e.currentTarget.setAttribute('title', this.#ultimoEvento.descricao);
+        target.setAttribute('title', this._ultimoEvento.descricao+'');
+        const g = this.#magiasAtuais;
         for( let i = 0; i < 2; i++ )
-            if( magSup[i].innerText == this.#ultimoEvento.nome )
-                this.#magiasAtuais['mag' + (i+3)] = this.#ultimoEvento;
+            if( magSup[i].innerText == this._ultimoEvento.nome )
+                this.#magiasAtuais[('mag' + (i+3)) as keyof typeof g] = this._ultimoEvento;
         mag.forEach((mag) => {
             mag.removeEventListener('click', this.#magicasSup);
         });
-        dialogo.innerText = 'Pra onde você quer ir?';
+        dialogo&&(dialogo.innerText = 'Pra onde você quer ir?');
         this.#opcaoCaminhar();
     }
+    //-----------------------------------
 
     #nenhuma = () => {
-        dialogo.innerText = `Pra onde você quer ir?`;
+        dialogo&&(dialogo.innerText = `Pra onde você quer ir?`);
         mag.forEach((mag) => {
             mag.removeEventListener('click', this.#magicasAtq);
             mag.removeEventListener('click', this.#magicasSup);
         });
-        btnNenhum.removeEventListener('click', this.#nenhuma);
+        btnNenhum?.removeEventListener('click', this.#nenhuma);
         this.#opcaoCaminhar();
     }
 
     //@follow-up ----------------------- batalha -------------------------
     #iniciarBatalha() {
         this.#contagemTurno ++;
-        turno.innerText = `Turno: ${this.#contagemTurno}`;
+        turno&&(turno.innerText = `Turno: ${this.#contagemTurno}`);
     
         console.log('somadano: ' + this.#somaDano);
-        btnPoderoso.setAttribute('title', 'Atq.Poderoso precisa ser carregado');
+        btnPoderoso?.setAttribute('title', 'Atq.Poderoso precisa ser carregado');
         this.#validarPoderoso = false;
         this.#dadosAtqPod = [];
 
         //validar poderoso
-        if(this.#nivel > 0) {
-            this.#contadorDano = 50 * (this.#nivel);
+        if(this._nivel > 0) {
+            this.#contadorDano = 50 * (this._nivel);
             console.log('contador dano: ' + this.#contadorDano);
-            if(this.#vida <= 45 && this.#somaDano >= this.#contadorDano) {
+            if(this._vida <= 45 && this.#somaDano >= this.#contadorDano) {
                 for (let i = 0; i < 3; i++)
-                    this.#dadosAtqPod.push(parseInt(this.#nivel)+(i+3));
+                    this.#dadosAtqPod.push(this._nivel+i+3);
                 let contar = 0;
                 this.#dadosAtqPod.forEach(dado => {
-                    if(this.#calcularMana(dado*2+5) > this.#mana)
+                    if(this._calcularMana(dado*2+5) > this._mana)
                         contar++;
                 });
                 if(contar < 3) {
-                    btnPoderoso.removeAttribute('title');
-                    btnPoderoso.addEventListener('click', this.#ataquePoderoso);
+                    btnPoderoso?.removeAttribute('title');
+                    btnPoderoso?.addEventListener('click', this.#ataquePoderoso);
                     this.#validarPoderoso = true;
                 }
             }
         }
 
-        btnPoderoso.disabled = !this.#validarPoderoso;
+        (btnPoderoso as HTMLButtonElement).disabled = !this.#validarPoderoso;
 
         if( !this.#furtivo ) {
             btnsAcao.forEach(btnAcao => {
@@ -1439,7 +901,7 @@ class Jogin extends Habilidades {
             });
             btnsAtq.forEach(btnAtq => {
                 btnAtq.style.setProperty('--bcBotoes', 'white');
-                if( !btnAtq.disabled )
+                if( !(btnAtq as HTMLButtonElement).disabled )
                     btnAtq.style.setProperty('color', 'white');
             });
         }
@@ -1479,44 +941,45 @@ class Jogin extends Habilidades {
         this.#iniciarBatalha();
     }
 
-    #definirDefesaPassiva(ctx) {
-        let defesaPassiva = 5 + this.#bonusDefesaPassiva;
+    #definirDefesaPassiva(ctx:string|null):number {
+        let defesaPassiva = 5 + this.bonusDefesaPassiva;
         if( ctx == 'vig' ) {
-            defesaPassiva += this.#adicionalDef;
+            defesaPassiva += this._adicionalDef;
             if(this.#recAtr('defesa') != 0)
-                defesaPassiva = ((this.#atributos.defesa + 1) * defesaPassiva) + 5;  
+                defesaPassiva = ((this._atributos.defesa + 1) * defesaPassiva) + 5;  
         } else {
-            if( this.#ultimoEvento.defesa != 0)
-                defesaPassiva = ((this.#ultimoEvento.defesa + 1) * defesaPassiva) + 5;
+            if( this._ultimoEvento.defesa != 0 && this._ultimoEvento.defesa)
+                defesaPassiva = ((this._ultimoEvento.defesa + 1) * defesaPassiva) + 5;
         }
         return defesaPassiva;
     }
 
-    #acoes = (e) => {
+    #acoes = (e:MouseEvent) => {
+        const target = e.currentTarget as HTMLElement;
         btnsAcao.forEach((btnsAcao) => {
             btnsAcao.style.display = 'none';
         });
     
         this.#testeDefesa = 0;
-        switch(e.currentTarget.innerText) {
+        switch(target.innerText) {
             case 'Atacar':
                 //@todo ao invés do ataque sempre ganhar se empatar em apenas 20 somam-se a defesa e o ataque em seus devidos testes e compara (quem tiver mais defesa ou quem tiver mais ataque ganhará)
                 //armas
-                if( Object.keys( this.#inventario['slot1'] ) != 0 || Object.keys( this.#inventario['slot2'] ) != 0 ) {
-                    btnsAtq[1].disabled = false;
+                if(Object.keys(this.#inventario['slot1']).length > 0 || Object.keys(this.#inventario['slot2']).length > 0) {
+                    (btnsAtq[1] as HTMLButtonElement).disabled = false;
                     btnsAtq[1].innerText = 'Atq. armado';
-                    if( this.#furtivo ) {
+                    if(this.#furtivo) {
                         btnsAtq[1].style.setProperty('color', '#575CFA');
                         btnsAtq[1].style.setProperty('--bcBotoes', '#575CFA') ;
                     }
                 } else {
-                    btnsAtq[1].disabled = true;
+                    (btnsAtq[1] as HTMLButtonElement).disabled = true;
                     btnsAtq[1].setAttribute('title', 'Você não possui uma arma, tente dar um soquinho :)');
                 }
 
                 //se não tiver magia ou mana ou for atq.furtivo
-                function toggleMag(toggle) {
-                    btnsAtq[2].disabled = !toggle;
+                function toggleMag(toggle:boolean) {
+                    (btnsAtq[2] as HTMLButtonElement).disabled = !toggle;
                     !toggle ?
                     btnsAtq[2].setAttribute('title', 'Você não consegue usar magias agora, tente dar um soquinho :)') :
                     btnsAtq[2].removeAttribute('title');
@@ -1525,11 +988,12 @@ class Jogin extends Habilidades {
                 if(this.#acumuloAtqPod != 0)
                     btnsAtq[2].setAttribute('title', 'Não da pra usar o ataque poderoso com ataques mágicos :(');
                 else {
-                    let i = 0, magiasSemMana = [];
+                    let i = 0, magiasSemMana:any = [];
                     for( let key in this.#magiasAtuais ) {
-                        var magia = this.#magiasAtuais[key];
-                        if( Object.keys(magia) != 0 && i < 2 )
-                            if( this.#mana < this.#calcularMana(magia.gastoMana) )
+                        const g = this.#magiasAtuais;
+                        var magia:any = this.#magiasAtuais[key as keyof typeof g];
+                        if( Object.keys(magia).length > 0 && i < 2 )
+                            if( this._mana < this._calcularMana(magia.gastoMana) )
                                 magiasSemMana.push(magia);
                             else
                                 toggleMag(true);
@@ -1562,26 +1026,28 @@ class Jogin extends Habilidades {
                 this.#furtivo = false;
                 this.#mudarVisibilidadeBotoes(4);
                 this.#cancelarToggle = true;
-                btnNenhum.removeEventListener('click', this.#nenhuma);
-                btnNenhum.addEventListener('click', this.#cancelar);   
+                btnNenhum?.removeEventListener('click', this.#nenhuma);
+                btnNenhum?.addEventListener('click', this.#cancelar);   
 
                 for( let i = 0; i < 2; i++ ) {
-                    let item = this.#inventario['slot'+(i+4)];
-                    let magia = this.#magiasAtuais['mag'+(i+3)];
-                    if( Object.keys(item) != 0 && item.usavel )
-                        invSup[i].addEventListener('click', this.#itensMagia);
-                    if( Object.keys(magia) != 0 )
+                    const n = this.#inventario;
+                    let item:any = this.#inventario[('slot'+(i+4)) as keyof typeof n];
+                    const g = this.#magiasAtuais;
+                    let magia = this.#magiasAtuais[('mag'+(i+3)) as keyof typeof g];
+                    if( Object.keys(item).length > 0 && item.usavel )
+                        invSup[i]?.addEventListener('click', this.#itensMagia);
+                    if( Object.keys(magia).length > 0 )
                         magSup[i].addEventListener('click', this.#itensMagia);
                 }
                 break;
             case 'Fugir':
                 let testeSorte = this.#rolarAcerto('sorte');
-                let dt = this.#ultimoEvento.inteligencia * 5 + 5;
+                let dt:number = this._ultimoEvento.inteligencia ? this._ultimoEvento.inteligencia * 5 + 5 : 0;
                 console.log('dt: ' + dt);
                 this.#furtivo = false;
                 if(testeSorte >= dt) {
                     this._escreverContexto('Você Fugiu!');
-                    turno.innerText = '';
+                    turno&&(turno.innerText = '');
                     this.#contagemTurno = 0;
                     this.#somaDano = 0;
                     this.#opcaoCaminhar();
@@ -1599,10 +1065,10 @@ class Jogin extends Habilidades {
     
     }
 
-    #itensMagia = (e) => {
-        
+    #itensMagia = (e:MouseEvent) => {
+        const target = e.currentTarget as HTMLElement;
         invSup.forEach(invSup => {
-            invSup.removeEventListener('click', this.#itensMagia);
+            invSup?.removeEventListener('click', this.#itensMagia);
         });
         magSup.forEach(magSup => {
             magSup.removeEventListener('click', this.#itensMagia);
@@ -1612,18 +1078,20 @@ class Jogin extends Habilidades {
         for( let key in this.#inventario ) {
             if(!this.#inventario.hasOwnProperty(key)) continue;
 
-            let item = this.#inventario[key];
+            const n = this.#inventario;
+            let item:any = this.#inventario[key as keyof typeof n];
             if(item.usavel)
-            if(item.nome == e.currentTarget.innerHTML.split('<span>')[1].split('</span>')[0]) {
-                item.efeito();
-            }
+                if(item.nome == target.innerHTML.split('<span>')[1].split('</span>')[0]) {
+                    item.efeito();
+                }
         }
 
         for( let key in this.#magiasAtuais ) {
             if(!this.#magiasAtuais.hasOwnProperty(key)) continue;
 
-            let magia = this.#magiasAtuais[key];
-            if( magia.nome == e.currentTarget.innerText ) {
+            const g = this.#magiasAtuais;
+            let magia:any = this.#magiasAtuais[key as keyof typeof g];
+            if( magia.nome == target.innerText ) {
                 magia.efeito();
             }
         }
@@ -1636,40 +1104,43 @@ class Jogin extends Habilidades {
     }
 
     #ataquePoderoso = () => {
-        btnPoderoso.removeEventListener('click', this.#ataquePoderoso);
+        btnPoderoso?.removeEventListener('click', this.#ataquePoderoso);
         this.#somaDano = 0;
         const respAtqPoderoso = document.getElementById('respAtqPoderoso');
         for (let i = 0; i < 3; i++) {
             buttonsAtqPod[i] = document.createElement('button');
-            respAtqPoderoso.appendChild(buttonsAtqPod[i]);
+            respAtqPoderoso?.appendChild(buttonsAtqPod[i]);
         }
-        buttonsAtqPod[0].innerHTML = `<span>+${(parseInt(this.#nivel)+3)}d12</span>`;
-        buttonsAtqPod[1].innerHTML = `<span>+${(parseInt(this.#nivel)+4)}d12</span>`;
-        buttonsAtqPod[2].innerHTML = `<span>+${(parseInt(this.#nivel)+5)}d12</span>`;
-        buttonsAtqPod.forEach(button => {
-            button.removeEventListener('click', this.#AddDadosAtqP);
-            button.disabled = true;
+        buttonsAtqPod[0].innerHTML = `<span>+${(this._nivel+3)}d12</span>`;
+        buttonsAtqPod[1].innerHTML = `<span>+${(this._nivel+4)}d12</span>`;
+        buttonsAtqPod[2].innerHTML = `<span>+${(this._nivel+5)}d12</span>`;
+        buttonsAtqPod.forEach((button:Element) => {
+            (button as HTMLButtonElement).removeEventListener('click', this.#AddDadosAtqP);
+            (button as HTMLButtonElement).disabled = true;
         });
         for( let m = 0; m < this.#dadosAtqPod.length; m++ ) {
-            if( this.#calcularMana((this.#dadosAtqPod[m]*2+5)) <= this.#mana ) {
-                buttonsAtqPod[m].disabled = false;
-                buttonsAtqPod[m].addEventListener('click', this.#AddDadosAtqP);
+            if( this._calcularMana((this.#dadosAtqPod[m]*2+5)) <= this._mana ) {
+                (buttonsAtqPod[m] as HTMLButtonElement).disabled = false;
+                (buttonsAtqPod[m] as HTMLElement).addEventListener('click', this.#AddDadosAtqP);
             }
         }
     }
 
-    #AddDadosAtqP = (e) => {
+    #AddDadosAtqP = (e:MouseEvent) => {
+        const target = e.currentTarget as HTMLElement;
         this.#dadosAtqPod.forEach(dado => {
-            if( e.currentTarget.innerText == ('+' + dado + 'd12') ) {
-                this.#acumuloAtqPod = this.#rolarDados('d12', dado);
-                this.#mana -= this.#calcularMana((dado*2+5));
-                progressbarMana.style.setProperty('--progress', this.#mana);
-                buttonsAtqPod.forEach(btn => {
-                    btn.style.display = 'none';
+            if( target.innerText == ('+' + dado + 'd12') ) {
+                this.#acumuloAtqPod = this._rolarDados('d12', dado);
+                this._mana -= this._calcularMana((dado*2+5));
+                progressbarMana?.style.setProperty('--progress', this._mana+'');
+                buttonsAtqPod.forEach((btn:HTMLElement) => {
+                    const b = btn as HTMLElement;
+                    b.style.display = 'none';
                 });
                 btnsAtq.forEach(btn => {
+                    const b = btn as HTMLButtonElement;
                     if(btn.innerText == 'Atq. mágico')
-                        btn.disabled = true;
+                        b.disabled = true;
                 });
                 btnsAcao.forEach(btn => {
                     if(btn.innerText == 'Atacar')
@@ -1682,87 +1153,57 @@ class Jogin extends Habilidades {
     #ataqueOponente() {
         btnsAcao[1].innerText = 'Defender';
         let usarMagias = false;
-        let ultimoEvento = this.#ultimoEvento; 
-    
-        //@todo arrumar esse troço ( nem fazer a chance se o uso de magia tiver acabado )
+        let ultimoEvento = this._ultimoEvento; 
+
         Object.keys(ultimoEvento).forEach(key => {
-            if(key == 'magias')
+            if(key == 'magias' && this.#usos > 0)
                 usarMagias = (Math.floor(Math.random() * 100) < 50) ? true : false;
         });
     
-        while(usarMagias || !usarMagias) {
-            console.log('usou magia? ' + usarMagias);
-            switch(usarMagias) {
-                case true:
-                    let numMagia = Math.floor(Math.random() * Object.keys(ultimoEvento.magias).length);
-    
-                    if(this.#usos.length <= 0)
-                        this.#usos.push(ultimoEvento.magias[numMagia].usos);
-                    else
-                        this.#usos.push(this.#usos[this.#usos.length - 1] - 1);
-    
-                    if(this.#usos.length > ultimoEvento.magias[numMagia].usos + 1)
-                        this.#usos.pop();
-    
-                    console.log('usos: ' + this.#usos);
-    
-                    if(this.#usos[this.#usos.length - 1] > 0) {
+        console.log('usou magia? ' + usarMagias);
+        if(usarMagias) {
+            let numMagia = Math.floor(Math.random() * Object.keys(ultimoEvento.magias).length);
+            if(this.#testeDefesa != 0)
+                this._inserirHtmlContexto('span', 'Não há como defender ataques mágicos', 'text-decoration', 'underline');
 
-                        if(this.#testeDefesa != 0) {
-                            this._inserirHtmlContexto('span', 'Não há como defender ataques mágicos', 'text-decoration', 'underline');
-                        }
-    
-                        if(this.#rolarAcerto('vigor') <= this.#rolarAcertoOponente('inteligencia'))
-                            this.#vida -= this.#calcularVida(ultimoEvento.magias[numMagia].efeito());
-                        else {
-                            this.#vida -= (this.#calcularVida(ultimoEvento.magias[numMagia].efeito()) / 2);
-                            console.log("metade do dano");
-                        }
-    
-                        this.#definirCondicao();
-                        progressbarVida.style.setProperty('--progress', this.#vida);
-                    } else {
-                        usarMagias = false;
-                        continue;
-                    }
-                    break;
-                case false:
-                    if(this.#testeDefesa != 0) {
-                        if(this.#rolarAcertoOponente('forca') >= this.#testeDefesa)
-                            this.#dano();
-                    } else {
-                        if(this.#definirDefesaPassiva('vig') <= this.#rolarAcertoOponente('forca'))
-                            this.#dano();
-                    }
-                    break;
-                default:
-                    console.log('Erro no ataque do oponente.');
-                    break;
-            }
-            break;
+            if(this.#rolarAcerto('vigor') <= this.#rolarAcertoOponente('inteligencia'))
+                this._vida -= this._calcularVida(ultimoEvento.magias[numMagia].efeito());
+            else
+                this._vida -= (this._calcularVida(ultimoEvento.magias[numMagia].efeito()) / 2);
+            
+            this.#definirCondicao();
+            progressbarVida?.style.setProperty('--progress', this._vida+'');
+        } else {
+            if(this.#rolarAcertoOponente('forca') >= this.#testeDefesa)
+                this.#dano();
+            else if(this.#definirDefesaPassiva('vig') <= this.#rolarAcertoOponente('forca'))
+                this.#dano();
+            else
+                contexto?.append('Você defende!');
         }
     
-        console.log('vida: ' + this.#vida);
+        console.log('vida: ' + this._vida);
     
-        turnoBicho.style.display = 'none';
+        turnoBicho&&(turnoBicho.style.display = 'none');
         this.#iniciarBatalha();
     }
     
-    #ataqueViajante = (e) => {
+    #ataqueViajante = (e:MouseEvent) => {
+        const target = e.currentTarget as HTMLElement;
         let vidaTirada = 0, testeForca = this.#rolarAcerto('forca');
-        let ultimoEvento = this.#ultimoEvento;
+        let ultimoEvento:any = this._ultimoEvento;
 
-        switch (e.currentTarget.innerText) {
+        switch (target.innerText) {
             case 'Soquinho':
-                dialogo.innerText = 'Você deu um soquinho';
+                dialogo&&(dialogo.innerText = 'Você deu um soquinho');
     
                 if(this.#definirDefesaPassiva(null) <= testeForca) {
                     //dano soquinho
-                    vidaTirada = this.#rolarDados('d3', 1);
+                    vidaTirada = this._rolarDados('d3', 1);
                     //adicionais
                     vidaTirada += this.#adicionaisAtq();
                     //critico
-                    if(this.#critico) {
+                    if(this._critico) {
                         let resto = this.#recAtr('sorte') % 5;
                         if( this.#recAtr('sorte') <= 0 )
                             vidaTirada *= 2;
@@ -1788,7 +1229,7 @@ class Jogin extends Habilidades {
                     }, 2000);
                 }
 
-                 //tirar furtivo e atq poderoso
+                 //tirar furtivo e atq poderoso @todo mudar todos esses trechos para o inicio do round do bicho
                  this.#acumuloAtqPod = 0;
                  this.#furtivo = false;
 
@@ -1807,9 +1248,10 @@ class Jogin extends Habilidades {
             case 'Atq. mágico':
                 this.#mudarVisibilidadeBotoes(4);
                 for (let i = 0; i < magAtq.length; i++) {
-                    const magia = this.#magiasAtuais['mag' + (i+1)];
-                    if( Object.keys(magia) != 0 ) {
-                        if(this.#mana < this.#calcularMana(magia.gastoMana)) {
+                    let m = this.#magiasAtuais;
+                    const magia:any = m[('mag' + (i+1)) as keyof typeof m];
+                    if( Object.keys(magia).length > 0 ) {
+                        if(this._mana < this._calcularMana(magia.gastoMana)) {
                             magAtq[i].removeEventListener('mouseover', this.#semManaOver);
                             magAtq[i].addEventListener('mouseover', this.#semManaOver);
                         } else {
@@ -1822,21 +1264,22 @@ class Jogin extends Habilidades {
                 }
 
                 this.#cancelarToggle = false;
-                btnNenhum.removeEventListener('click', this.#nenhuma);
-                btnNenhum.addEventListener('click', this.#cancelar);
+                btnNenhum?.removeEventListener('click', this.#nenhuma);
+                btnNenhum?.addEventListener('click', this.#cancelar);
                 break;
             case 'Atq. armado':
                 console.log(this.#inventario);
                 for( let i = 0; i < 2; i++) {
-                    const arma = this.#inventario['slot' + (i+1)];
-                    if( Object.keys(arma) != 0 )
+                    let n = this.#inventario;
+                    const arma:{} = n[('slot' + (i+1)) as keyof typeof n];
+                    if( Object.keys(arma).length > 0 )
                         inv[i].addEventListener('click', this.#atacarArma);
                 }
 
                 this.#mudarVisibilidadeBotoes(4);
                 this.#cancelarToggle = false;
-                btnNenhum.removeEventListener('click', this.#nenhuma);
-                btnNenhum.addEventListener('click', this.#cancelar);
+                btnNenhum?.removeEventListener('click', this.#nenhuma);
+                btnNenhum?.addEventListener('click', this.#cancelar);
                 break;
             default:
                 break;
@@ -1847,25 +1290,27 @@ class Jogin extends Habilidades {
         let vidaTirada = 0;
         let forca = this.#recAtr('forca');
         //bonus da força
-        forca > 0 ? vidaTirada += this.#rolarDados('d3', forca) : '';
+        forca > 0 ? vidaTirada += this._rolarDados('d3', forca) : '';
         //adicionais
         console.log(this.#acumuloAtqPod);
         vidaTirada += this.#acumuloAtqPod;
         //@todo balancear po
         if(this.#furtivo)
-            vidaTirada += this.#rolarDados('d6', (this.#recAtr('agilidade')+2));
+            vidaTirada += this._rolarDados('d6', (this.#recAtr('agilidade')+2));
 
         return vidaTirada;
     }
 
-    #atacarMagia = (e) => {
+    #atacarMagia = (e:MouseEvent) => {
+        const target = e.currentTarget as HTMLElement;
+
         mag.forEach(mag => {
             mag.removeEventListener('click', this.#atacarMagia);
         });
 
-        magAtq.forEach(e => {
-            e.removeEventListener('mouseover', this.#semManaOver);
-            e.removeEventListener('mouseout', this.#semManaOut);
+        magAtq.forEach(magAtq => {
+            magAtq.removeEventListener('mouseover', this.#semManaOver);
+            magAtq.removeEventListener('mouseout', this.#semManaOut);
         });
 
         let i = 0;
@@ -1877,18 +1322,19 @@ class Jogin extends Habilidades {
 
         let vidaTirada = 0,
         testeInt = this.#rolarAcerto('inteligencia');
-        let ultimoEvento = this.#ultimoEvento;
+        let ultimoEvento = this._ultimoEvento;
 
         for( var key in this.#magiasAtuais ) {
             if (!this.#magiasAtuais.hasOwnProperty(key)) continue;
 
-            let magia = this.#magiasAtuais[key];
+            let m = this.#magiasAtuais;
+            let magia:any = m[key as keyof typeof m];
             //@todo depois fazer algum sistema pra não pegar itens reptidos
-            if( magia.nome == e.currentTarget.innerText ) {
+            if( magia.nome == target.innerText ) {
                 //bonus inteligência
-                vidaTirada += this.#rolarDados('d3', (this.#recAtr('inteligencia')+1));
+                vidaTirada += this._rolarDados('d3', (this.#recAtr('inteligencia') + 1));
                 //critico
-                if(this.#critico) {
+                if(this._critico) {
                     let resto = this.#recAtr('sorte') % 5;
                     if( this.#recAtr('sorte') <= 0 )
                         vidaTirada *= 2;
@@ -1900,19 +1346,19 @@ class Jogin extends Habilidades {
                 }
                 if(this.#rolarAcertoOponente('vigor') <= testeInt) {
                     vidaTirada += magia.efeito();
-                    ultimoEvento.vida -= vidaTirada;
+                    ultimoEvento.vida&&(ultimoEvento.vida -= vidaTirada);
                 } else {
                     vidaTirada += magia.efeito();
                     vidaTirada = Math.floor(vidaTirada / 2);
-                    ultimoEvento.vida -= vidaTirada;
+                    ultimoEvento.vida&&(ultimoEvento.vida -= vidaTirada);
                 }
 
-                this.#mana -= this.#calcularMana(magia.gastoMana);
-                progressbarMana.style.setProperty('--progress', this.#mana);
+                this._mana -= this._calcularMana(magia.gastoMana);
+                progressbarMana?.style.setProperty('--progress', this._mana+'');
                 this._escreverContexto(`Você acerta sua magia com ${testeInt}, tirando ${vidaTirada} de vida.`);
                 console.log('vida tirada: ' + ultimoEvento.vida);
         
-                if(ultimoEvento.vida <= 0) {
+                if(ultimoEvento.vida&&(ultimoEvento.vida <= 0)) {
                     //@todo depois colocar narração legal e exclusiva par amagias tbm
                     this.#morteOponente('Em uma explosão de mana, você oblitera esta criatura.')
                 } else {
@@ -1927,27 +1373,28 @@ class Jogin extends Habilidades {
         }       
     }
 
-    #atacarArma = (e) => {
+    #atacarArma = (e:MouseEvent) => {
+        const target = e.currentTarget as HTMLElement;
         inv.forEach(k => {
             k.removeEventListener('click', this.#atacarArma);
         });
 
-        let ultimoEvento = this.#ultimoEvento, vidaTirada = 0;
+        let ultimoEvento:any = this._ultimoEvento, vidaTirada = 0;
         let testeForca = this.#rolarAcerto('forca');
 
         for( let key in this.#inventario ) {
             if(!this.#inventario.hasOwnProperty(key)) continue;
 
-            let armaAtual = this.#inventario[key];
-            if( armaAtual.nome == e.currentTarget.innerHTML.split('<span>')[1].split('</span>')[0] ) {
-               
+            let i = this.#inventario;
+            let armaAtual:any = i[key as keyof typeof i];
+            if( armaAtual.nome == target.innerHTML.split('<span>')[1].split('</span>')[0] ) {
                 if(this.#definirDefesaPassiva(null) <= testeForca) {
                     //dano arma
                     vidaTirada = armaAtual.efeito();
                     //adicionais
                     vidaTirada += this.#adicionaisAtq();
                     //critico
-                    if(this.#critico) {
+                    if(this._critico) {
                         let resto = this.#recAtr('sorte') % 5;
                     if( this.#recAtr('sorte') <= 0 )
                         vidaTirada *= 2;
@@ -1961,7 +1408,7 @@ class Jogin extends Habilidades {
                     ultimoEvento.vida = ultimoEvento.vida - vidaTirada;
                     this._escreverContexto(`Você acerta com ${testeForca} em seu teste, tirando ${vidaTirada} de vida. `);
                     console.log('vida tirada: ' + ultimoEvento.vida);
-                    console.log('defesa bicho: ' + this.#definirDefesaPassiva());
+                    console.log('defesa bicho: ' + this.#definirDefesaPassiva(null));
 
                      //remover furtivo e atq poderoso
                      this.#acumuloAtqPod = 0;
@@ -1983,7 +1430,7 @@ class Jogin extends Habilidades {
 
     #cancelar = () => {
         invSup.forEach(invSup => {
-            invSup.removeEventListener('click', this.#itensMagia);
+            invSup?.removeEventListener('click', this.#itensMagia);
         });
         magSup.forEach(magSup => {
             magSup.removeEventListener('click', this.#itensMagia);
@@ -2009,25 +1456,26 @@ class Jogin extends Habilidades {
         });
 
         this.#mudarVisibilidadeBotoes(this.#cancelarToggle ? 1 : 3);
-        btnNenhum.removeEventListener('click', this.#cancelar);
+        btnNenhum?.removeEventListener('click', this.#cancelar);
     }
 
-    #morteOponente(msg) {
+    #morteOponente(msg:string) {
         this._escreverContexto(msg);
-        this.#ultimoEvento.vida = this.#ultimoEventoVida;
-        this.#usos = [];
-        turno.innerText = '';
+        this._ultimoEvento.vida = this._ultimoEventoVida;
+        this.#usos = 0;
+        turno&&(turno.innerText = '');
         this.#contagemTurno = 0;
         this.#somaDano = 0;
         this.#ultimoMapa = 0;
-        this.#experiencia += this.#ultimoEvento.exp;  
+        this._experiencia += this._ultimoEvento.exp;  
         if(this.#eventoUpar()) this.#validarUpar = true;
         this.#opcaoCaminhar();
     }
 
     //@follow-up -------------- definir o que rolou ------------------
-    #eventoAndar = (e) => {
-        this.#ultimoLugar = e.currentTarget.innerText.toLowerCase();
+    #eventoAndar = (e:MouseEvent) => {
+        const target = e.currentTarget as HTMLElement;
+        this.#ultimoLugar = target.innerText.toLowerCase();
         this.#escolherMapa();
     }
 
@@ -2048,7 +1496,7 @@ class Jogin extends Habilidades {
     #escolherMapa() {
         //this.#aleatorizar();
         let ultimaAndada = this.#ultimoLugar;
-        let eventos =  [];
+        let eventos:any[] = [];
 
         this.#mapaEscolhido = maaaaaaaaaaaaaa[Math.floor(Math.random()*maaaaaaaaaaaaaa.length)];
 
@@ -2146,33 +1594,33 @@ class Jogin extends Habilidades {
 
         // }
         
-            if(this.#nivel < 5 && this.#mapaEscolhido == 4)
+            if(this._nivel < 5 && this.#mapaEscolhido == 4)
                 this.#mapaEscolhido = 0;
 
-            this.#eventos.forEach(e => {
+            this._eventos.forEach((e:any) => {
                 if( e.classe == this.#mapaEscolhido )
                     eventos.push(e);
             });
 
-            dialogo.innerText = `Você andou para ${ultimaAndada} e encontrou...`
+            dialogo&&(dialogo.innerText = `Você andou para ${ultimaAndada} e encontrou...`);
 
             if(this.#mapaEscolhido == 0) {
                 const escolha = Math.floor(Math.random() * 10);
                 this._escreverContexto(eventos[escolha].descricao[Math.floor(Math.random() * 5)] + '');
-                this.#ultimoEvento = eventos[escolha];
+                this._ultimoEvento = eventos[escolha];
 
             } else if(this.#mapaEscolhido == 1) {
                 const escolha = Math.floor(Math.random() * 7);
                 this._escreverContexto(eventos[escolha].descricao);
-                this.#ultimoEvento = eventos[escolha];
+                this._ultimoEvento = eventos[escolha];
 
-                if(this.#ultimoEvento.tipo == 'pocao') {
-                    dialogo.innerHTML = `<b style="color: yellow" > &#9888 Poções podem substituir comidas</b>`;
-                    invSup[0].style.color = 'yellow';
+                if(this._ultimoEvento.tipo == 'pocao') {
+                    dialogo&&(dialogo.innerHTML = `<b style="color: yellow" > &#9888 Poções podem substituir comidas</b>`);
+                    invSup[0]&&(invSup[0].style.color = 'yellow');
                 }
-                if(this.#ultimoEvento.tipo == 'comida') {
-                    dialogo.innerHTML = `<b style="color: yellow" > &#9888 Comidas podem substituir poções</b>`;
-                    invSup[0].style.color = 'yellow';
+                if(this._ultimoEvento.tipo == 'comida') {
+                    dialogo&&(dialogo.innerHTML = `<b style="color: yellow" > &#9888 Comidas podem substituir poções</b>`);
+                    invSup[0]&&(invSup[0].style.color = 'yellow');
                 }
 
                 this.#mudarVisibilidadeBotoes(2);
@@ -2186,35 +1634,37 @@ class Jogin extends Habilidades {
             } else if(this.#mapaEscolhido == 2) {
                 const escolha = Math.floor(Math.random() * 3);
                 this._escreverContexto(eventos[escolha].descricao);
-                this.#ultimoEvento = eventos[escolha];
+                this._ultimoEvento = eventos[escolha];
 
                 this.#mudarVisibilidadeBotoes(4);
 
-                btnNenhum.removeEventListener('click', this.#cancelar);
-                btnNenhum.addEventListener('click', this.#nenhuma);
+                btnNenhum?.removeEventListener('click', this.#cancelar);
+                btnNenhum?.addEventListener('click', this.#nenhuma);
 
-                if(this.#ultimoEvento.tipo == 'atq')
+                if(this._ultimoEvento.tipo == 'atq')
                     magAtq.forEach(magAtq => {
                         magAtq.addEventListener('click', this.#magicasAtq);
                     });
-                else if(this.#ultimoEvento.tipo == 'sup')
+                else if(this._ultimoEvento.tipo == 'sup')
                     magSup.forEach(magSup => {
                         magSup.addEventListener('click', this.#magicasSup);
                     });
 
             } else if(this.#mapaEscolhido == 3) {
-                dialogo.append(' Prepare-se para batalha');
+                dialogo?.append(' Prepare-se para batalha');
                 const escolha = Math.floor(Math.random() * 1);
                 this._escreverContexto(eventos[escolha].descricao);
-                this.#ultimoEvento = eventos[escolha];
-                this.#ultimoEventoVida = this.#ultimoEvento.vida;
+                this._ultimoEvento = eventos[escolha];
+                this._ultimoEventoVida = this._ultimoEvento.vida;
+                console.log(eventos[escolha]);
+                console.log(this._ultimoEvento);
 
                 //ver quem começa
-                let testeAgi = this.#rolarAcerto('agilidade'), testeAgiOp = this.#rolarAcertoOponente('agilidade');
+                let testeAgi = this.#rolarAcerto('agilidade'), testeAgiOp:any = this.#rolarAcertoOponente('agilidade');
                 while(testeAgiOp == testeAgi) {
-                    if( this.#atributos.agilidade != this.#ultimoEvento.agilidade ) {
-                        testeAgi += this.#atributos.agilidade;
-                        testeAgiOp += this.#ultimoEvento.agilidade;
+                    if( this._atributos.agilidade != this._ultimoEvento.agilidade && this._ultimoEvento != undefined ) {
+                        testeAgi += this._atributos.agilidade;
+                        testeAgiOp += this._ultimoEvento.agilidade;
                     } else {
                         testeAgi = this.#rolarAcerto('agilidade');
                         testeAgiOp = this.#rolarAcertoOponente('agilidade');
@@ -2224,18 +1674,19 @@ class Jogin extends Habilidades {
                 testeAgi >= testeAgiOp ? this.#rolarAtaqueFurtivo() : this.#iniciarTurnoOp();                 
 
             } else if(this.#mapaEscolhido == 4) {
-                dialogo.innerText = `Você andou para ${ultimaAndada} e encontrou... Para onde você quer ir?`
-                const escolha = "m" + this.#mapaEscolhido + (Math.floor(Math.random() * (1 - 1)) + 1);
-                this._escreverContexto(eventos[escolha].descricao);
-                ultimoEvento = eval(escolha);
-                iniciarBatalha();
+                // dialogo.innerText = `Você andou para ${ultimaAndada} e encontrou... Para onde você quer ir?`
+                // const escolha = "m" + this.#mapaEscolhido + (Math.floor(Math.random() * (1 - 1)) + 1);
+                // this._escreverContexto(eventos[escolha].descricao);
+                // ultimoEvento = eval(escolha);
+                // iniciarBatalha();
             }
 
             this.#ultimoMapa = this.#mapaEscolhido;
     }
 
-    #btnSN = (e) => {
-        const valor = e.currentTarget.innerHTML;
+    #btnSN = (e:MouseEvent) => {
+        const target = e.currentTarget as HTMLElement;
+        const valor = target.innerHTML;
         let contentSpanAC = document.createElement('span');
         let contentSpanAD = document.createElement('span');
         let contentSpanCo = document.createElement('span');
@@ -2246,7 +1697,7 @@ class Jogin extends Habilidades {
 
         switch(valor) {
             case "Sim":
-                switch(this.#ultimoEvento.tipo) {
+                switch(this._ultimoEvento.tipo) {
                     case 'armaCaC':
                         this.#adicionar(contentSpanAC, inv[0], divContent1, imgContent1, hover[0], 'slot1');
                         break;
@@ -2271,7 +1722,7 @@ class Jogin extends Habilidades {
                 this._mudarVazio();
                 break;
             case "Não":
-                dialogo.innerText = 'Pra onde você quer ir?';
+                dialogo&&(dialogo.innerText = 'Pra onde você quer ir?');
                 this.#opcaoCaminhar();
                 break;
             default:
@@ -2279,15 +1730,16 @@ class Jogin extends Habilidades {
         }
     }
 
-    #adicionar(span, elemento, div, img, hover, slot) {
-        span.innerHTML = this.#ultimoEvento.nome;
+    #adicionar(span:HTMLSpanElement, elemento:HTMLElement, div:HTMLElement|null, img:HTMLElement|null, hover:Element, slot:string) {
+        span.innerHTML = this._ultimoEvento.nome+'';
         elemento.removeAttribute('title');
         elemento.childNodes[0].replaceWith(span);
-        div.innerText = this.#ultimoEvento.descricao;
-        img.setAttribute('src', this.#ultimoEvento.imgArma);
+        div&&(div.innerText = this._ultimoEvento.descricao+'');
+        img?.setAttribute('src', this._ultimoEvento.imgArma+'');
         hover.classList.add('hoverAtivo');
-        this.#inventario[slot] = this.#ultimoEvento;
-        dialogo.innerText = 'Pra onde você quer ir?';
+        let i = this.#inventario;
+        i[slot as keyof typeof i] = this._ultimoEvento;
+        dialogo&&(dialogo.innerText = 'Pra onde você quer ir?');
         this.#opcaoCaminhar();
     }
 

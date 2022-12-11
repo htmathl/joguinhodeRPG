@@ -1,17 +1,16 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-class Habilidades {
+import Calc from "./calc.js";
+export default class Habilidades extends Calc {
+    habilidades;
+    addModsHab;
+    itensExtras = 0;
+    raridadeItem = 0;
+    itensPorBau = 0;
+    prevencao = 0;
+    efeitoAoSeuToque = null;
+    resistenciaFisica = 0;
+    bonusDefesaPassiva = 0;
     constructor() {
-        this.margemCritico = 20;
-        this.resistenciaMana = 0;
-        this.itensExtras = 0;
-        this.raridadeItem = 0;
-        this.itensPorBau = 0;
-        this.prevencao = 0;
-        this.efeitoAoSeuToque = null;
-        this.resistenciaFisica = 0;
-        this.bonusDefesaPassiva = 0;
-        this.adicionalDef = 0;
+        super();
         this.addModsHab = {
             forca: 0,
             defesa: 0,
@@ -20,7 +19,7 @@ class Habilidades {
             agilidade: 0,
             sorte: 0,
         };
-        this.hablidades = [
+        this.habilidades = [
             {
                 id: 'hab1',
                 nome: 'Treinamento',
@@ -58,7 +57,7 @@ class Habilidades {
                 nome: 'Sortudo',
                 descricao: 'Sua margem de crítico dobra',
                 efeito: () => {
-                    this.margemCritico = 19;
+                    this._margemCritico = 19;
                 },
                 toggle: false,
                 adiquirida: false,
@@ -71,7 +70,7 @@ class Habilidades {
                 nome: 'Catalisador',
                 descricao: 'Você desenvolve resistência de +3 em gastos de mana',
                 efeito: () => {
-                    this.resistenciaMana = 3;
+                    this._resistenciaMana = 3;
                 },
                 toggle: false,
                 adiquirida: false,
@@ -337,7 +336,6 @@ class Habilidades {
         ];
     }
     getHabilidades() {
-        return this.hablidades;
+        return this.habilidades;
     }
 }
-exports.default = Habilidades;

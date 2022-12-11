@@ -1,4 +1,4 @@
-import Habilidades from "./habilidades.js";
+import Habilidades from "./habilidades1.js";
 
 export default class Eventos extends Habilidades {
     #miau;
