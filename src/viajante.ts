@@ -16,7 +16,5 @@ export default class Viajante {
     protected _experiencia:any = 0;
     protected _nivel = 0;
     protected _pontos = 0;
-    constructor() {
-        
-    }
+    protected _condicao = 'NORMAL';
 }

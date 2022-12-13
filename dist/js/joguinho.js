@@ -1,4 +1,4 @@
-import { Mixin } from 'ts-mixer';
+import { Mixin } from './ts-mixer.js';
 let dialogo = document.getElementById("dialogo");
 let btnContinuar = document.getElementById('continuar');
 let btnsAndar = document.querySelectorAll('.botoes');
@@ -106,7 +106,6 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
     #validarUpar;
     #inventario;
     #magiasAtuais;
-    #condicao;
     #habilidadesAtuais;
     #furtivo;
     #validarPoderoso;
@@ -143,7 +142,6 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
             mag3: {},
             mag4: {},
         };
-        this.#condicao = 'NORMAL';
         this.#habilidadesAtuais = [];
         this.#furtivo = false;
         this.#validarPoderoso = false;
@@ -165,6 +163,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
         this._mudarVazio();
         this.#definirIntro();
         this.#definirCondicao();
+        document.body.style.opacity = '1';
     }
     #mudarVisibilidadeBotoes(ctx) {
         let botoes = [btnsAndar, btnsAcao, btnsSN, btnsAtq];
@@ -409,7 +408,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
             tituloUp.style.opacity = '1';
         }, 200);
         setTimeout(() => {
-            tituloUp.style.margin = '10px';
+            tituloUp.style.margin = '0px';
             tituloUp.style.width = '100%';
         }, 1200);
         let telaUps = document.createElement('div');
@@ -1277,8 +1276,6 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
             this._escreverContexto(eventos[escolha].descricao);
             this._ultimoEvento = eventos[escolha];
             this._ultimoEventoVida = this._ultimoEvento.vida;
-            console.log(eventos[escolha]);
-            console.log(this._ultimoEvento);
             let testeAgi = this.#rolarAcerto('agilidade'), testeAgiOp = this.#rolarAcertoOponente('agilidade');
             while (testeAgiOp == testeAgi) {
                 if (this._atributos.agilidade != this._ultimoEvento.agilidade && this._ultimoEvento != undefined) {

@@ -16,6 +16,5 @@ export default class Viajante {
     _experiencia = 0;
     _nivel = 0;
     _pontos = 0;
-    constructor() {
-    }
+    _condicao = 'NORMAL';
 }
