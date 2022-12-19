@@ -343,6 +343,7 @@ button:disabled > span {
 }
 
 .inv {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -469,8 +470,10 @@ button:disabled > span {
   display: flex;
   flex-direction: column;
   position: absolute;
-  margin-top: -250px;
-  margin-left: -57px;
+  margin-bottom: 300px;
+  left: 50%;
+  transform: translate(-50%);
+  padding: 10px;
 }
 
 #blur {

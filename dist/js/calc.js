@@ -61,4 +61,7 @@ export default class Calc extends Viajante {
     _calcularVida(vida) {
         return Math.floor((vida * 100) / this._pontosVida);
     }
+    _setResistencia(resis) {
+        this._resistenciaMana = resis;
+    }
 }

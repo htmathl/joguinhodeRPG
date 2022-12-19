@@ -10,7 +10,7 @@ export default class Viajante {
     };
     protected _constVigor = 0;
     protected _pontosVida = 20;
-    protected _pontosMana = 20;
+    protected _pontosMana = 100;
     protected _vida = 100;
     protected _mana = 100;
     protected _experiencia:any = 0;

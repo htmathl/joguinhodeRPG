@@ -2,13 +2,10 @@ import Calc from './calc.js';
 export default class Eventos extends Calc {
     _eventos;
     _ultimoEvento;
-    _ultimoEventoVida;
-    constructor() {
-        super();
+    _viewer() {
         let progressbarVida = document.getElementById('barraVida');
         let progressbarMana = document.getElementById('barraMana');
         let condicao = document.getElementById('condicao');
-        this._ultimoEventoVida = 0;
         this._eventos = [
             {
                 id: 0,
@@ -115,7 +112,7 @@ export default class Eventos extends Calc {
                 classe: 1,
                 nome: 'Espada enferrujada',
                 tipo: 'armaCaC',
-                imgArma: './img/testinho.png',
+                imgArma: '../img/testinho.png',
                 descricao: '[Espada enferrujada, 1d6 + 4 de dano]',
                 msgMorte: 'Um corte rápido que arranca o braço da criatura faz com que ela morra de hemorragia',
                 bonusHab: 0,
@@ -220,7 +217,6 @@ export default class Eventos extends Calc {
                 descricao: '[Machadinha, 1d6 + 2]',
                 bonusCrt: 1,
                 efeito: () => {
-                    this._ultimoEvento.condicao = 'VULNERAVEL';
                     return this._rolarDados('d6', 1) + 2;
                 },
             },
@@ -240,8 +236,9 @@ export default class Eventos extends Calc {
                 tipo: 'atq',
                 descricao: 'descrição de uma magia 1',
                 efeito: () => {
-                    this._ultimoEvento.condicao = 'AMALDICOADO';
-                    return this._rolarDados('d10', 1);
+                    let teste = this._rolarDados('d10', 1);
+                    let condicao = 'miu';
+                    return { teste, condicao };
                 },
                 gastoMana: 16,
                 bonusCrt: 1,
@@ -253,8 +250,9 @@ export default class Eventos extends Calc {
                 tipo: 'atq',
                 descricao: 'descrição de uma magia 3',
                 efeito: () => {
-                    this._ultimoEvento.condicao = 'AMALDICOADO';
-                    return this._rolarDados('d10', 5);
+                    let teste = this._rolarDados('d10', 5);
+                    let condicao = 'auau';
+                    return { teste, condicao };
                 },
                 gastoMana: 4,
                 bonusCrt: 1,
@@ -315,5 +313,17 @@ export default class Eventos extends Calc {
                 descricao: 'um boss',
             },
         ];
+    }
+    set _seUltimoEvento(ultimoEvento) {
+        this._ultimoEvento = ultimoEvento;
+        console.log(this._ultimoEvento);
+        this._viewer();
+    }
+    get getUltimoEvento() {
+        return this._ultimoEvento;
+    }
+    get getEventos() {
+        this._viewer();
+        return this._eventos;
     }
 }

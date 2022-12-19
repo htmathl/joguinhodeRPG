@@ -348,6 +348,7 @@ export default class Habilidades extends Calc {
             },
         ];
     }
+    
     getHabilidades() {
         return this.habilidades;
     }
