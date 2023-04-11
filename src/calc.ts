@@ -11,7 +11,7 @@ export default class Calc extends Viajante {
         switch (tipoDados) {
             case 'd3':
                 //dano (verificar se é preciso colocar um tipo de rolada, ex: dano, teste aleatório, teste...).
-                for(var i = 1; i <= qntDados; i++) {
+                for(let i = 1; i <= qntDados; i++) {
                     result += Math.floor(Math.random() * (4 - 1) + 1);
                 }
     
@@ -19,7 +19,7 @@ export default class Calc extends Viajante {
     
                 return result;
             case 'd6':
-                for(var i = 1; i <= qntDados; i++) {
+                for(let i = 1; i <= qntDados; i++) {
                     result += Math.floor(Math.random() * (7 - 1) + 1);
                 }
     
@@ -27,7 +27,7 @@ export default class Calc extends Viajante {
     
                 return result;
             case 'd8':
-                for(var i = 1; i <= qntDados; i++) {
+                for(let i = 1; i <= qntDados; i++) {
                     result += Math.floor(Math.random() * (9 - 1) + 1);
                 }
     
@@ -35,7 +35,7 @@ export default class Calc extends Viajante {
     
                 return result;
             case 'd10':
-                for(var i = 1; i <= qntDados; i++) {
+                for(let i = 1; i <= qntDados; i++) {
                     result += Math.floor(Math.random() * (11 - 1) + 1);
                 }
     
@@ -43,7 +43,7 @@ export default class Calc extends Viajante {
     
                 return result;
             case 'd12':
-                for(var i = 1; i <= qntDados; i++) {
+                for(let i = 1; i <= qntDados; i++) {
                     result += Math.floor(Math.random() * (13 - 1) + 1);
                 }
     
@@ -51,7 +51,7 @@ export default class Calc extends Viajante {
     
                 return result;
             case 'd20':
-                for(var i = 1; i <= qntDados; i++) {
+                for(let i = 1; i <= qntDados; i++) {
                     dados.push(Math.floor(Math.random() * (21 - 1) + 1));
                 }
     
@@ -80,7 +80,31 @@ export default class Calc extends Viajante {
         return Math.floor((vida * 100) / this._pontosVida);
     }
 
-    protected _setResistencia(resis:number) {
-        this._resistenciaMana = resis;
+    protected set _setMargemCritico(margemCritico:number) {
+        this._margemCritico = margemCritico;
+    }
+
+    public get getMargemCritico():number {
+        return this._margemCritico;
+    }
+
+    protected set _setResistenciaMana(resistenciaMana:number) {
+        this._resistenciaMana = resistenciaMana;
+    }
+
+    public get getResistenciaMana():number {
+        return this._resistenciaMana;
+    }
+
+    public get getCritico():boolean {
+        return this._critico;
+    }
+
+    protected set _setAdicionalDef(adicionalDef:number) {
+        this._adicionalDef = adicionalDef;
+    }
+
+    public get getAdicionalDef() {
+        return this._adicionalDef;
     }
 }

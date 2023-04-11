@@ -4,6 +4,11 @@ export default class Eventos extends Calc {
     protected _eventos:any;
     protected _ultimoEvento:any;
 
+    constructor() {
+        super();
+        this._viewer();
+    }
+
     protected _viewer() {
         let progressbarVida = document.getElementById('barraVida');
         let progressbarMana = document.getElementById('barraMana');
@@ -124,7 +129,7 @@ export default class Eventos extends Calc {
                 msgMorte: 'Um corte rápido que arranca o braço da criatura faz com que ela morra de hemorragia',
                 bonusHab: 0,
                 efeito: ():number => {
-                    if(!this._eventos[10].bonusHab) console.log('ERRO TOTAL linha 127 ev');
+                    if(!this._eventos[10].bonusHab) window.alert('ERRO TOTAL linha 127 ev');
                     return this._rolarDados('d6', 1) + 4 + (this._eventos[10].bonusHab ? this._eventos[10].bonusHab : 0);
                 },
             },
@@ -138,7 +143,7 @@ export default class Eventos extends Calc {
                 msgMorte: 'Você atira uma flecha que passa direto pelo crânio da criatura a matando',
                 bonusHab: 0,
                 efeito: ():number => {
-                    if(!this._eventos[11].bonusHab) console.log('ERRO TOTAL linha 142 ev');
+                    if(!this._eventos[11].bonusHab) window.alert('ERRO TOTAL linha 142 ev');
                     return this._rolarDados('d3', 1) + 2 + (this._eventos[11].bonusHab ? this._eventos[11].bonusHab : 0);
                 },
             },
@@ -178,7 +183,7 @@ export default class Eventos extends Calc {
                 imgArma: '',
                 descricao: '[Armadura feia, resistência +5 a atqs armados]',
                 efeito: () => {
-                    this._adicionalDef += 5;
+                    this._setAdicionalDef += 5;
                 },
             },
             
@@ -228,7 +233,7 @@ export default class Eventos extends Calc {
                 bonusCrt: 1,
                 efeito: () => {
                     //ver se essa linha ta funcionando como deve
-                    //this._ultimoEvento.condicao = 'VULNERAVEL';
+                    //this.#ultimoEvento.condicao = 'VULNERAVEL';
                     return this._rolarDados('d6', 1) + 2;
                 },
             },
@@ -254,6 +259,7 @@ export default class Eventos extends Calc {
                 efeito: () => {
                     let teste:number = this._rolarDados('d10', 1);
                     let condicao = 'miu';
+                    console.log(this.getUltimoEvento.forca);
                     return { teste, condicao };
                 },
                 gastoMana: 16,
@@ -299,7 +305,7 @@ export default class Eventos extends Calc {
                 classe: 3,
                 nome: 'um zumbi de gelo',
                 descricao: 'uma descrição de um bicho',
-                vida: 1,
+                vida: 100,
                 defesa: 0,
                 forca: 1,
                 inteligencia: 1,
@@ -312,6 +318,7 @@ export default class Eventos extends Calc {
                 },
                 magias: {
                     0: {
+                        id: 0,
                         nome: 'Geada',
                         descricao: 'causará 1d6 de dano e adicionará a condição de congelamento',
                         efeito: () => {
@@ -320,6 +327,17 @@ export default class Eventos extends Calc {
                             return Math.floor(Math.random() * (7 - 1) + 1);
                         },
                         usos: 2,
+                    },
+                    1: {
+                        id: 1,
+                        nome: 'Fogareu',
+                        descricao: 'causará 1d6 de dano e adicionará a condição de em chamas',
+                        efeito: () => {
+                            //@todo trocar a condição variavel e depois colocar alguma função que troque quando a variavel for trocada
+                            condicao&&(condicao.innerText = 'EM CHAMAS');
+                            return Math.floor(Math.random() * (8 - 1) + 1);
+                        },
+                        usos: 6,
                     }
                 },
                 textoAtaques: [
@@ -327,7 +345,7 @@ export default class Eventos extends Calc {
                     //5-9 acerto
                     //10-14 acerto muito
                     //15-19 acerto critico
-                    'te acerta suas garras em sua barriga, fazendo um corte liso.',
+                    'acerta suas garras em sua barriga, fazendo um corte liso.',
                     'te acerta e crava suas garras em seu ombro.',
                     'te acerta '
                 ],
@@ -344,17 +362,16 @@ export default class Eventos extends Calc {
     }
 
     protected set _seUltimoEvento(ultimoEvento:any) {
+        this._viewer();
         this._ultimoEvento = ultimoEvento;
         console.log(this._ultimoEvento);
-        this._viewer();
     }
 
     public get getUltimoEvento() {
         return this._ultimoEvento;
     }
 
-    public get getEventos() : [] {
-        this._viewer();
+    public get getEventos():[] {
         return this._eventos;
     }
     

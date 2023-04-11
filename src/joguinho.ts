@@ -57,9 +57,7 @@ mag.forEach(mag => {
     mag.setAttribute('title', 'Aqui é onde você escreve ou guarda suas magias, eu chamo de Alfredo, mas você pode escolher algo como grimório, não sei.');
 });
 
-//@todo fazer sistemas de escapar dos bichos tbm (tem alguns que nao vai funcionar)
-//sistema só funciona quando há uma certeza que terá atq furtivo
-//mudar o botao de defesa para fugir
+//@todo
 //colocar algumas recompensas alem de xp por derrotar certas criaturas
 
 //   @todo     !!!!!!!!!  refatorar fors !!!!!!!!!
@@ -149,9 +147,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
     #constNumHab;
 
     //@todo rever os atributos dos bichos e tudo mias
-    //@todo rever o bonus dos negocios ( +15 para 4 dados me parece muito ) ( pode ser tipo a cada numero impar ou par aumentar o bonus )
-    //@todo se tirar 1 (mesmo que ataque magico) colocar desastre (acontece algo ruim);
-    //@todo se matar com magia a cor do botao nao fica branca (arrumar)
+    //@todo se tirar 1 (mesmo que ataque magico) colocar desastre (acontece algo ruim)
 
     // @follow-up -------------- eventos ---------------
     //mapa com evento aleatório = 0
@@ -475,14 +471,15 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
 
     #rolarAcertoOponente(atributo:string):number {
         console.log('teste oponente: ' + atributo);
-        const a = this._ultimoEvento;
-        return this._rolarDados('d20', (this._ultimoEvento[atributo as keyof typeof a] + 1));
+        const a = this.getUltimoEvento;
+        return this._rolarDados('d20', (this.getUltimoEvento[atributo as keyof typeof a] + 1));
     }
 
     #rolarAcerto(atributo:string):number {
         console.log('teste viajante: ' + atributo);
-        const a = this.addModsHab;
-        let teste = this._rolarDados('d20', (this.#recAtr(atributo) + 1)) + this.addModsHab[atributo as keyof typeof a];
+        const a = this.getAddModsHab;
+        let teste = this._rolarDados('d20', (this.#recAtr(atributo) + 1));
+        if(teste != 1) teste += a[atributo as keyof typeof a];
         console.log(teste);
         return teste;
     }
@@ -493,10 +490,10 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
     }
 
     #dano() {
-        this._vida -= this._calcularVida(this._ultimoEvento.efeito ? this._ultimoEvento.efeito() : 0);
+        this._vida -= this._calcularVida(this.getUltimoEvento.dano ? this.getUltimoEvento.dano() : 0);
         progressbarVida?.style.setProperty('--progress', this._vida+'');
-        if(this._ultimoEvento.textoAtaques)
-            this._escreverContexto(this._ultimoEvento.nome + ', ' + this._ultimoEvento.textoAtaques[Math.floor(Math.random() * (this._ultimoEvento.textoAtaques.length))]);
+        if(this.getUltimoEvento.textoAtaques)
+            this._escreverContexto(this.getUltimoEvento.nome + ', ' + this.getUltimoEvento.textoAtaques[Math.floor(Math.random() * (this.getUltimoEvento.textoAtaques.length))]);
         else
             console.log('ERRO TOTAL linha 951');
     }
@@ -566,7 +563,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
 
         let divListaHB = document.createElement('div');
         divListaHB.setAttribute('id', 'listaHB');
-        this.habilidades.forEach((k:any) => {
+        this.getHabilidades.forEach((k:any) => {
             if(k.nivel <= this._nivel && !k.adiquirida) {
                 let divChecks = document.createElement('div');
                 divChecks.setAttribute('class', 'divChecks');
@@ -704,36 +701,36 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
 
     #clickHabilidades = (e:MouseEvent) => {
         const key = e.currentTarget as HTMLElement;
-        for(let i = 0; i < this.habilidades.length; i++) {
-            if(key.innerText == this.habilidades[i].nome) {
-                if(this.#numHabilidades > 0 && !this.habilidades[i].toggle)  {
+        for(let i = 0; i < this.getHabilidades.length; i++) {
+            if(key.innerText == this.getHabilidades[i].nome) {
+                if(this.#numHabilidades > 0 && !this.getHabilidades[i].toggle)  {
                     key.style.color = 'red';
-                    this.habilidades[i].toggle = true;
+                    this.getHabilidades[i].toggle = true;
                     this.#numHabilidades --;
                     return;
                 }
-                if(this.#numHabilidades > 0 && this.habilidades[i].toggle) {
+                if(this.#numHabilidades > 0 && this.getHabilidades[i].toggle) {
                     key.style.color = 'white';
-                    this.habilidades[i].toggle = false;
+                    this.getHabilidades[i].toggle = false;
                     this.#numHabilidades ++;
                     return;
                 }
-                if(this.#numHabilidades == 0 && this.habilidades[i].toggle) {
+                if(this.#numHabilidades == 0 && this.getHabilidades[i].toggle) {
                     key.style.color = 'white';
-                    this.habilidades[i].toggle = false;
+                    this.getHabilidades[i].toggle = false;
                     this.#numHabilidades ++;
                     return;
                 }
-                if(this.#numHabilidades == 0 && !this.habilidades[i].toggle) {
+                if(this.#numHabilidades == 0 && !this.getHabilidades[i].toggle) {
                     for(let j = 0; j < elDivChecks.length; j++) {
-                        this.habilidades[j].toggle = false;
+                        this.getHabilidades[j].toggle = false;
                         elDivChecks[j].style.color = 'white';
                     }
                     if(this.#constNumHab > 1) {
                         this.#numHabilidades = this.#constNumHab-1;
                     }
                     key.style.color = 'red';
-                    this.habilidades[i].toggle = true;
+                    this.getHabilidades[i].toggle = true;
                     return;
                 }
             }
@@ -792,7 +789,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
         progressbarVida?.style.setProperty('--progress', this._vida+'');
 
         const divHab = document.getElementById('divHab');
-        this.habilidades.forEach((habilidade:any) => {
+        this.getHabilidades.forEach((habilidade:any) => {
             if(habilidade.toggle) {
                 habilidade.adiquirida = true;
                 const span = document.createElement('span');
@@ -804,7 +801,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
         });
         habilidades?.append(divHab? divHab : 'ERROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO linha 1242');
 
-        this.habilidades.forEach((habilidade:any) => {
+        this.getHabilidades.forEach((habilidade:any) => {
             habilidade.toggle = false;
         });
 
@@ -821,13 +818,13 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
     //@todo cdg repitindo ---------------
     #magicasAtq = (e:MouseEvent) => {
         const target = e.currentTarget as HTMLButtonElement;
-        target.innerText = this._ultimoEvento.nome+'';
+        target.innerText = this.getUltimoEvento.nome+'';
         this._mudarVazio();
-        target.setAttribute('title', this._ultimoEvento.descricao+'');
+        target.setAttribute('title', this.getUltimoEvento.descricao+'');
         const g = this.#magiasAtuais;
         for( let i = 0; i < 2; i++ )
-            if( magAtq[i].innerText == this._ultimoEvento.nome )
-                this.#magiasAtuais[('mag' + (i+1)) as keyof typeof g] = this._ultimoEvento;
+            if( magAtq[i].innerText == this.getUltimoEvento.nome )
+                this.#magiasAtuais[('mag' + (i+1)) as keyof typeof g] = this.getUltimoEvento;
         mag.forEach((mag) => {
             mag.removeEventListener('click', this.#magicasAtq);
         });
@@ -837,13 +834,13 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
     
     #magicasSup = (e:MouseEvent) => {
         const target = e.currentTarget as HTMLButtonElement;
-        target.innerText = this._ultimoEvento.nome+'';
+        target.innerText = this.getUltimoEvento.nome+'';
         this._mudarVazio();
-        target.setAttribute('title', this._ultimoEvento.descricao+'');
+        target.setAttribute('title', this.getUltimoEvento.descricao+'');
         const g = this.#magiasAtuais;
         for( let i = 0; i < 2; i++ )
-            if( magSup[i].innerText == this._ultimoEvento.nome )
-                this.#magiasAtuais[('mag' + (i+3)) as keyof typeof g] = this._ultimoEvento;
+            if( magSup[i].innerText == this.getUltimoEvento.nome )
+                this.#magiasAtuais[('mag' + (i+3)) as keyof typeof g] = this.getUltimoEvento;
         mag.forEach((mag) => {
             mag.removeEventListener('click', this.#magicasSup);
         });
@@ -942,14 +939,14 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
     }
 
     #definirDefesaPassiva(ctx:string|null):number {
-        let defesaPassiva = 5 + this.bonusDefesaPassiva;
+        let defesaPassiva = 5 + this.getBonusDefesaPassiva;
         if( ctx == 'vig' ) {
-            defesaPassiva += this._adicionalDef;
+            defesaPassiva += this.getAdicionalDef;
             if(this.#recAtr('defesa') != 0)
                 defesaPassiva = ((this._atributos.defesa + 1) * defesaPassiva) + 5;  
         } else {
-            if( this._ultimoEvento.defesa != 0 && this._ultimoEvento.defesa)
-                defesaPassiva = ((this._ultimoEvento.defesa + 1) * defesaPassiva) + 5;
+            if( this.getUltimoEvento.defesa != 0 && this.getUltimoEvento.defesa)
+                defesaPassiva = ((this.getUltimoEvento.defesa + 1) * defesaPassiva) + 5;
         }
         return defesaPassiva;
     }
@@ -1042,7 +1039,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                 break;
             case 'Fugir':
                 let testeSorte = this.#rolarAcerto('sorte');
-                let dt:number = this._ultimoEvento.inteligencia ? this._ultimoEvento.inteligencia * 5 + 5 : 0;
+                let dt:number = this.getUltimoEvento.inteligencia ? this.getUltimoEvento.inteligencia * 5 + 5 : 0;
                 console.log('dt: ' + dt);
                 this.#furtivo = false;
                 if(testeSorte >= dt) {
@@ -1152,37 +1149,66 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
 
     #ataqueOponente() {
         btnsAcao[1].innerText = 'Defender';
-        let usarMagias = false;
+        let usarMagias = (Math.floor(Math.random() * 100) < 50) ? true : false;
+        let magiaUsada:any;
 
-        Object.keys(this._ultimoEvento).forEach(key => {
-            if(key == 'magias' && this.#usos > 0)
-                usarMagias = (Math.floor(Math.random() * 100) < 50) ? true : false;
-        });
-    
-        console.log('usou magia? ' + usarMagias);
-        if(usarMagias) {
-            let numMagia = Math.floor(Math.random() * Object.keys(this._ultimoEvento.magias).length);
-            if(this.#testeDefesa != 0)
-                this._inserirHtmlContexto('span', 'Não há como defender ataques mágicos', 'text-decoration', 'underline');
-
-            if(this.#rolarAcerto('vigor') <= this.#rolarAcertoOponente('inteligencia'))
-                this._vida -= this._calcularVida(this._ultimoEvento.magias[numMagia].efeito());
-            else
-                this._vida -= (this._calcularVida(this._ultimoEvento.magias[numMagia].efeito()) / 2);
-            
-            this.#definirCondicao();
-            progressbarVida?.style.setProperty('--progress', this._vida+'');
-        } else {
-            if(this.#rolarAcertoOponente('forca') >= this.#testeDefesa)
-                this.#dano();
-            else if(this.#definirDefesaPassiva('vig') <= this.#rolarAcertoOponente('forca'))
-                this.#dano();
-            else
-                contexto?.append('Você defende!');
+        let atqSemMagia = () => {
+            let testeForca = this.#rolarAcertoOponente('forca');
+            if( this.#testeDefesa != 0 ) {
+                if(testeForca >= this.#testeDefesa) 
+                    this.#dano();
+                else
+                    this._escreverContexto('Você defende!');
+            } else {
+                if(this.#definirDefesaPassiva('vig') <= testeForca)
+                    this.#dano();
+                else
+                    this._escreverContexto('Você defende!');
+            }
         }
+
+        console.log('usou magia? ' + usarMagias);
+
+        if(usarMagias) {
+            Object.keys(this.getUltimoEvento).forEach(key => {
+                if(key == 'magias') {
+                    let castarMagia:number = Math.floor(Math.random() * Object.keys(this.getUltimoEvento[key]).length);
+                    magiaUsada = Object.values(this.getUltimoEvento[key])[castarMagia];
+                    console.log(magiaUsada);
+                }
+            });
+    
+            for(let i = 0; i < Object.values(this.getUltimoEvento['magias']).length; i++) {
+                const e:any = Object.values(this.getUltimoEvento['magias'])[i];
+                if(magiaUsada.usos <= 0) {
+                    if(e.usos > 0) magiaUsada = e;
+                }
+            }
+
+            console.log(magiaUsada);
+
+            if((magiaUsada.usos-1) >= 0) {
+                if(this.#testeDefesa != 0)
+                    this._inserirHtmlContexto('span', 'Não há como defender ataques mágicos', 'text-decoration', 'underline');
+    
+                if(this.#rolarAcerto('vigor') <= this.#rolarAcertoOponente('inteligencia'))
+                    this._vida -= this._calcularVida(magiaUsada.efeito());
+                else
+                    this._vida -= (this._calcularVida(magiaUsada.efeito()) / 2);
+                
+                this._escreverContexto(`${this.getUltimoEvento.nome} te acerta com sua magia`);
+                this.#definirCondicao();
+                progressbarVida?.style.setProperty('--progress', this._vida+'');
+                magiaUsada.usos--;
+
+                console.log('usos: ' + magiaUsada.usos);
+
+            } else atqSemMagia();
+
+        } else atqSemMagia();
     
         console.log('vida: ' + this._vida);
-    
+
         turnoBicho&&(turnoBicho.style.display = 'none');
         this.#iniciarBatalha();
     }
@@ -1201,7 +1227,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                     //adicionais
                     vidaTirada += this.#adicionaisAtq();
                     //critico
-                    if(this._critico) {
+                    if(this.getCritico) {
                         let resto = this.#recAtr('sorte') % 5;
                         if( this.#recAtr('sorte') <= 0 )
                             vidaTirada *= 2;
@@ -1212,8 +1238,8 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                             }
                     }
 
-                    this._ultimoEvento.vida -= vidaTirada;
-                    console.log('vida tirada: ' + this._ultimoEvento.vida);
+                    this.getUltimoEvento.vida -= vidaTirada;
+                    console.log('vida tirada: ' + this.getUltimoEvento.vida);
                     console.log('defesa bicho: ' + this.#definirDefesaPassiva(null));
                     this.#somaDano += vidaTirada;
 
@@ -1221,17 +1247,13 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                 } else {
                     //@todo fazer pra outros tipos de defesa alem de esquiva (se for implementado)
                     this._escreverContexto('Em um momento de desespero, você tenta dar um soco nesta criatura, que desvia com facilidade.');
-                    this.#mudarVisibilidadeBotoes(5);
-                    setTimeout(() =>{
-                        this.#ataqueOponente();
-                    }, 2000);
                 }
 
                  //tirar furtivo e atq poderoso @todo mudar todos esses trechos para o inicio do round do bicho
                  this.#acumuloAtqPod = 0;
                  this.#furtivo = false;
 
-                if(this._ultimoEvento.vida <= 0) {
+                if(this.getUltimoEvento.vida <= 0) {
                     //@todo colocar cada vez menos chance de encontrar o bicho que ja matou
                     //@todo colocar texto dinamico pra cada arma (dentro de eventos)
                     this.#morteOponente('Com um golpe fatal, você arranca a cabeça desta criatura.')
@@ -1320,6 +1342,15 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
 
         let vidaTirada = 0,
         testeInt = this.#rolarAcerto('inteligencia');
+        if( testeInt == 1 ) {
+            this._escreverContexto('Você não consegue se concentrar para usar sua magia.');
+            this.#mudarVisibilidadeBotoes(5);
+            this.#somaDano += vidaTirada;
+            setTimeout(() => {
+                this.#ataqueOponente();
+            }, 2000);
+            return;
+        }
 
         for( var key in this.#magiasAtuais ) {
             if (!this.#magiasAtuais.hasOwnProperty(key)) continue;
@@ -1335,12 +1366,12 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                 vidaTirada += this._rolarDados('d3', (this.#recAtr('inteligencia') + 1));
                 
                 if(this.#rolarAcertoOponente('vigor') <= testeInt) {
-                    this._ultimoEvento.condicao = condicao;
+                    this.getUltimoEvento.condicao = condicao;
                     vidaTirada += teste;
                 } else vidaTirada += Math.floor(teste/2);
 
                 //critico
-                if(this._critico) {
+                if(this.getCritico) {
                     let resto = this.#recAtr('sorte') % 5;
                     if( this.#recAtr('sorte') <= 0 )
                         vidaTirada *= 2;
@@ -1351,13 +1382,13 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                         }
                 }
 
-                this._ultimoEvento.vida&&(this._ultimoEvento.vida -= vidaTirada);
+                this.getUltimoEvento.vida&&(this.getUltimoEvento.vida -= vidaTirada);
                 this._mana -= this._calcularMana(magia.gastoMana);
                 progressbarMana?.style.setProperty('--progress', this._mana+'');
                 this._escreverContexto(`Você acerta sua magia com ${testeInt}, tirando ${vidaTirada} de vida.`);
-                console.log('vida tirada: ' + this._ultimoEvento.vida);
+                console.log('vida tirada: ' + this.getUltimoEvento.vida);
         
-                if(this._ultimoEvento.vida&&(this._ultimoEvento.vida <= 0)) {
+                if(this.getUltimoEvento.vida&&(this.getUltimoEvento.vida <= 0)) {
                     //@todo depois colocar narração legal e exclusiva par amagias tbm
                     this.#morteOponente('Em uma explosão de mana, você oblitera esta criatura.')
                 } else {
@@ -1393,7 +1424,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                     //adicionais
                     vidaTirada += this.#adicionaisAtq();
                     //critico
-                    if(this._critico) {
+                    if(this.getCritico) {
                         let resto = this.#recAtr('sorte') % 5;
                     if( this.#recAtr('sorte') <= 0 )
                         vidaTirada *= 2;
@@ -1404,16 +1435,16 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                         }
                     }
 
-                    this._ultimoEvento.vida = this._ultimoEvento.vida - vidaTirada;
+                    this.getUltimoEvento.vida = this.getUltimoEvento.vida - vidaTirada;
                     this._escreverContexto(`Você acerta com ${testeForca} em seu teste, tirando ${vidaTirada} de vida. `);
-                    console.log('vida tirada: ' + this._ultimoEvento.vida);
+                    console.log('vida tirada: ' + this.getUltimoEvento.vida);
                     console.log('defesa bicho: ' + this.#definirDefesaPassiva(null));
 
                      //remover furtivo e atq poderoso
                      this.#acumuloAtqPod = 0;
                      this.#furtivo = false;
 
-                    if(this._ultimoEvento.vida <= 0) {
+                    if(this.getUltimoEvento.vida <= 0) {
                         this.#morteOponente(armaAtual.msgMorte);
                     } else {
                         this.#mudarVisibilidadeBotoes(5);
@@ -1460,13 +1491,13 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
 
     #morteOponente(msg:string) {
         this._escreverContexto(msg);
-        this._ultimoEvento.vida = this.#ultimoEventoVida;
+        this.getUltimoEvento.vida = this.#ultimoEventoVida;
         this.#usos = 0;
         turno&&(turno.innerText = '');
         this.#contagemTurno = 0;
         this.#somaDano = 0;
         this.#ultimoMapa = 0;
-        this._experiencia += this._ultimoEvento.exp;  
+        this._experiencia += this.getUltimoEvento.exp;  
         if(this.#eventoUpar()) this.#validarUpar = true;
         this.#opcaoCaminhar();
     }
@@ -1516,18 +1547,18 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
         //     if(this.#mapaEscolhido == 0) {
         //         const escolha = Math.floor(Math.random() * 10);
         //         this._escreverContexto(eventos[escolha].descricao[Math.floor(Math.random() * 5)] + '');
-        //         this._ultimoEvento = eventos[escolha];
+        //         this.getUltimoEvento = eventos[escolha];
 
         //     } else if(this.#mapaEscolhido == 1) {
         //         const escolha = Math.floor(Math.random() * 7);
         //         this._escreverContexto(eventos[escolha].descricao);
-        //         this._ultimoEvento = eventos[escolha];
+        //         this.getUltimoEvento = eventos[escolha];
 
-        //         if(this._ultimoEvento.tipo == 'pocao') {
+        //         if(this.getUltimoEvento.tipo == 'pocao') {
         //             dialogo.innerHTML = `<b style="color: yellow" > &#9888 Poções podem substituir comidas</b>`;
         //             invSup[0].style.color = 'yellow';
         //         }
-        //         if(this._ultimoEvento.tipo == 'comida') {
+        //         if(this.getUltimoEvento.tipo == 'comida') {
         //             dialogo.innerHTML = `<b style="color: yellow" > &#9888 Comidas podem substituir poções</b>`;
         //             invSup[0].style.color = 'yellow';
         //         }
@@ -1543,18 +1574,18 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
         //     } else if(this.#mapaEscolhido == 2) {
         //         const escolha = Math.floor(Math.random() * 3);
         //         this._escreverContexto(eventos[escolha].descricao);
-        //         this._ultimoEvento = eventos[escolha];
+        //         this.getUltimoEvento = eventos[escolha];
 
         //         this.#mudarVisibilidadeBotoes(4);
 
         //         btnNenhum.removeEventListener('click', this.#cancelar);
         //         btnNenhum.addEventListener('click', this.#nenhuma);
 
-        //         if(this._ultimoEvento.tipo == 'atq')
+        //         if(this.getUltimoEvento.tipo == 'atq')
         //             magAtq.forEach(magAtq => {
         //                 magAtq.addEventListener('click', this.#magicasAtq);
         //             });
-        //         else if(this._ultimoEvento.tipo == 'sup')
+        //         else if(this.getUltimoEvento.tipo == 'sup')
         //             magSup.forEach(magSup => {
         //                 magSup.addEventListener('click', this.#magicasSup);
         //             });
@@ -1563,15 +1594,15 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
         //         dialogo.append(' Prepare-se para batalha');
         //         const escolha = Math.floor(Math.random() * 1);
         //         this._escreverContexto(eventos[escolha].descricao);
-        //         this._ultimoEvento = eventos[escolha];
-        //         this.#ultimoEventoVida = this._ultimoEvento.vida;
+        //         this.getUltimoEvento = eventos[escolha];
+        //         this.#ultimoEventoVida = this.getUltimoEvento.vida;
 
         //         //ver quem começa
         //         let testeAgi = this.#rolarAcerto('agilidade'), testeAgiOp = this.#rolarAcertoOponente('agilidade');
         //         while(testeAgiOp == testeAgi) {
-        //             if( this.#atributos.agilidade != this._ultimoEvento.agilidade ) {
+        //             if( this.#atributos.agilidade != this.getUltimoEvento.agilidade ) {
         //                 testeAgi += this.#atributos.agilidade;
-        //                 testeAgiOp += this._ultimoEvento.agilidade;
+        //                 testeAgiOp += this.getUltimoEvento.agilidade;
         //             } else {
         //                 testeAgi = this.#rolarAcerto('agilidade');
         //                 testeAgiOp = this.#rolarAcertoOponente('agilidade');
@@ -1606,18 +1637,18 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
             if(this.#mapaEscolhido == 0) {
                 const escolha = Math.floor(Math.random() * 10);
                 this._escreverContexto(eventos[escolha].descricao[Math.floor(Math.random() * 5)] + '');
-                this._ultimoEvento = eventos[escolha];
+                this._seUltimoEvento = eventos[escolha];
 
             } else if(this.#mapaEscolhido == 1) {
                 const escolha = Math.floor(Math.random() * 7);
                 this._escreverContexto(eventos[escolha].descricao);
-                this._ultimoEvento = eventos[escolha];
+                this._seUltimoEvento = eventos[escolha];
 
-                if(this._ultimoEvento.tipo == 'pocao') {
+                if(this.getUltimoEvento.tipo == 'pocao') {
                     dialogo&&(dialogo.innerHTML = `<b style="color: yellow" > &#9888 Poções podem substituir comidas</b>`);
                     invSup[0]&&(invSup[0].style.color = 'yellow');
                 }
-                if(this._ultimoEvento.tipo == 'comida') {
+                if(this.getUltimoEvento.tipo == 'comida') {
                     dialogo&&(dialogo.innerHTML = `<b style="color: yellow" > &#9888 Comidas podem substituir poções</b>`);
                     invSup[0]&&(invSup[0].style.color = 'yellow');
                 }
@@ -1633,18 +1664,18 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
             } else if(this.#mapaEscolhido == 2) {
                 const escolha = Math.floor(Math.random() * 3);
                 this._escreverContexto(eventos[escolha].descricao);
-                this._ultimoEvento = eventos[escolha];
+                this._seUltimoEvento = eventos[escolha];
 
                 this.#mudarVisibilidadeBotoes(4);
 
                 btnNenhum?.removeEventListener('click', this.#cancelar);
                 btnNenhum?.addEventListener('click', this.#nenhuma);
 
-                if(this._ultimoEvento.tipo == 'atq')
+                if(this.getUltimoEvento.tipo == 'atq')
                     magAtq.forEach(magAtq => {
                         magAtq.addEventListener('click', this.#magicasAtq);
                     });
-                else if(this._ultimoEvento.tipo == 'sup')
+                else if(this.getUltimoEvento.tipo == 'sup')
                     magSup.forEach(magSup => {
                         magSup.addEventListener('click', this.#magicasSup);
                     });
@@ -1653,15 +1684,15 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                 dialogo?.append(' Prepare-se para batalha');
                 const escolha = Math.floor(Math.random() * 1);
                 this._escreverContexto(eventos[escolha].descricao);
-                this._ultimoEvento = eventos[escolha];
-                this.#ultimoEventoVida = this._ultimoEvento.vida;
+                this._seUltimoEvento = eventos[escolha];
+                this.#ultimoEventoVida = this.getUltimoEvento.vida;
 
                 //ver quem começa
                 let testeAgi = this.#rolarAcerto('agilidade'), testeAgiOp:any = this.#rolarAcertoOponente('agilidade');
                 while(testeAgiOp == testeAgi) {
-                    if( this._atributos.agilidade != this._ultimoEvento.agilidade && this._ultimoEvento != undefined ) {
+                    if( this._atributos.agilidade != this.getUltimoEvento.agilidade && this.getUltimoEvento != undefined ) {
                         testeAgi += this._atributos.agilidade;
-                        testeAgiOp += this._ultimoEvento.agilidade;
+                        testeAgiOp += this.getUltimoEvento.agilidade;
                     } else {
                         testeAgi = this.#rolarAcerto('agilidade');
                         testeAgiOp = this.#rolarAcertoOponente('agilidade');
@@ -1677,8 +1708,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                 // ultimoEvento = eval(escolha);
                 // iniciarBatalha();
             }
-
-            this._seUltimoEvento = this._ultimoEvento;
+            
             this.#ultimoMapa = this.#mapaEscolhido;
     }
 
@@ -1695,7 +1725,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
 
         switch(valor) {
             case "Sim":
-                switch(this._ultimoEvento.tipo) {
+                switch(this.getUltimoEvento.tipo) {
                     case 'armaCaC':
                         this.#adicionar(contentSpanAC, inv[0], divContent1, imgContent1, hover[0], 'slot1');
                         break;
@@ -1729,14 +1759,14 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
     }
 
     #adicionar(span:HTMLSpanElement, elemento:HTMLElement, div:HTMLElement|null, img:HTMLElement|null, hover:Element, slot:string) {
-        span.innerHTML = this._ultimoEvento.nome+'';
+        span.innerHTML = this.getUltimoEvento.nome+'';
         elemento.removeAttribute('title');
         elemento.childNodes[0].replaceWith(span);
-        div&&(div.innerText = this._ultimoEvento.descricao+'');
-        img?.setAttribute('src', this._ultimoEvento.imgArma+'');
+        div&&(div.innerText = this.getUltimoEvento.descricao+'');
+        img?.setAttribute('src', this.getUltimoEvento.imgArma+'');
         hover.classList.add('hoverAtivo');
         let i = this.#inventario;
-        i[slot as keyof typeof i] = this._ultimoEvento;
+        i[slot as keyof typeof i] = this.getUltimoEvento;
         dialogo&&(dialogo.innerText = 'Pra onde você quer ir?');
         this.#opcaoCaminhar();
     }
@@ -1745,4 +1775,4 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
 
 new Jogin;
 
-let maaaaaaaaaaaaaa = [3, 1, 2];
+let maaaaaaaaaaaaaa = [3, 2];

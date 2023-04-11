@@ -2,6 +2,10 @@ import Calc from './calc.js';
 export default class Eventos extends Calc {
     _eventos;
     _ultimoEvento;
+    constructor() {
+        super();
+        this._viewer();
+    }
     _viewer() {
         let progressbarVida = document.getElementById('barraVida');
         let progressbarMana = document.getElementById('barraMana');
@@ -118,7 +122,7 @@ export default class Eventos extends Calc {
                 bonusHab: 0,
                 efeito: () => {
                     if (!this._eventos[10].bonusHab)
-                        console.log('ERRO TOTAL linha 127 ev');
+                        window.alert('ERRO TOTAL linha 127 ev');
                     return this._rolarDados('d6', 1) + 4 + (this._eventos[10].bonusHab ? this._eventos[10].bonusHab : 0);
                 },
             },
@@ -133,7 +137,7 @@ export default class Eventos extends Calc {
                 bonusHab: 0,
                 efeito: () => {
                     if (!this._eventos[11].bonusHab)
-                        console.log('ERRO TOTAL linha 142 ev');
+                        window.alert('ERRO TOTAL linha 142 ev');
                     return this._rolarDados('d3', 1) + 2 + (this._eventos[11].bonusHab ? this._eventos[11].bonusHab : 0);
                 },
             },
@@ -173,7 +177,7 @@ export default class Eventos extends Calc {
                 imgArma: '',
                 descricao: '[Armadura feia, resistência +5 a atqs armados]',
                 efeito: () => {
-                    this._adicionalDef += 5;
+                    this._setAdicionalDef += 5;
                 },
             },
             {
@@ -238,6 +242,7 @@ export default class Eventos extends Calc {
                 efeito: () => {
                     let teste = this._rolarDados('d10', 1);
                     let condicao = 'miu';
+                    console.log(this.getUltimoEvento.forca);
                     return { teste, condicao };
                 },
                 gastoMana: 16,
@@ -278,7 +283,7 @@ export default class Eventos extends Calc {
                 classe: 3,
                 nome: 'um zumbi de gelo',
                 descricao: 'uma descrição de um bicho',
-                vida: 1,
+                vida: 100,
                 defesa: 0,
                 forca: 1,
                 inteligencia: 1,
@@ -291,6 +296,7 @@ export default class Eventos extends Calc {
                 },
                 magias: {
                     0: {
+                        id: 0,
                         nome: 'Geada',
                         descricao: 'causará 1d6 de dano e adicionará a condição de congelamento',
                         efeito: () => {
@@ -298,10 +304,20 @@ export default class Eventos extends Calc {
                             return Math.floor(Math.random() * (7 - 1) + 1);
                         },
                         usos: 2,
+                    },
+                    1: {
+                        id: 1,
+                        nome: 'Fogareu',
+                        descricao: 'causará 1d6 de dano e adicionará a condição de em chamas',
+                        efeito: () => {
+                            condicao && (condicao.innerText = 'EM CHAMAS');
+                            return Math.floor(Math.random() * (8 - 1) + 1);
+                        },
+                        usos: 6,
                     }
                 },
                 textoAtaques: [
-                    'te acerta suas garras em sua barriga, fazendo um corte liso.',
+                    'acerta suas garras em sua barriga, fazendo um corte liso.',
                     'te acerta e crava suas garras em seu ombro.',
                     'te acerta '
                 ],
@@ -315,15 +331,14 @@ export default class Eventos extends Calc {
         ];
     }
     set _seUltimoEvento(ultimoEvento) {
+        this._viewer();
         this._ultimoEvento = ultimoEvento;
         console.log(this._ultimoEvento);
-        this._viewer();
     }
     get getUltimoEvento() {
         return this._ultimoEvento;
     }
     get getEventos() {
-        this._viewer();
         return this._eventos;
     }
 }

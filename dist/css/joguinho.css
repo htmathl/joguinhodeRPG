@@ -112,6 +112,8 @@ input, div.inputInfos {
   padding: 5px;
 }
 
+
+
 #inputResposta {
   border: none;
   font-size: 20px;
@@ -199,6 +201,7 @@ button:disabled > span {
 .inputInfos {
   margin: 0px 19px;
   height: 124.8px;
+  min-width: 170px;
   word-break: break-word;
   text-align: start;
   display: flex;

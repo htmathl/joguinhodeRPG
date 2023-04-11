@@ -8,37 +8,37 @@ export default class Calc extends Viajante {
         let dados = [], result = 0;
         switch (tipoDados) {
             case 'd3':
-                for (var i = 1; i <= qntDados; i++) {
+                for (let i = 1; i <= qntDados; i++) {
                     result += Math.floor(Math.random() * (4 - 1) + 1);
                 }
                 console.log(tipoDados + ':' + result);
                 return result;
             case 'd6':
-                for (var i = 1; i <= qntDados; i++) {
+                for (let i = 1; i <= qntDados; i++) {
                     result += Math.floor(Math.random() * (7 - 1) + 1);
                 }
                 console.log(tipoDados + ':' + result);
                 return result;
             case 'd8':
-                for (var i = 1; i <= qntDados; i++) {
+                for (let i = 1; i <= qntDados; i++) {
                     result += Math.floor(Math.random() * (9 - 1) + 1);
                 }
                 console.log(tipoDados + ':' + result);
                 return result;
             case 'd10':
-                for (var i = 1; i <= qntDados; i++) {
+                for (let i = 1; i <= qntDados; i++) {
                     result += Math.floor(Math.random() * (11 - 1) + 1);
                 }
                 console.log(tipoDados + ':' + result);
                 return result;
             case 'd12':
-                for (var i = 1; i <= qntDados; i++) {
+                for (let i = 1; i <= qntDados; i++) {
                     result += Math.floor(Math.random() * (13 - 1) + 1);
                 }
                 console.log(tipoDados + ':' + result);
                 return result;
             case 'd20':
-                for (var i = 1; i <= qntDados; i++) {
+                for (let i = 1; i <= qntDados; i++) {
                     dados.push(Math.floor(Math.random() * (21 - 1) + 1));
                 }
                 result = Math.max.apply(null, dados);
@@ -61,7 +61,25 @@ export default class Calc extends Viajante {
     _calcularVida(vida) {
         return Math.floor((vida * 100) / this._pontosVida);
     }
-    _setResistencia(resis) {
-        this._resistenciaMana = resis;
+    set _setMargemCritico(margemCritico) {
+        this._margemCritico = margemCritico;
+    }
+    get getMargemCritico() {
+        return this._margemCritico;
+    }
+    set _setResistenciaMana(resistenciaMana) {
+        this._resistenciaMana = resistenciaMana;
+    }
+    get getResistenciaMana() {
+        return this._resistenciaMana;
+    }
+    get getCritico() {
+        return this._critico;
+    }
+    set _setAdicionalDef(adicionalDef) {
+        this._adicionalDef = adicionalDef;
+    }
+    get getAdicionalDef() {
+        return this._adicionalDef;
     }
 }

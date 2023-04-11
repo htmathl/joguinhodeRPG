@@ -1,17 +1,21 @@
 import Calc from "./calc.js";
 export default class Habilidades extends Calc {
-    habilidades;
-    addModsHab;
-    itensExtras = 0;
-    raridadeItem = 0;
-    itensPorBau = 0;
-    prevencao = 0;
-    efeitoAoSeuToque = null;
-    resistenciaFisica = 0;
-    bonusDefesaPassiva = 0;
+    _habilidades;
+    _addModsHab;
+    _itensExtras = 0;
+    _raridadeItem = 0;
+    _itensPorBau = 0;
+    _prevencao = 0;
+    _efeitoAoSeuToque = null;
+    _resistenciaFisica = 0;
+    _bonusDefesaPassiva = 0;
     constructor() {
         super();
-        this.addModsHab = {
+        this._viwer();
+    }
+    _viwer() {
+        let mdh = this._addModsHab;
+        this._addModsHab = {
             forca: 0,
             defesa: 0,
             inteligencia: 0,
@@ -19,7 +23,7 @@ export default class Habilidades extends Calc {
             agilidade: 0,
             sorte: 0,
         };
-        this.habilidades = [
+        this._habilidades = [
             {
                 id: 'hab1',
                 nome: 'Treinamento',
@@ -27,7 +31,7 @@ export default class Habilidades extends Calc {
                 efeito: () => {
                     const mod = ['forca', 'defesa', 'vigor'];
                     mod.forEach(key => {
-                        this.addModsHab[key] = 5;
+                        this._addModsHab[key] = 5;
                     });
                 },
                 toggle: false,
@@ -43,7 +47,7 @@ export default class Habilidades extends Calc {
                 efeito: () => {
                     const mod = ['agilidade', 'inteligencia', 'sorte'];
                     mod.forEach(key => {
-                        this.addModsHab[key] = 5;
+                        this._addModsHab[key] = 5;
                     });
                 },
                 toggle: false,
@@ -57,7 +61,7 @@ export default class Habilidades extends Calc {
                 nome: 'Sortudo',
                 descricao: 'Sua margem de crítico dobra',
                 efeito: () => {
-                    this._margemCritico = 19;
+                    this._setMargemCritico = 19;
                 },
                 toggle: false,
                 adiquirida: false,
@@ -70,7 +74,7 @@ export default class Habilidades extends Calc {
                 nome: 'Catalisador',
                 descricao: 'Você desenvolve resistência de +3 em gastos de mana',
                 efeito: () => {
-                    this._resistenciaMana = 3;
+                    this._setResistenciaMana = 3;
                 },
                 toggle: false,
                 adiquirida: false,
@@ -83,7 +87,7 @@ export default class Habilidades extends Calc {
                 nome: 'Investigador',
                 descricao: 'Com está habilidade você podera encontrar itens extra raros',
                 efeito: () => {
-                    this.itensExtras = 1;
+                    this._itensExtras = 1;
                 },
                 toggle: false,
                 adiquirida: false,
@@ -96,7 +100,7 @@ export default class Habilidades extends Calc {
                 nome: 'Vidente',
                 descricao: 'Você terá 40% de chance em prever armadilhas',
                 efeito: () => {
-                    this.prevencao = 40;
+                    this._prevencao = 40;
                 },
                 toggle: false,
                 adiquirida: false,
@@ -121,7 +125,7 @@ export default class Habilidades extends Calc {
                 nome: 'Estática',
                 descricao: 'Ao sofrer qualquer ataque corpo-a-corpo, seu oponente ficará paralizado',
                 efeito: () => {
-                    this.efeitoAoSeuToque = 'PARALIZADO';
+                    this._efeitoAoSeuToque = 'PARALIZADO';
                 },
                 toggle: false,
                 adiquirida: false,
@@ -135,7 +139,7 @@ export default class Habilidades extends Calc {
                 descricao: 'Você terá 35% de chance de achar um ítem a mais por baú',
                 efeito: () => {
                     const chance = Math.floor(Math.random() * 100);
-                    chance <= 35 ? this.itensPorBau += 1 : '';
+                    chance <= 35 ? this._itensPorBau += 1 : '';
                 },
                 toggle: false,
                 adiquirida: false,
@@ -162,7 +166,7 @@ export default class Habilidades extends Calc {
                 efeito: () => {
                     const mod = ['forca', 'defesa', 'vigor'];
                     mod.forEach(key => {
-                        this.addModsHab[key] = 10;
+                        this._addModsHab[key] = 10;
                     });
                 },
                 toggle: false,
@@ -178,7 +182,7 @@ export default class Habilidades extends Calc {
                 efeito: () => {
                     const mod = ['inteligencia', 'agilidade', 'sorte'];
                     mod.forEach(key => {
-                        this.addModsHab[key] = 10;
+                        this._addModsHab[key] = 10;
                     });
                 },
                 toggle: false,
@@ -288,10 +292,10 @@ export default class Habilidades extends Calc {
                 nome: 'Proficiência',
                 descricao: '1. Esta substitui as habilidades (Veterano) (Namastê) e seus anteriores \n 2. Você ganhará +15 pontos para todos seus atributos',
                 efeito: () => {
-                    for (let key in this.addModsHab) {
-                        if (!this.addModsHab.hasOwnProperty(key))
+                    for (let key in this._addModsHab) {
+                        if (!this._addModsHab.hasOwnProperty(key))
                             continue;
-                        this.addModsHab[key] = 15;
+                        this._addModsHab[key] = 15;
                     }
                 },
                 toggle: false,
@@ -335,7 +339,13 @@ export default class Habilidades extends Calc {
             },
         ];
     }
-    getHabilidades() {
-        return this.habilidades;
+    get getHabilidades() {
+        return this._habilidades;
+    }
+    get getAddModsHab() {
+        return this._addModsHab;
+    }
+    get getBonusDefesaPassiva() {
+        return this._bonusDefesaPassiva;
     }
 }
