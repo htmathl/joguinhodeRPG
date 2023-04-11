@@ -1,4 +1,4 @@
-import { Mixin } from 'ts-mixer';
+import { Mixin } from './ts-mixer.js';
 let dialogo = document.getElementById("dialogo");
 let btnContinuar = document.getElementById('continuar');
 let btnsAndar = document.querySelectorAll('.botoes');
