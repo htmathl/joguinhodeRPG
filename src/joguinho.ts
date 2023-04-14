@@ -298,7 +298,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
             });
         }
     
-        //@todo concertar depois
+        //@todo consertar depois
         // btnContinuar?.addEventListener('click', () => {
         //     if(n == 0) {
         //         dialogo.innerText = "Seu objetivo é só meter porrada em tudo que ver...";
@@ -1439,21 +1439,25 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                     this._escreverContexto(`Você acerta com ${testeForca} em seu teste, tirando ${vidaTirada} de vida. `);
                     console.log('vida tirada: ' + this.getUltimoEvento.vida);
                     console.log('defesa bicho: ' + this.#definirDefesaPassiva(null));
+                    this.#somaDano += vidaTirada;
 
-                     //remover furtivo e atq poderoso
-                     this.#acumuloAtqPod = 0;
-                     this.#furtivo = false;
-
-                    if(this.getUltimoEvento.vida <= 0) {
-                        this.#morteOponente(armaAtual.msgMorte);
-                    } else {
-                        this.#mudarVisibilidadeBotoes(5);
-                        this.#somaDano += vidaTirada;
-                        setTimeout(() =>{
-                            this.#ataqueOponente();
-                        }, 2500);
-                    }
+                } else {
+                    this._escreverContexto('Em um momento de desespero, você erra seu golpe.');
                 }
+
+                //remover furtivo e atq poderoso
+                this.#acumuloAtqPod = 0;
+                this.#furtivo = false;
+
+                if(this.getUltimoEvento.vida <= 0) {
+                    this.#morteOponente(armaAtual.msgMorte);
+                } else {
+                    this.#mudarVisibilidadeBotoes(5);
+                    setTimeout(() =>{
+                        this.#ataqueOponente();
+                    }, 2500);
+                }
+
             }
         }
     }
@@ -1640,7 +1644,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                 this._seUltimoEvento = eventos[escolha];
 
             } else if(this.#mapaEscolhido == 1) {
-                const escolha = Math.floor(Math.random() * 7);
+                const escolha = Math.floor(Math.random() * 5);
                 this._escreverContexto(eventos[escolha].descricao);
                 this._seUltimoEvento = eventos[escolha];
 
@@ -1775,4 +1779,4 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
 
 new Jogin;
 
-let maaaaaaaaaaaaaa = [3, 2];
+let maaaaaaaaaaaaaa = [1, 2, 0, 3];

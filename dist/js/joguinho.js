@@ -1181,18 +1181,21 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
                     this._escreverContexto(`Você acerta com ${testeForca} em seu teste, tirando ${vidaTirada} de vida. `);
                     console.log('vida tirada: ' + this.getUltimoEvento.vida);
                     console.log('defesa bicho: ' + this.#definirDefesaPassiva(null));
-                    this.#acumuloAtqPod = 0;
-                    this.#furtivo = false;
-                    if (this.getUltimoEvento.vida <= 0) {
-                        this.#morteOponente(armaAtual.msgMorte);
-                    }
-                    else {
-                        this.#mudarVisibilidadeBotoes(5);
-                        this.#somaDano += vidaTirada;
-                        setTimeout(() => {
-                            this.#ataqueOponente();
-                        }, 2500);
-                    }
+                    this.#somaDano += vidaTirada;
+                }
+                else {
+                    this._escreverContexto('Em um momento de desespero, você erra seu golpe.');
+                }
+                this.#acumuloAtqPod = 0;
+                this.#furtivo = false;
+                if (this.getUltimoEvento.vida <= 0) {
+                    this.#morteOponente(armaAtual.msgMorte);
+                }
+                else {
+                    this.#mudarVisibilidadeBotoes(5);
+                    setTimeout(() => {
+                        this.#ataqueOponente();
+                    }, 2500);
                 }
             }
         }
@@ -1267,7 +1270,7 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
             this._seUltimoEvento = eventos[escolha];
         }
         else if (this.#mapaEscolhido == 1) {
-            const escolha = Math.floor(Math.random() * 7);
+            const escolha = Math.floor(Math.random() * 5);
             this._escreverContexto(eventos[escolha].descricao);
             this._seUltimoEvento = eventos[escolha];
             if (this.getUltimoEvento.tipo == 'pocao') {
@@ -1383,4 +1386,4 @@ class Jogin extends Mixin(Viajante, Eventos, Habilidades) {
     }
 }
 new Jogin;
-let maaaaaaaaaaaaaa = [3, 2];
+let maaaaaaaaaaaaaa = [1, 2, 0, 3];

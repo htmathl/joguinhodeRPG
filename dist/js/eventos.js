@@ -129,15 +129,13 @@ export default class Eventos extends Calc {
             {
                 id: 11,
                 classe: 1,
-                nome: 'Arco Tenebroso',
+                nome: 'Arco',
                 tipo: 'armaDis',
                 imgArma: '',
-                descricao: '[Arco Tenebroso, 1d6 + 6 de dano]',
+                descricao: '[Arco, 1d6 + 6 de dano]',
                 msgMorte: 'Você atira uma flecha que passa direto pelo crânio da criatura a matando',
                 bonusHab: 0,
                 efeito: () => {
-                    if (!this._eventos[11].bonusHab)
-                        window.alert('ERRO TOTAL linha 142 ev');
                     return this._rolarDados('d3', 1) + 2 + (this._eventos[11].bonusHab ? this._eventos[11].bonusHab : 0);
                 },
             },
@@ -159,11 +157,11 @@ export default class Eventos extends Calc {
             {
                 id: 13,
                 classe: 1,
-                nome: 'Amianto',
+                nome: 'Poção',
                 tipo: 'pocao',
                 usavel: true,
                 imgArma: '',
-                descricao: '[Amianto, recupera 5pms]',
+                descricao: '[Poção, recupera 5pms]',
                 efeito: () => {
                     this._mana += this._calcularMana(5);
                     progressbarMana?.style.setProperty('--progress', this._mana + '');
@@ -172,66 +170,13 @@ export default class Eventos extends Calc {
             {
                 id: 14,
                 classe: 1,
-                nome: 'Armadura feia',
+                nome: 'Armadura',
                 tipo: 'armadura',
                 imgArma: '',
-                descricao: '[Armadura feia, resistência +5 a atqs armados]',
+                descricao: '[Armadura, resistência +5 a atqs armados]',
                 efeito: () => {
                     this._setAdicionalDef += 5;
                 },
-            },
-            {
-                id: 15,
-                classe: 1,
-                nome: 'Amuleto desgraçado',
-                tipo: 'amuleto',
-                imgArma: '',
-                usavel: false,
-                descricao: '[Amuleto desgraçado, +2 de atq por nível]',
-                efeito: () => {
-                },
-            },
-            {
-                id: 16,
-                classe: 1,
-                nome: 'Arma 4',
-                imgArma: './img/miuu.png',
-                tipo: 'arma',
-                descricao: '[Espada do chacau, 1d12]',
-                bonusCrt: 2,
-                efeito: () => {
-                    return this._rolarDados('d12', 1);
-                },
-            },
-            {
-                id: 17,
-                classe: 1,
-                nome: 'Esp. 8',
-                tipo: '',
-                descricao: '[Lança gigante, 2d12 de dano]',
-                dano: (Math.floor(Math.random() * (12 - 1)) + 1) +
-                    (Math.floor(Math.random() * (12 - 1)) + 1),
-            },
-            {
-                id: 18,
-                classe: 1,
-                nome: 'Arma 5',
-                tipo: 'arma',
-                imgArma: './img/miuu.png',
-                descricao: '[Machadinha, 1d6 + 2]',
-                bonusCrt: 1,
-                efeito: () => {
-                    return this._rolarDados('d6', 1) + 2;
-                },
-            },
-            {
-                id: 19,
-                classe: 1,
-                nome: 'Esp. 10',
-                tipo: false,
-                descricao: '[Foice da morte, 2d12 + 6 de dano]',
-                dano: (Math.floor(Math.random() * (12 - 1)) + 1) +
-                    (Math.floor(Math.random() * (12 - 1)) + 1) + 6,
             },
             {
                 id: 20,
@@ -242,7 +187,6 @@ export default class Eventos extends Calc {
                 efeito: () => {
                     let teste = this._rolarDados('d10', 1);
                     let condicao = 'miu';
-                    console.log(this.getUltimoEvento.forca);
                     return { teste, condicao };
                 },
                 gastoMana: 16,

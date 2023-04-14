@@ -42,7 +42,6 @@ export default class Calc extends Viajante {
                     dados.push(Math.floor(Math.random() * (21 - 1) + 1));
                 }
                 result = Math.max.apply(null, dados);
-                result = 20;
                 if (result == this._margemCritico)
                     this._critico = true;
                 else

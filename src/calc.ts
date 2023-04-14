@@ -56,7 +56,7 @@ export default class Calc extends Viajante {
                 }
     
                 result = Math.max.apply(null, dados);
-                result = 20;
+                //result = 20;
                 if(result == this._margemCritico)
                     this._critico = true;
                 else
