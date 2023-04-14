@@ -121,8 +121,6 @@ export default class Eventos extends Calc {
                 msgMorte: 'Um corte rápido que arranca o braço da criatura faz com que ela morra de hemorragia',
                 bonusHab: 0,
                 efeito: () => {
-                    if (!this._eventos[10].bonusHab)
-                        window.alert('ERRO TOTAL linha 127 ev');
                     return this._rolarDados('d6', 1) + 4 + (this._eventos[10].bonusHab ? this._eventos[10].bonusHab : 0);
                 },
             },
